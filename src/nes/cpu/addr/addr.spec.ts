@@ -1,6 +1,17 @@
 import { Nes } from "@/nes/nes";
-import { ACC, IMP } from "./addr";
+import { ACC, IMM, IMP } from "./addr";
 import { Cpu } from "../cpu";
+import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
+
+const initBus = (): Bus =>
+  "_"
+    .repeat(0x2)
+    .split("")
+    .map((_, i) => ({
+      data: i,
+      read: simpleRead,
+      write: simpleWrite,
+    }));
 
 const initCpu = (): Cpu => ({
   ACC: 0,
@@ -12,7 +23,7 @@ const initCpu = (): Cpu => ({
 });
 
 const initNes = (): Nes => ({
-  bus: [],
+  bus: initBus(),
   cpu: initCpu(),
   ppu: {},
 });
@@ -39,6 +50,16 @@ describe("test addressing mode", () => {
   });
 
   test("Immediate test", () => {
-    throw new Error("not implemented");
+    const nes: Nes = initNes();
+
+    expect(nes.cpu.PC).toBe(0);
+
+    const { cross, data, nes: newNes } = IMM(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(1);
+
+    expect(newNes.cpu.PC).toBe(1);
   });
 });

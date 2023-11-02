@@ -16,11 +16,19 @@ const simpleWrite = (addr: number, value: number, nes: Nes): Nes => ({
   bus: nes.bus.map((v, i) => (i == addr ? { ...v, data: value } : { ...v })),
 });
 
-const read = (addr: number, nes: Nes) => {
+const readBus = (addr: number, nes: Nes) => {
   if (addr >= 0 && addr <= 0xffff) return nes.bus[addr].read(addr, nes);
-  throw new Error("cross the border off buss");
+  throw new Error("cross the border off buss on read");
 };
 
-export { simpleRead, simpleWrite, read };
+const writeBus = (addr: number, value: number, nes: Nes): Nes => {
+  if (addr >= 0 && addr <= 0xffff)
+    return {
+      ...nes.bus[addr].write(addr, value, nes),
+    };
+  throw new Error("cross the border off buss on write");
+};
+
+export { simpleRead, simpleWrite, readBus, writeBus };
 
 export type { Bus };
