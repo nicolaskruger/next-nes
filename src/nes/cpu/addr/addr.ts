@@ -8,4 +8,6 @@ type Addr = {
 
 const IMP = (nes: Nes): Addr => ({ nes, data: 0, cross: false });
 
-export { IMP };
+const ACC = (nes: Nes): Addr => ({ nes, data: nes.cpu.ACC, cross: false });
+
+export { IMP, ACC };
