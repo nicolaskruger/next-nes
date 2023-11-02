@@ -1,7 +1,6 @@
 import { Nes } from "@/nes/nes";
 import { ACC, IMP } from "./addr";
 import { Cpu } from "../cpu";
-import exp from "constants";
 
 const initCpu = (): Cpu => ({
   ACC: 0,
@@ -13,7 +12,7 @@ const initCpu = (): Cpu => ({
 });
 
 const initNes = (): Nes => ({
-  bus: {},
+  bus: [],
   cpu: initCpu(),
   ppu: {},
 });
@@ -37,5 +36,9 @@ describe("test addressing mode", () => {
 
     expect(cross).toBeFalsy();
     expect(data).toBe(1);
+  });
+
+  test("Immediate test", () => {
+    throw new Error("not implemented");
   });
 });
