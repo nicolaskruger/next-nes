@@ -1,5 +1,6 @@
 import { Nes } from "@/nes/nes";
 import {
+  ABS,
   ACC,
   IMM,
   IMP,
@@ -269,5 +270,31 @@ describe("test addressing mode", () => {
 
       expect(nes.cpu.PC).toBe(i + 1);
     }
+  });
+
+  test("relative test", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0x34,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x1234] = {
+      ...nes.bus[0x1234],
+      data: 0x77,
+    };
+
+    const { cross, data, nes: newNes } = ABS(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(0x77);
+
+    expect(newNes.cpu.PC).toBe(2);
   });
 });
