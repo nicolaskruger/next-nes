@@ -1,6 +1,7 @@
 import { Nes } from "@/nes/nes";
 import {
   ABS,
+  ABSX,
   ACC,
   IMM,
   IMP,
@@ -272,7 +273,7 @@ describe("test addressing mode", () => {
     }
   });
 
-  test("relative test", () => {
+  test("absolute test", () => {
     const nes = initNesAllRam();
 
     nes.bus[1] = {
@@ -292,6 +293,61 @@ describe("test addressing mode", () => {
     const { cross, data, nes: newNes } = ABS(nes);
 
     expect(cross).toBe(false);
+
+    expect(data).toBe(0x77);
+
+    expect(newNes.cpu.PC).toBe(2);
+  });
+
+  test("absolute x, test, not cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0x30,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x1234] = {
+      ...nes.bus[0x1234],
+      data: 0x77,
+    };
+
+    nes.cpu.X = 0x04;
+
+    const { cross, data, nes: newNes } = ABSX(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(0x77);
+
+    expect(newNes.cpu.PC).toBe(2);
+  });
+  test("absolute x, test, cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0x01,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x1300] = {
+      ...nes.bus[0x1300],
+      data: 0x77,
+    };
+
+    nes.cpu.X = 0xff;
+
+    const { cross, data, nes: newNes } = ABSX(nes);
+
+    expect(cross).toBe(true);
 
     expect(data).toBe(0x77);
 
