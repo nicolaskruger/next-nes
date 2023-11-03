@@ -82,4 +82,20 @@ const ZERO_PAGE_Y = (nes: Nes): Addr => {
   };
 };
 
-export { IMP, ACC, IMM, ZERO_PAGE, ZERO_PAGE_X, ZERO_PAGE_Y };
+const RELATIVE = (nes: Nes): Addr => {
+  const { cpu } = nes;
+
+  const PC = cpu.PC + 1;
+
+  let data = readBus(PC, nes);
+
+  if (((data >> 7) & 1) == 1) data = (-1 << 8) | data;
+
+  return {
+    cross: false,
+    data,
+    nes: { ...nes, cpu: { ...cpu, PC } },
+  };
+};
+
+export { IMP, ACC, IMM, ZERO_PAGE, ZERO_PAGE_X, ZERO_PAGE_Y, RELATIVE };

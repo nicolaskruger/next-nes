@@ -1,5 +1,13 @@
 import { Nes } from "@/nes/nes";
-import { ACC, IMM, IMP, ZERO_PAGE, ZERO_PAGE_X, ZERO_PAGE_Y } from "./addr";
+import {
+  ACC,
+  IMM,
+  IMP,
+  RELATIVE,
+  ZERO_PAGE,
+  ZERO_PAGE_X,
+  ZERO_PAGE_Y,
+} from "./addr";
 import { Cpu } from "../cpu";
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 
@@ -211,5 +219,55 @@ describe("test addressing mode", () => {
     expect(data).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x0101);
+  });
+  test("relative positive value", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[0x1].data = 0x05;
+
+    const { cross, data, nes: newNes } = RELATIVE(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(5);
+
+    expect(newNes.cpu.PC).toBe(0x1);
+  });
+
+  test("relative negative value", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[0x1].data = 0xff;
+
+    const { cross, data, nes: newNes } = RELATIVE(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(-1);
+
+    expect(newNes.cpu.PC).toBe(0x1);
+  });
+  test("relative all negative values", () => {
+    let nes = initNesAllRam();
+
+    nes.bus = "_"
+      .repeat(0x100)
+      .split("")
+      .map((v, i) => ({
+        data: 0x100 - i,
+        read: simpleRead,
+        write: simpleWrite,
+      }));
+
+    for (let i = 0; i < 128; i++) {
+      const { cross, data, nes: newNes } = RELATIVE(nes);
+
+      nes = newNes;
+      expect(cross).toBe(false);
+
+      expect(data).toBe(-1 - i);
+
+      expect(nes.cpu.PC).toBe(i + 1);
+    }
   });
 });
