@@ -1,8 +1,17 @@
 import { Nes } from "@/nes/nes";
-import { ACC, IMM, IMP } from "./addr";
+import { ACC, IMM, IMP, ZERO_PAGE } from "./addr";
 import { Cpu } from "../cpu";
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 
+const initBusAllRam = (): Bus =>
+  "_"
+    .repeat(0x10000)
+    .split("")
+    .map((_) => ({
+      data: 0,
+      read: simpleRead,
+      write: simpleWrite,
+    }));
 const initBus = (): Bus =>
   "_"
     .repeat(0x2)
@@ -61,5 +70,26 @@ describe("test addressing mode", () => {
     expect(data).toBe(1);
 
     expect(newNes.cpu.PC).toBe(1);
+  });
+  test("Zero page test", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0x0100;
+
+    nes.bus = initBusAllRam();
+
+    const addr = 0xaa;
+
+    nes.bus[0x0101].data = addr;
+
+    nes.bus[addr].data = 5;
+
+    const { cross, data, nes: newNes } = ZERO_PAGE(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(5);
+
+    expect(newNes.cpu.PC).toBe(0x0101);
   });
 });

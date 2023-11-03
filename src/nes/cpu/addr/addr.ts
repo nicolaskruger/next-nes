@@ -23,4 +23,19 @@ const IMM = (nes: Nes): Addr => {
   };
 };
 
-export { IMP, ACC, IMM };
+const ZERO_PAGE = (nes: Nes): Addr => {
+  const { cpu } = nes;
+  const PC = cpu.PC + 1;
+
+  const zeroPageAddr = readBus(PC, nes);
+
+  const data = readBus(zeroPageAddr, nes);
+
+  return {
+    nes: { ...nes, cpu: { ...cpu, PC } },
+    data,
+    cross: false,
+  };
+};
+
+export { IMP, ACC, IMM, ZERO_PAGE };
