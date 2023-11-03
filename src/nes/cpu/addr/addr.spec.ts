@@ -1,5 +1,5 @@
 import { Nes } from "@/nes/nes";
-import { ACC, IMM, IMP, ZERO_PAGE } from "./addr";
+import { ACC, IMM, IMP, ZERO_PAGE, ZERO_PAGE_X } from "./addr";
 import { Cpu } from "../cpu";
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 
@@ -37,6 +37,12 @@ const initNes = (): Nes => ({
   ppu: {},
 });
 
+const initNesAllRam = (): Nes => {
+  const nes = initNes();
+  nes.bus = initBusAllRam();
+  return nes;
+};
+
 describe("test addressing mode", () => {
   test("Implicit test", () => {
     const nes: Nes = initNes();
@@ -72,11 +78,9 @@ describe("test addressing mode", () => {
     expect(newNes.cpu.PC).toBe(1);
   });
   test("Zero page test", () => {
-    const nes = initNes();
+    const nes = initNesAllRam();
 
     nes.cpu.PC = 0x0100;
-
-    nes.bus = initBusAllRam();
 
     const addr = 0xaa;
 
@@ -87,6 +91,45 @@ describe("test addressing mode", () => {
     const { cross, data, nes: newNes } = ZERO_PAGE(nes);
 
     expect(cross).toBe(false);
+
+    expect(data).toBe(5);
+
+    expect(newNes.cpu.PC).toBe(0x0101);
+  });
+
+  test("Zero page, x no cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.cpu.PC = 0x0100;
+
+    nes.cpu.X = 0x0f;
+
+    nes.bus[0x0101].data = 0x80;
+
+    nes.bus[0x8f].data = 5;
+
+    const { cross, data, nes: newNes } = ZERO_PAGE_X(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(5);
+
+    expect(newNes.cpu.PC).toBe(0x0101);
+  });
+  test("Zero page, x cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.cpu.PC = 0x0100;
+
+    nes.cpu.X = 0xff;
+
+    nes.bus[0x0101].data = 0x80;
+
+    nes.bus[0x7f].data = 5;
+
+    const { cross, data, nes: newNes } = ZERO_PAGE_X(nes);
+
+    expect(cross).toBe(true);
 
     expect(data).toBe(5);
 

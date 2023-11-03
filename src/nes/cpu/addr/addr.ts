@@ -38,4 +38,26 @@ const ZERO_PAGE = (nes: Nes): Addr => {
   };
 };
 
-export { IMP, ACC, IMM, ZERO_PAGE };
+const ZERO_PAGE_X = (nes: Nes): Addr => {
+  const { cpu } = nes;
+
+  const PC = cpu.PC + 1;
+
+  let cross = false;
+  let addr = readBus(PC, nes) + cpu.X;
+
+  if (addr > 0xff) {
+    addr = 0xff & addr;
+    cross = true;
+  }
+
+  const data = readBus(addr, nes);
+
+  return {
+    cross,
+    data,
+    nes: { ...nes, cpu: { ...cpu, PC } },
+  };
+};
+
+export { IMP, ACC, IMM, ZERO_PAGE, ZERO_PAGE_X };
