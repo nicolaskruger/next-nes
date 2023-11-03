@@ -138,6 +138,27 @@ const ABSX = (nes: Nes): Addr => {
   };
 };
 
+const ABSY = (nes: Nes): Addr => {
+  const { cpu } = nes;
+
+  let PC = cpu.PC + 1;
+
+  const low = readBus(PC++, nes);
+  const high = readBus(PC, nes);
+
+  const addr = ((high << 8) | low) + cpu.Y;
+
+  const data = readBus(addr, nes);
+
+  const cross = low + cpu.Y > 0xff;
+
+  return {
+    cross,
+    data,
+    nes: { ...nes, cpu: { ...cpu, PC } },
+  };
+};
+
 export {
   IMP,
   ACC,
@@ -148,4 +169,5 @@ export {
   RELATIVE,
   ABS,
   ABSX,
+  ABSY,
 };
