@@ -6,6 +6,7 @@ import {
   ACC,
   IMM,
   IMP,
+  INDIRECT,
   RELATIVE,
   ZERO_PAGE,
   ZERO_PAGE_X,
@@ -407,6 +408,61 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x77);
 
+    expect(newNes.cpu.PC).toBe(2);
+  });
+  test("indirect, when cross border on address and value", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0xff,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x12ff] = {
+      ...nes.bus[0x12ff],
+      data: 0xff,
+    };
+    nes.bus[0x1200] = {
+      ...nes.bus[0x1200],
+      data: 0x34,
+    };
+
+    const { cross, data, nes: newNes } = INDIRECT(nes);
+
+    expect(cross).toBe(true);
+    expect(data).toBe(0x34ff);
+    expect(newNes.cpu.PC).toBe(2);
+  });
+
+  test("indirect, when cross border on address and value", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0x34,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x1234] = {
+      ...nes.bus[0x1234],
+      data: 0x21,
+    };
+    nes.bus[0x1235] = {
+      ...nes.bus[0x1235],
+      data: 0x43,
+    };
+
+    const { cross, data, nes: newNes } = INDIRECT(nes);
+
+    expect(cross).toBe(false);
+    expect(data).toBe(0x4321);
     expect(newNes.cpu.PC).toBe(2);
   });
 });

@@ -159,6 +159,36 @@ const ABSY = (nes: Nes): Addr => {
   };
 };
 
+const INDIRECT = (nes: Nes): Addr => {
+  const { cpu } = nes;
+
+  let PC = cpu.PC;
+  let cross = false;
+  const lowAddr = readBus(++PC, nes);
+  const highAddr = readBus(++PC, nes);
+
+  if (lowAddr >= 0xff) cross = true;
+
+  const low = (highAddr << 8) | lowAddr;
+  const high = (highAddr << 8) | (lowAddr + 1) % 256;
+
+  const lowValue = readBus(low, nes);
+  const highValue = readBus(high, nes);
+
+  const data = (highValue << 8) | lowValue;
+  return {
+    cross,
+    data,
+    nes: {
+      ...nes,
+      cpu: {
+        ...cpu,
+        PC,
+      },
+    },
+  };
+};
+
 export {
   IMP,
   ACC,
@@ -170,4 +200,5 @@ export {
   ABS,
   ABSX,
   ABSY,
+  INDIRECT,
 };
