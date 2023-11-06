@@ -8,6 +8,7 @@ import {
   IMP,
   INDEXED_INDIRECT,
   INDIRECT,
+  INDIRECT_INDEXED,
   RELATIVE,
   ZERO_PAGE,
   ZERO_PAGE_X,
@@ -498,7 +499,7 @@ describe("test addressing mode", () => {
     expect(newNes.cpu.PC).toBe(1);
   });
 
-  test("indexed indirect, when cross border", () => {
+  test("indexed indirect, no cross border", () => {
     const nes = initNesAllRam();
 
     nes.cpu.X = 0xe;
@@ -525,6 +526,68 @@ describe("test addressing mode", () => {
     expect(cross).toBe(false);
 
     expect(data).toBe(0x12);
+
+    expect(newNes.cpu.PC).toBe(1);
+  });
+
+  test("indirect indexed, when cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.cpu.Y = 0xf;
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0xff,
+    };
+    nes.bus[0xff] = {
+      ...nes.bus[0x00],
+      data: 0xf1,
+    };
+    nes.bus[0x00] = {
+      ...nes.bus[0x00],
+      data: 0x12,
+    };
+    nes.bus[0x1200] = {
+      ...nes.bus[0x1200],
+      data: 0x2,
+    };
+
+    const { cross, data, nes: newNes } = INDIRECT_INDEXED(nes);
+
+    expect(cross).toBe(true);
+
+    expect(data).toBe(0x2);
+
+    expect(newNes.cpu.PC).toBe(1);
+  });
+
+  test("indirect indexed, no cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.cpu.Y = 0xf;
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0xfe,
+    };
+    nes.bus[0xfe] = {
+      ...nes.bus[0x00],
+      data: 0x10,
+    };
+    nes.bus[0xff] = {
+      ...nes.bus[0x00],
+      data: 0xf1,
+    };
+    nes.bus[0xf11f] = {
+      ...nes.bus[0x1200],
+      data: 0x2,
+    };
+
+    const { cross, data, nes: newNes } = INDIRECT_INDEXED(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(0x2);
 
     expect(newNes.cpu.PC).toBe(1);
   });

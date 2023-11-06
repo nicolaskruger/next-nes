@@ -212,6 +212,30 @@ const INDEXED_INDIRECT = (nes: Nes): Addr => {
   };
 };
 
+const INDIRECT_INDEXED = (nes: Nes): Addr => {
+  const { cpu } = nes;
+  let PC = cpu.PC;
+  const Y = cpu.Y;
+  const addr = readBus(++PC, nes);
+  let cross = addr + 1 > 0xff;
+  const low = readBus(addr % 256, nes);
+  const high = readBus((addr + 1) % 256, nes);
+  cross ||= low + Y > 0xff;
+  const data = readBus((high << 8) | (low + Y) % 256, nes);
+
+  return {
+    data,
+    cross,
+    nes: {
+      ...nes,
+      cpu: {
+        ...cpu,
+        PC,
+      },
+    },
+  };
+};
+
 export {
   IMP,
   ACC,
@@ -225,4 +249,5 @@ export {
   ABSY,
   INDIRECT,
   INDEXED_INDIRECT,
+  INDIRECT_INDEXED,
 };
