@@ -1,7 +1,7 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
-import { ACL, ADC, AND } from "./instruction";
+import { ACL, ADC, AND, BCC } from "./instruction";
 
 const initBus = (): Bus =>
   "_"
@@ -39,7 +39,6 @@ describe("instruction test", () => {
       baseCycles: 2,
       cross: true,
       offsetOnCross: 2,
-      offsetOnBranchSucceed: 0,
     });
 
     expect(totalCycle).toBe(4);
@@ -56,7 +55,6 @@ describe("instruction test", () => {
       baseCycles: 2,
       cross: false,
       offsetOnCross: 2,
-      offsetOnBranchSucceed: 0,
     });
 
     expect(totalCycle).toBe(2);
@@ -73,7 +71,6 @@ describe("instruction test", () => {
       nes,
       baseCycles: 1,
       cross: false,
-      offsetOnBranchSucceed: 0,
       offsetOnCross: 0,
     });
 
@@ -97,7 +94,6 @@ describe("instruction test", () => {
       offsetOnCross: 2,
       nes,
       data,
-      offsetOnBranchSucceed: 0,
     });
 
     expect(totalCycle).toBe(3);
@@ -120,7 +116,6 @@ describe("instruction test", () => {
       offsetOnCross: 2,
       nes,
       data,
-      offsetOnBranchSucceed: 0,
     });
 
     expect(totalCycle).toBe(3);
@@ -166,5 +161,40 @@ describe("instruction test", () => {
     expect(newNes.cpu.ACC).toBe(0x80);
 
     expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("BCC, branch not occur", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1;
+
+    const { nes: newNes, totalCycle } = BCC({
+      baseCycles: 2,
+      cross: false,
+      data: 2,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(newNes.cpu.PC).toBe(0);
+    expect(totalCycle).toBe(2);
+  });
+
+  test("BCC, branch occur and got to another page", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0xff;
+    nes.cpu.STATUS = 0;
+
+    const { nes: newNes, totalCycle } = BCC({
+      baseCycles: 2,
+      cross: false,
+      data: 2,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(newNes.cpu.PC).toBe(0x101);
+    expect(totalCycle).toBe(5);
   });
 });

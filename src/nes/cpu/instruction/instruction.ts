@@ -6,7 +6,6 @@ import {
   setOverFlowFlag,
   setZeroFlag,
 } from "../cpu";
-import { Result } from "postcss";
 import { MASK_8 } from "@/nes/helper/mask";
 
 type InstructionData = {
@@ -15,7 +14,6 @@ type InstructionData = {
   baseCycles: number;
   cross: boolean;
   offsetOnCross: number;
-  offsetOnBranchSucceed?: number;
 };
 
 type InstructionReturn = {
@@ -25,10 +23,8 @@ type InstructionReturn = {
 
 type CalculateCycles = Pick<
   InstructionData,
-  "baseCycles" | "cross" | "offsetOnBranchSucceed" | "offsetOnCross"
-> & {
-  crossBranch?: boolean;
-};
+  "baseCycles" | "cross" | "offsetOnCross"
+>;
 
 const verifyIfCarryBit = (result: number) => {
   return (result & 0x100) >> 8;
@@ -48,13 +44,8 @@ const is8bitsPositive = (value: number) => !is8bitsNegative(value);
 const calculateCycles = ({
   baseCycles,
   cross,
-  crossBranch,
-  offsetOnBranchSucceed,
   offsetOnCross,
-}: CalculateCycles) =>
-  baseCycles +
-  (cross ? offsetOnCross : 0) +
-  (crossBranch ? (offsetOnBranchSucceed as number) : 0);
+}: CalculateCycles) => baseCycles + (cross ? offsetOnCross : 0);
 
 const ADC = ({
   data,
@@ -156,4 +147,33 @@ const ACL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   };
 };
 
-export { ADC, AND, ACL };
+const BCC = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
+  const CARRY = getCarryFlag(nes);
+
+  if (CARRY)
+    return {
+      nes,
+      totalCycle: baseCycles,
+    };
+
+  let extraCycles = 1;
+
+  const { cpu } = nes;
+
+  const PC = cpu.PC + data;
+
+  if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
+
+  return {
+    nes: {
+      ...nes,
+      cpu: {
+        ...cpu,
+        PC,
+      },
+    },
+    totalCycle: baseCycles + extraCycles,
+  };
+};
+
+export { ADC, AND, ACL, BCC };
