@@ -124,4 +124,36 @@ const AND = ({
   };
 };
 
-export { ADC, AND };
+const ACL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
+  const result = data << 1;
+
+  const CARRY = verifyIfCarryBit(result);
+  const ZERO = verifyIfZero(result);
+  const NEGATIVE = verifyNegative(result & MASK_8);
+
+  const newNes = [
+    {
+      set: setCarryFlag,
+      flag: CARRY,
+    },
+    {
+      set: setZeroFlag,
+      flag: ZERO,
+    },
+    {
+      set: setNegativeFlag,
+      flag: NEGATIVE,
+    },
+  ].reduce((acc, curr) => {
+    return curr.set(curr.flag, acc);
+  }, nes);
+
+  const totalCycle = calculateCycles({ ...cycles });
+
+  return {
+    nes: { ...newNes, cpu: { ...newNes.cpu, ACC: result & MASK_8 } },
+    totalCycle,
+  };
+};
+
+export { ADC, AND, ACL };

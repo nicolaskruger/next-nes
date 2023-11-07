@@ -1,7 +1,7 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
-import { ADC, AND } from "./instruction";
+import { ACL, ADC, AND } from "./instruction";
 
 const initBus = (): Bus =>
   "_"
@@ -126,6 +126,44 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(3);
 
     expect(newNes.cpu.ACC).toBe(0xa0);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("ASL, when cary flag and zero flag is set", () => {
+    const nes = initNes();
+    const data = 0x80;
+
+    const { nes: newNes, totalCycle } = ACL({
+      baseCycles: 1,
+      cross: true,
+      data,
+      nes,
+      offsetOnCross: 1,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.ACC).toBe(0x00);
+
+    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+  });
+
+  test("ASL, when negative is set", () => {
+    const nes = initNes();
+    const data = 0x40;
+
+    const { nes: newNes, totalCycle } = ACL({
+      baseCycles: 1,
+      cross: true,
+      data,
+      nes,
+      offsetOnCross: 1,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.ACC).toBe(0x80);
 
     expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
