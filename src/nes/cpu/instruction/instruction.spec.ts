@@ -1,7 +1,7 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
-import { ACL, ADC, AND, BCC } from "./instruction";
+import { ACL, ADC, AND, BCC, BCS } from "./instruction";
 
 const initBus = (): Bus =>
   "_"
@@ -187,6 +187,41 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 0;
 
     const { nes: newNes, totalCycle } = BCC({
+      baseCycles: 2,
+      cross: false,
+      data: 2,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(newNes.cpu.PC).toBe(0x101);
+    expect(totalCycle).toBe(5);
+  });
+
+  test("BCS, branch not occur", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 0;
+
+    const { nes: newNes, totalCycle } = BCS({
+      baseCycles: 2,
+      cross: false,
+      data: 2,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(newNes.cpu.PC).toBe(0);
+    expect(totalCycle).toBe(2);
+  });
+
+  test("BCS, branch occur and got to another page", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0xff;
+    nes.cpu.STATUS = 1;
+
+    const { nes: newNes, totalCycle } = BCS({
       baseCycles: 2,
       cross: false,
       data: 2,

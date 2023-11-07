@@ -176,4 +176,33 @@ const BCC = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-export { ADC, AND, ACL, BCC };
+const BCS = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
+  const CARRY = getCarryFlag(nes);
+
+  if (!CARRY)
+    return {
+      nes,
+      totalCycle: baseCycles,
+    };
+
+  let extraCycles = 1;
+
+  const { cpu } = nes;
+
+  const PC = cpu.PC + data;
+
+  if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
+
+  return {
+    nes: {
+      ...nes,
+      cpu: {
+        ...cpu,
+        PC,
+      },
+    },
+    totalCycle: baseCycles + extraCycles,
+  };
+};
+
+export { ADC, AND, ACL, BCC, BCS };
