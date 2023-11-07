@@ -1,7 +1,7 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
-import { ACL, ADC, AND, BCC, BCS, BEQ } from "./instruction";
+import { ACL, ADC, AND, BCC, BCS, BEQ, BIT } from "./instruction";
 
 const initBus = (): Bus =>
   "_"
@@ -266,5 +266,42 @@ describe("instruction test", () => {
 
     expect(newNes.cpu.PC).toBe(0x101);
     expect(totalCycle).toBe(5);
+  });
+
+  test("BIT, when the bit 6 and bit 7 are set", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xff;
+
+    const { nes: newNes, totalCycle } = BIT({
+      baseCycles: 3,
+      cross: false,
+      data: (1 << 7) | (1 << 6),
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(3);
+
+    expect(newNes.cpu.STATUS).toBe((1 << 6) | (1 << 5));
+
+    expect(newNes.cpu.ACC).toBe(0xff);
+  });
+  test("BIT, when zero flag to be set", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xff;
+
+    const { nes: newNes, totalCycle } = BIT({
+      baseCycles: 3,
+      cross: false,
+      data: 0,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(3);
+
+    expect(newNes.cpu.STATUS).toBe(1);
   });
 });

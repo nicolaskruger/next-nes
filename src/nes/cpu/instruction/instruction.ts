@@ -235,4 +235,28 @@ const BEQ = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ };
+const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
+  const result = data & nes.cpu.ACC;
+
+  const newNes = [
+    {
+      set: setCarryFlag,
+      value: result === 0 ? 1 : 0,
+    },
+    {
+      set: setOverFlowFlag,
+      value: (result >> 6) & 1,
+    },
+    {
+      set: setNegativeFlag,
+      value: (result >> 7) & 1,
+    },
+  ].reduce((acc, curr) => curr.set(curr.value, acc), nes);
+
+  return {
+    nes: newNes,
+    totalCycle: baseCycles,
+  };
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ, BIT };
