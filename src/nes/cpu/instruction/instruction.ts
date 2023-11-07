@@ -15,12 +15,19 @@ type InstructionData = {
   baseCycles: number;
   cross: boolean;
   offsetOnCross: number;
-  offsetOnBranchSucceed: number;
+  offsetOnBranchSucceed?: number;
 };
 
 type InstructionReturn = {
   nes: Nes;
   totalCycle: number;
+};
+
+type CalculateCycles = Pick<
+  InstructionData,
+  "baseCycles" | "cross" | "offsetOnBranchSucceed" | "offsetOnCross"
+> & {
+  crossBranch?: boolean;
 };
 
 const verifyIfCarryBit = (result: number) => {
@@ -29,12 +36,25 @@ const verifyIfCarryBit = (result: number) => {
 
 const verifyIfZero = (result: number) => ((result & 0xff) === 0 ? 1 : 0);
 
+const verifyNegative = (result: number) => (is8bitsNegative(result) ? 1 : 0);
+
 const isOverFlow = (result: number, a: number, b: number) =>
   (is8bitsNegative(result) && is8bitsPositive(a) && is8bitsPositive(b)) ||
   (is8bitsPositive(result) && is8bitsNegative(a) && is8bitsNegative(b));
 
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 const is8bitsPositive = (value: number) => !is8bitsNegative(value);
+
+const calculateCycles = ({
+  baseCycles,
+  cross,
+  crossBranch,
+  offsetOnBranchSucceed,
+  offsetOnCross,
+}: CalculateCycles) =>
+  baseCycles +
+  (cross ? offsetOnCross : 0) +
+  (crossBranch ? (offsetOnBranchSucceed as number) : 0);
 
 const ADC = ({
   data,
@@ -72,4 +92,36 @@ const ADC = ({
   };
 };
 
-export { ADC };
+const AND = ({
+  nes,
+  data,
+  baseCycles,
+  cross,
+  offsetOnCross,
+}: InstructionData): InstructionReturn => {
+  const { cpu } = nes;
+  const { ACC } = cpu;
+
+  const result = ACC & data;
+
+  const ZERO = verifyIfZero(result);
+  const NEGATIVE = verifyNegative(result);
+
+  let newNes = setZeroFlag(ZERO, nes);
+  newNes = setNegativeFlag(NEGATIVE, newNes);
+
+  const totalCycle = calculateCycles({ baseCycles, cross, offsetOnCross });
+
+  return {
+    totalCycle,
+    nes: {
+      ...newNes,
+      cpu: {
+        ...newNes.cpu,
+        ACC: result,
+      },
+    },
+  };
+};
+
+export { ADC, AND };

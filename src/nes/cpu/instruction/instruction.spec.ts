@@ -1,7 +1,7 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
-import { ADC } from "./instruction";
+import { ADC, AND } from "./instruction";
 
 const initBus = (): Bus =>
   "_"
@@ -82,5 +82,51 @@ describe("instruction test", () => {
     expect(newNes.cpu.STATUS).toBe((1 << 6) | (1 << 5));
 
     expect(newNes.cpu.ACC).toBe(128);
+  });
+
+  test("AND, when result is zero", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x00;
+
+    const data = 0xff;
+
+    const { nes: newNes, totalCycle } = AND({
+      baseCycles: 1,
+      cross: true,
+      offsetOnCross: 2,
+      nes,
+      data,
+      offsetOnBranchSucceed: 0,
+    });
+
+    expect(totalCycle).toBe(3);
+
+    expect(newNes.cpu.ACC).toBe(0x00);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 1);
+  });
+
+  test("AND, when result is negative", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xf0;
+
+    const data = 0xa0;
+
+    const { nes: newNes, totalCycle } = AND({
+      baseCycles: 1,
+      cross: true,
+      offsetOnCross: 2,
+      nes,
+      data,
+      offsetOnBranchSucceed: 0,
+    });
+
+    expect(totalCycle).toBe(3);
+
+    expect(newNes.cpu.ACC).toBe(0xa0);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
 });
