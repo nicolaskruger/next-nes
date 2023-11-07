@@ -1,6 +1,7 @@
 import { Nes } from "@/nes/nes";
 import {
   getCarryFlag,
+  getZeroFlag,
   setCarryFlag,
   setNegativeFlag,
   setOverFlowFlag,
@@ -205,4 +206,33 @@ const BCS = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-export { ADC, AND, ACL, BCC, BCS };
+const BEQ = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
+  const ZERO = getZeroFlag(nes);
+
+  if (!ZERO)
+    return {
+      nes,
+      totalCycle: baseCycles,
+    };
+
+  let extraCycles = 1;
+
+  const { cpu } = nes;
+
+  const PC = cpu.PC + data;
+
+  if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
+
+  return {
+    nes: {
+      ...nes,
+      cpu: {
+        ...cpu,
+        PC,
+      },
+    },
+    totalCycle: baseCycles + extraCycles,
+  };
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ };
