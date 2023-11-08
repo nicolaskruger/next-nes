@@ -61,9 +61,10 @@ describe("test addressing mode", () => {
   test("Implicit test", () => {
     const nes: Nes = initNes();
 
-    const { cross, data } = IMP(nes);
+    const { cross, data, nes: newNes } = IMP(nes);
 
     expect(cross).toBeFalsy();
+    expect(newNes.cpu.PC).toBe(1);
     expect(data).toBe(0);
   });
 
@@ -72,9 +73,10 @@ describe("test addressing mode", () => {
 
     nes.cpu.ACC = 1;
 
-    const { cross, data } = ACC(nes);
+    const { cross, data, nes: newNes } = ACC(nes);
 
     expect(cross).toBeFalsy();
+    expect(newNes.cpu.PC).toBe(1);
     expect(data).toBe(1);
   });
 
@@ -89,7 +91,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(1);
 
-    expect(newNes.cpu.PC).toBe(1);
+    expect(newNes.cpu.PC).toBe(2);
   });
   test("Zero page test", () => {
     const nes = initNesAllRam();
@@ -108,7 +110,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
 
   test("Zero page, x no cross border", () => {
@@ -128,7 +130,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
   test("Zero page, x cross border", () => {
     const nes = initNesAllRam();
@@ -147,7 +149,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
   test("Zero page, x no cross border", () => {
     const nes = initNesAllRam();
@@ -166,7 +168,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
   test("Zero page, x cross border", () => {
     const nes = initNesAllRam();
@@ -185,7 +187,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
 
   test("Zero page, y no cross border", () => {
@@ -205,7 +207,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
   test("Zero page, y cross border", () => {
     const nes = initNesAllRam();
@@ -224,7 +226,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x0101);
+    expect(newNes.cpu.PC).toBe(0x0102);
   });
   test("relative positive value", () => {
     const nes = initNesAllRam();
@@ -237,7 +239,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(5);
 
-    expect(newNes.cpu.PC).toBe(0x1);
+    expect(newNes.cpu.PC).toBe(0x2);
   });
 
   test("relative negative value", () => {
@@ -251,7 +253,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(-1);
 
-    expect(newNes.cpu.PC).toBe(0x1);
+    expect(newNes.cpu.PC).toBe(0x2);
   });
   test("relative all negative values", () => {
     let nes = initNesAllRam();
@@ -259,11 +261,19 @@ describe("test addressing mode", () => {
     nes.bus = "_"
       .repeat(0x100)
       .split("")
-      .map((v, i) => ({
-        data: 0x100 - i,
-        read: simpleRead,
-        write: simpleWrite,
-      }));
+      .map((v, i) => [
+        {
+          data: 0xff - i,
+          read: simpleRead,
+          write: simpleWrite,
+        },
+        {
+          data: 0xff - i,
+          read: simpleRead,
+          write: simpleWrite,
+        },
+      ])
+      .reduce((acc, curr) => [...acc, ...curr], []);
 
     for (let i = 0; i < 128; i++) {
       const { cross, data, nes: newNes } = RELATIVE(nes);
@@ -273,7 +283,7 @@ describe("test addressing mode", () => {
 
       expect(data).toBe(-1 - i);
 
-      expect(nes.cpu.PC).toBe(i + 1);
+      expect(nes.cpu.PC).toBe((i + 1) * 2);
     }
   });
 
@@ -300,7 +310,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x77);
 
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
 
   test("absolute x, test, not cross border", () => {
@@ -328,7 +338,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x77);
 
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
   test("absolute x, test, cross border", () => {
     const nes = initNesAllRam();
@@ -355,7 +365,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x77);
 
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
 
   test("absolute y, test, not cross border", () => {
@@ -383,7 +393,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x77);
 
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
   test("absolute y, test, cross border", () => {
     const nes = initNesAllRam();
@@ -410,7 +420,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x77);
 
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
   test("indirect, when cross border on address and value", () => {
     const nes = initNesAllRam();
@@ -437,7 +447,7 @@ describe("test addressing mode", () => {
 
     expect(cross).toBe(true);
     expect(data).toBe(0x34ff);
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
 
   test("indirect, when cross border on address and value", () => {
@@ -465,7 +475,7 @@ describe("test addressing mode", () => {
 
     expect(cross).toBe(false);
     expect(data).toBe(0x4321);
-    expect(newNes.cpu.PC).toBe(2);
+    expect(newNes.cpu.PC).toBe(3);
   });
 
   test("indexed indirect, when cross border", () => {
@@ -496,7 +506,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x12);
 
-    expect(newNes.cpu.PC).toBe(1);
+    expect(newNes.cpu.PC).toBe(2);
   });
 
   test("indexed indirect, no cross border", () => {
@@ -527,7 +537,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x12);
 
-    expect(newNes.cpu.PC).toBe(1);
+    expect(newNes.cpu.PC).toBe(2);
   });
 
   test("indirect indexed, when cross border", () => {
@@ -558,7 +568,7 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x2);
 
-    expect(newNes.cpu.PC).toBe(1);
+    expect(newNes.cpu.PC).toBe(2);
   });
 
   test("indirect indexed, no cross border", () => {
@@ -589,6 +599,6 @@ describe("test addressing mode", () => {
 
     expect(data).toBe(0x2);
 
-    expect(newNes.cpu.PC).toBe(1);
+    expect(newNes.cpu.PC).toBe(2);
   });
 });
