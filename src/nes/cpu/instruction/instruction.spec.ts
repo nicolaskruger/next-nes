@@ -12,6 +12,7 @@ import {
   BMI,
   BNE,
   BPL,
+  BRK,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -28,7 +29,7 @@ const initCpu = (): Cpu => ({
   ACC: 0,
   PC: 0,
   STATUS: 0,
-  STK: 0,
+  STK: 0xff,
   X: 0,
   Y: 0,
 });
@@ -426,5 +427,45 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x0200);
+  });
+
+  test("BRK, should throw an error when STK overflow", () => {
+    const nes = initNes();
+
+    nes.cpu.STK = -1;
+
+    expect(() => {
+      BRK({
+        nes,
+        data: 0,
+        baseCycles: 7,
+        cross: false,
+        offsetOnCross: 0,
+      });
+    }).toThrow("stack overflow");
+  });
+  test("BRK, should atl the PC to 0xfffe/f and put the old PC and status to the stack", () => {
+    const nes = initNes();
+
+    nes.cpu.STK = 0xff;
+
+    nes.cpu.STATUS = 1;
+
+    nes.cpu.PC = 2;
+
+    const { nes: newNes, totalCycle } = BRK({
+      nes,
+      data: 0,
+      baseCycles: 7,
+      cross: false,
+      offsetOnCross: 0,
+    });
+
+    expect(newNes.cpu.STK).toBe(0xfd);
+    expect(newNes.bus[0x01ff].data).toBe(2);
+    expect(newNes.bus[0x01fe].data).toBe(1);
+    expect(newNes.cpu.PC).toBe(0xfffe);
+    expect(totalCycle).toBe(7);
+    expect(newNes.cpu.STATUS).toBe((1 << 4) | 1);
   });
 });

@@ -3,12 +3,14 @@ import {
   getCarryFlag,
   getNegativeFlag,
   getZeroFlag,
+  setBreakCommand,
   setCarryFlag,
   setNegativeFlag,
   setOverFlowFlag,
   setZeroFlag,
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
+import { writeBus } from "@/nes/bus/bus";
 
 type InstructionData = {
   nes: Nes;
@@ -231,4 +233,40 @@ const BPL = (instruction: InstructionData): InstructionReturn => {
   return branch(getNegativeFlag, (v) => !!v, instruction);
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL };
+const pushToStack = (nes: Nes, data: number): Nes => {
+  let STK = nes.cpu.STK;
+  if (STK < 0) throw new Error("stack overflow");
+  const newNes = writeBus(0x0100 | STK, data, nes);
+  STK--;
+  return {
+    ...newNes,
+    cpu: {
+      ...newNes.cpu,
+      STK,
+    },
+  };
+};
+
+const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  let newNes = [nes.cpu.PC, nes.cpu.STATUS].reduce(
+    (acc, curr) => pushToStack(acc, curr),
+    nes
+  );
+
+  newNes = setBreakCommand(1, newNes);
+
+  const { cpu } = newNes;
+
+  return {
+    totalCycle: baseCycles,
+    nes: {
+      ...newNes,
+      cpu: {
+        ...cpu,
+        PC: 0xfffe,
+      },
+    },
+  };
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK };
