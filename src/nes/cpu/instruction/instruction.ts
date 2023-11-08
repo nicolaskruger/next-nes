@@ -148,14 +148,19 @@ const ACL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   };
 };
 
-const BCC = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
-  const CARRY = getCarryFlag(nes);
+const branch = (
+  getFlag: (nes: Nes) => number,
+  verify: (flag: number) => boolean,
+  { nes, data, baseCycles }: InstructionData
+): InstructionReturn => {
+  const flag = getFlag(nes);
 
-  if (CARRY)
+  if (verify(flag)) {
     return {
       nes,
       totalCycle: baseCycles,
     };
+  }
 
   let extraCycles = 1;
 
@@ -177,62 +182,16 @@ const BCC = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-const BCS = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
-  const CARRY = getCarryFlag(nes);
-
-  if (!CARRY)
-    return {
-      nes,
-      totalCycle: baseCycles,
-    };
-
-  let extraCycles = 1;
-
-  const { cpu } = nes;
-
-  const PC = cpu.PC + data;
-
-  if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
-
-  return {
-    nes: {
-      ...nes,
-      cpu: {
-        ...cpu,
-        PC,
-      },
-    },
-    totalCycle: baseCycles + extraCycles,
-  };
+const BCC = (instruction: InstructionData): InstructionReturn => {
+  return branch(getCarryFlag, (value) => !!value, instruction);
 };
 
-const BEQ = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
-  const ZERO = getZeroFlag(nes);
+const BCS = (instruction: InstructionData): InstructionReturn => {
+  return branch(getCarryFlag, (value) => !value, instruction);
+};
 
-  if (!ZERO)
-    return {
-      nes,
-      totalCycle: baseCycles,
-    };
-
-  let extraCycles = 1;
-
-  const { cpu } = nes;
-
-  const PC = cpu.PC + data;
-
-  if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
-
-  return {
-    nes: {
-      ...nes,
-      cpu: {
-        ...cpu,
-        PC,
-      },
-    },
-    totalCycle: baseCycles + extraCycles,
-  };
+const BEQ = (instruction: InstructionData): InstructionReturn => {
+  return branch(getZeroFlag, (value) => !value, instruction);
 };
 
 const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
@@ -259,4 +218,8 @@ const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ, BIT };
+const BMI = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI };
