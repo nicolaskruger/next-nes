@@ -1,7 +1,7 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
-import { ACL, ADC, AND, BCC, BCS, BEQ, BIT, BMI } from "./instruction";
+import { ACL, ADC, AND, BCC, BCS, BEQ, BIT, BMI, BNE } from "./instruction";
 
 const initBus = (): Bus =>
   "_"
@@ -330,6 +330,44 @@ describe("instruction test", () => {
     nes.cpu.PC = 0x01f1;
 
     const { nes: newNes, totalCycle } = BMI({
+      nes,
+      data: 0x0f,
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(newNes.cpu.PC).toBe(0x0200);
+  });
+
+  test("BNE, should not increment the PC nether add additional cycles when zero flag is set", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1 << 1;
+
+    const { nes: newNes, totalCycle } = BNE({
+      nes,
+      data: 0x0f,
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.PC).toBe(0);
+  });
+
+  test("BNE, should increment the PC and add additional cycles when zero flag is clear and cross to a new page", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 0;
+
+    nes.cpu.PC = 0x01f1;
+
+    const { nes: newNes, totalCycle } = BNE({
       nes,
       data: 0x0f,
       baseCycles: 2,
