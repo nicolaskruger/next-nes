@@ -227,4 +227,8 @@ const BNE = (instruction: InstructionData): InstructionReturn => {
   return branch(getZeroFlag, (v) => !!v, instruction);
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE };
+const BPL = (instruction: InstructionData): InstructionReturn => {
+  return branch(getNegativeFlag, (v) => !!v, instruction);
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL };
