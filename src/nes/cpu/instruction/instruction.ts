@@ -1,6 +1,7 @@
 import { Nes } from "@/nes/nes";
 import {
   getCarryFlag,
+  getNegativeFlag,
   getZeroFlag,
   setCarryFlag,
   setNegativeFlag,
@@ -218,8 +219,8 @@ const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-const BMI = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const BMI = (instruction: InstructionData): InstructionReturn => {
+  return branch(getNegativeFlag, (v) => !v, instruction);
 };
 
 export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI };
