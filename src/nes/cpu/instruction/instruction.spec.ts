@@ -16,6 +16,7 @@ import {
   BVC,
   BVS,
   CLC,
+  CLD,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -564,5 +565,21 @@ describe("instruction test", () => {
     expect(newNes.cpu.STATUS).toBe(0);
   });
 
-  test("CLD, should clear decimal mode", () => {});
+  test("CLD, should clear decimal mode", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1 << 3;
+
+    const { nes: newNes, totalCycle } = CLD({
+      baseCycles: 2,
+      cross: false,
+      data: 0,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.STATUS).toBe(0);
+  });
 });
