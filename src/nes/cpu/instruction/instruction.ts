@@ -302,8 +302,11 @@ const CLI = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const CLV = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const CLV = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  return {
+    nes: setOverFlowFlag(0, nes),
+    totalCycle: baseCycles,
+  };
 };
 const CMP = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

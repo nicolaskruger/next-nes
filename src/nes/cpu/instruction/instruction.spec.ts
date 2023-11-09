@@ -18,6 +18,7 @@ import {
   CLC,
   CLD,
   CLI,
+  CLV,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -590,6 +591,24 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1 << 2;
 
     const { nes: newNes, totalCycle } = CLI({
+      baseCycles: 2,
+      cross: false,
+      data: 0,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.STATUS).toBe(0);
+  });
+
+  test("CLV, should clear overflow", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1 << 5;
+
+    const { nes: newNes, totalCycle } = CLV({
       baseCycles: 2,
       cross: false,
       data: 0,
