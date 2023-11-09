@@ -277,4 +277,8 @@ const BVC = (instruction: InstructionData): InstructionReturn => {
   return branch(getOverFlowFlag, clearFlag, instruction);
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC };
+const BVS = (instruction: InstructionData): InstructionReturn => {
+  return branch(getOverFlowFlag, setFlag, instruction);
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC, BVS };

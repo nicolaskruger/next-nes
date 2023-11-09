@@ -14,6 +14,7 @@ import {
   BPL,
   BRK,
   BVC,
+  BVS,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -496,6 +497,43 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 0;
 
     const { totalCycle, nes: newNes } = BVC({
+      nes,
+      cross: false,
+      baseCycles: 2,
+      data: 0x0f,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(5);
+    expect(newNes.cpu.PC).toBe(0x0200);
+  });
+
+  test("BVS, should not branch if overflow is clear", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0x00;
+
+    nes.cpu.STATUS = 0;
+
+    const { totalCycle, nes: newNes } = BVS({
+      nes,
+      cross: false,
+      baseCycles: 2,
+      data: 0xff,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+    expect(newNes.cpu.PC).toBe(0);
+  });
+  test("BVS, should branch when overflow is set", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0x01f1;
+
+    nes.cpu.STATUS = 1 << 5;
+
+    const { totalCycle, nes: newNes } = BVS({
       nes,
       cross: false,
       baseCycles: 2,
