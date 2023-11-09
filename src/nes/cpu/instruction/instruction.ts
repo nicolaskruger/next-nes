@@ -2,6 +2,7 @@ import { Nes } from "@/nes/nes";
 import {
   getCarryFlag,
   getNegativeFlag,
+  getOverFlowFlag,
   getZeroFlag,
   setBreakCommand,
   setCarryFlag,
@@ -185,16 +186,19 @@ const branch = (
   };
 };
 
+const clearFlag = (value: number) => !!value;
+const setFlag = (value: number) => !value;
+
 const BCC = (instruction: InstructionData): InstructionReturn => {
-  return branch(getCarryFlag, (value) => !!value, instruction);
+  return branch(getCarryFlag, clearFlag, instruction);
 };
 
 const BCS = (instruction: InstructionData): InstructionReturn => {
-  return branch(getCarryFlag, (value) => !value, instruction);
+  return branch(getCarryFlag, setFlag, instruction);
 };
 
 const BEQ = (instruction: InstructionData): InstructionReturn => {
-  return branch(getZeroFlag, (value) => !value, instruction);
+  return branch(getZeroFlag, setFlag, instruction);
 };
 
 const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
@@ -222,15 +226,15 @@ const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
 };
 
 const BMI = (instruction: InstructionData): InstructionReturn => {
-  return branch(getNegativeFlag, (v) => !v, instruction);
+  return branch(getNegativeFlag, setFlag, instruction);
 };
 
 const BNE = (instruction: InstructionData): InstructionReturn => {
-  return branch(getZeroFlag, (v) => !!v, instruction);
+  return branch(getZeroFlag, clearFlag, instruction);
 };
 
 const BPL = (instruction: InstructionData): InstructionReturn => {
-  return branch(getNegativeFlag, (v) => !!v, instruction);
+  return branch(getNegativeFlag, clearFlag, instruction);
 };
 
 const pushToStack = (nes: Nes, data: number): Nes => {
@@ -269,4 +273,8 @@ const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK };
+const BVC = (instruction: InstructionData): InstructionReturn => {
+  return branch(getOverFlowFlag, clearFlag, instruction);
+};
+
+export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC };

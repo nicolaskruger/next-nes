@@ -13,6 +13,7 @@ import {
   BNE,
   BPL,
   BRK,
+  BVC,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -467,5 +468,42 @@ describe("instruction test", () => {
     expect(newNes.cpu.PC).toBe(0xfffe);
     expect(totalCycle).toBe(7);
     expect(newNes.cpu.STATUS).toBe((1 << 4) | 1);
+  });
+
+  test("BVC, should not branch if overflow is set", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0x00;
+
+    nes.cpu.STATUS = 1 << 5;
+
+    const { totalCycle, nes: newNes } = BVC({
+      nes,
+      cross: false,
+      baseCycles: 2,
+      data: 0xff,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+    expect(newNes.cpu.PC).toBe(0);
+  });
+  test("BVC, should branch when overflow is clear", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 0x01f1;
+
+    nes.cpu.STATUS = 0;
+
+    const { totalCycle, nes: newNes } = BVC({
+      nes,
+      cross: false,
+      baseCycles: 2,
+      data: 0x0f,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(5);
+    expect(newNes.cpu.PC).toBe(0x0200);
   });
 });
