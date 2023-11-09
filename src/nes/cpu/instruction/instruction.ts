@@ -281,4 +281,196 @@ const BVS = (instruction: InstructionData): InstructionReturn => {
   return branch(getOverFlowFlag, setFlag, instruction);
 };
 
-export { ADC, AND, ACL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC, BVS };
+const CLC = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  return {
+    nes: setCarryFlag(0, nes),
+    totalCycle: baseCycles,
+  };
+};
+
+const CLD = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const CLI = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const CLV = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const CMP = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const CPX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const CPY = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const DEC = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const DEX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const DEY = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const EOR = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const INC = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const INX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const INY = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const JMP = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const JSR = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const LDA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const LDX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const LDY = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const LSR = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const NOP = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+
+const ORA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const PHA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const PHP = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const PLA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const PLP = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const ROL = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const POR = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const RTI = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const RTS = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const SBC = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const SEC = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+
+const SED = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const SEI = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const STA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const STX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const STY = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const TAX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const TAY = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const TSX = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const TXA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const TXS = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+const TYA = (instruction: InstructionData): InstructionReturn => {
+  throw new Error("not implemented");
+};
+export {
+  ADC,
+  AND,
+  ACL,
+  BCC,
+  BCS,
+  BEQ,
+  BIT,
+  BMI,
+  BNE,
+  BPL,
+  BRK,
+  BVC,
+  BVS,
+  CLC,
+  CLD,
+  CLI,
+  CLV,
+  CMP,
+  CPX,
+  CPY,
+  DEC,
+  DEX,
+  DEY,
+  EOR,
+  INC,
+  INX,
+  INY,
+  JMP,
+  JSR,
+  LDA,
+  LDX,
+  LDY,
+  LSR,
+  NOP,
+  ORA,
+  PHA,
+  PHP,
+  PLA,
+  PLP,
+  ROL,
+  POR,
+  RTI,
+  RTS,
+  SBC,
+  SEC,
+  SED,
+  SEI,
+  STA,
+  STX,
+  STY,
+  TAX,
+  TAY,
+  TSX,
+  TXA,
+  TXS,
+  TYA,
+};

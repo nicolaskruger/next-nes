@@ -15,6 +15,7 @@ import {
   BRK,
   BVC,
   BVS,
+  CLC,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -544,4 +545,24 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(5);
     expect(newNes.cpu.PC).toBe(0x0200);
   });
+
+  test("CLC, should clear the carry flag", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1;
+
+    const { nes: newNes, totalCycle } = CLC({
+      baseCycles: 2,
+      cross: false,
+      data: 0,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.STATUS).toBe(0);
+  });
+
+  test("CLD, should clear decimal mode", () => {});
 });
