@@ -7,6 +7,7 @@ import {
   setBreakCommand,
   setCarryFlag,
   setDecimalMode,
+  setInterruptDisable,
   setNegativeFlag,
   setOverFlowFlag,
   setZeroFlag,
@@ -295,8 +296,11 @@ const CLD = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const CLI = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const CLI = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  return {
+    nes: setInterruptDisable(0, nes),
+    totalCycle: baseCycles,
+  };
 };
 const CLV = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

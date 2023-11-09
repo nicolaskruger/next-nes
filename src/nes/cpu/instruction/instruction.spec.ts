@@ -17,6 +17,7 @@ import {
   BVS,
   CLC,
   CLD,
+  CLI,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -571,6 +572,24 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1 << 3;
 
     const { nes: newNes, totalCycle } = CLD({
+      baseCycles: 2,
+      cross: false,
+      data: 0,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.STATUS).toBe(0);
+  });
+
+  test("CLI, should clear interrupt disable", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1 << 2;
+
+    const { nes: newNes, totalCycle } = CLI({
       baseCycles: 2,
       cross: false,
       data: 0,
