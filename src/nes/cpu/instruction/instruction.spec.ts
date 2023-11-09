@@ -19,6 +19,7 @@ import {
   CLD,
   CLI,
   CLV,
+  CMP,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -619,5 +620,60 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(2);
 
     expect(newNes.cpu.STATUS).toBe(0);
+  });
+
+  test("CMP, should set carry flag if ACC >== memory", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x0f;
+    const data = 0x0e;
+
+    const { totalCycle, nes: newNes } = CMP({
+      baseCycles: 3,
+      cross: true,
+      offsetOnCross: 2,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(newNes.cpu.STATUS).toBe(1);
+  });
+  test("CMP, should set zero flag if ACC === memory", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x0f;
+    const data = 0x0f;
+
+    const { totalCycle, nes: newNes } = CMP({
+      baseCycles: 3,
+      cross: true,
+      offsetOnCross: 2,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+  });
+  test("CMP, should negative flag if the result was negative", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x0e;
+    const data = 0x0f;
+
+    const { totalCycle, nes: newNes } = CMP({
+      baseCycles: 3,
+      cross: true,
+      offsetOnCross: 2,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
 });

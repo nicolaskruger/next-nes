@@ -44,9 +44,13 @@ const verifyNegative = (result: number) => (is8bitsNegative(result) ? 1 : 0);
 const isOverFlow = (result: number, a: number, b: number) =>
   (is8bitsNegative(result) && is8bitsPositive(a) && is8bitsPositive(b)) ||
   (is8bitsPositive(result) && is8bitsNegative(a) && is8bitsNegative(b));
-
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 const is8bitsPositive = (value: number) => !is8bitsNegative(value);
+
+const make8bitSigned = (value: number) => {
+  if (is8bitsNegative(value)) return ~0xff | value;
+  return value;
+};
 
 const calculateCycles = ({
   baseCycles,
@@ -308,8 +312,38 @@ const CLV = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
+const compare = (
+  value: number,
+  { data, nes, baseCycles, cross, offsetOnCross }: InstructionData
+): InstructionReturn => {
+  const signedValue = make8bitSigned(value);
+  const signedData = make8bitSigned(data);
+
+  const newNes = [
+    {
+      verify: signedValue >= signedData,
+      set: setCarryFlag,
+    },
+    {
+      verify: signedValue === signedData,
+      set: setZeroFlag,
+    },
+    {
+      verify: ((signedValue - signedData) & (1 << 7)) === 1 << 7,
+      set: setNegativeFlag,
+    },
+  ].reduce((acc, curr) => {
+    if (curr.verify) return curr.set(1, acc);
+    return acc;
+  }, nes);
+
+  return {
+    nes: newNes,
+    totalCycle: baseCycles + (cross ? offsetOnCross : 0),
+  };
+};
 const CMP = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  return compare(instruction.nes.cpu.ACC, instruction);
 };
 const CPX = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
