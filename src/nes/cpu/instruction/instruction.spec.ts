@@ -22,6 +22,7 @@ import {
   CMP,
   CPX,
   CPY,
+  DEC,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -779,5 +780,44 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(2);
 
     expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+  test("DEC, should decrement memory and ser zero flag when memory = 1", () => {
+    const nes = initNes();
+
+    nes.bus[0].data = 0x01;
+
+    const data = 0x00;
+
+    const { totalCycle, nes: newNes } = DEC({
+      baseCycles: 5,
+      cross: false,
+      data,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(5);
+    expect(newNes.cpu.STATUS).toBe(1 << 1);
+    expect(newNes.bus[0].data).toBe(0);
+  });
+
+  test("DEC, should decrement memory and ser negative flag when memory = 0", () => {
+    const nes = initNes();
+
+    nes.bus[0].data = 0x00;
+
+    const data = 0x00;
+
+    const { totalCycle, nes: newNes } = DEC({
+      baseCycles: 5,
+      cross: false,
+      data,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(5);
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expect(newNes.bus[0].data).toBe(0xff);
   });
 });

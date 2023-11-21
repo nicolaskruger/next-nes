@@ -13,7 +13,7 @@ const simpleRead = (addr: number, nes: Nes) => nes.bus[addr].data;
 
 const simpleWrite = (addr: number, value: number, nes: Nes): Nes => ({
   ...nes,
-  bus: nes.bus.map((v, i) => (i == addr ? { ...v, data: value } : { ...v })),
+  bus: nes.bus.map((v, i) => (i === addr ? { ...v, data: value } : { ...v })),
 });
 
 const readBus = (addr: number, nes: Nes) => {

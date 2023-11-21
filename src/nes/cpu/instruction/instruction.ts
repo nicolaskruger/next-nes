@@ -13,7 +13,7 @@ import {
   setZeroFlag,
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
-import { writeBus } from "@/nes/bus/bus";
+import { readBus, writeBus } from "@/nes/bus/bus";
 
 type InstructionData = {
   nes: Nes;
@@ -351,7 +351,25 @@ const CPY = (instruction: InstructionData): InstructionReturn => {
   return compare(instruction.nes.cpu.Y, instruction);
 };
 const DEC = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  const { nes, data: addr, baseCycles } = instruction;
+
+  const result = (readBus(addr, nes) - 1) & MASK_8;
+  let _nes = writeBus(addr, result, nes);
+  _nes = [
+    {
+      bit: result === 0 ? 1 : 0,
+      set: setZeroFlag,
+    },
+    {
+      bit: result >> 7,
+      set: setNegativeFlag,
+    },
+  ].reduce((acc, curr) => curr.set(curr.bit, acc), _nes);
+
+  return {
+    nes: _nes,
+    totalCycle: baseCycles,
+  };
 };
 const DEX = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
