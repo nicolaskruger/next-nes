@@ -20,6 +20,7 @@ import {
   CLI,
   CLV,
   CMP,
+  CPX,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -674,6 +675,51 @@ describe("instruction test", () => {
 
     expect(totalCycle).toBe(5);
 
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("CPX, should set carry flag if X >= memory", () => {
+    const nes = initNes();
+    nes.cpu.X = 0x0e;
+    const data = 0x0d;
+    const { totalCycle, nes: newNes } = CPX({
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+    expect(totalCycle).toBe(2);
+    expect(newNes.cpu.STATUS).toBe(1);
+  });
+
+  test("CPX, should set zero flag if X === memory", () => {
+    const nes = initNes();
+    nes.cpu.X = 0x0e;
+    const data = 0x0e;
+    const { totalCycle, nes: newNes } = CPX({
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+    expect(totalCycle).toBe(2);
+    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+  });
+
+  test("CPX, should set negative flag if the result was negative", () => {
+    const nes = initNes();
+    nes.cpu.X = 0xfe;
+    const data = 0x0e;
+    const { totalCycle, nes: newNes } = CPX({
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+    expect(totalCycle).toBe(2);
     expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
 });
