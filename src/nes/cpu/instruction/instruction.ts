@@ -333,8 +333,7 @@ const compare = (
       set: setNegativeFlag,
     },
   ].reduce((acc, curr) => {
-    if (curr.verify) return curr.set(1, acc);
-    return acc;
+    return curr.set(curr.verify ? 1 : 0, acc);
   }, nes);
 
   return {
