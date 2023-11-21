@@ -348,7 +348,7 @@ const CPX = (instruction: InstructionData): InstructionReturn => {
   return compare(instruction.nes.cpu.X, instruction);
 };
 const CPY = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  return compare(instruction.nes.cpu.Y, instruction);
 };
 const DEC = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

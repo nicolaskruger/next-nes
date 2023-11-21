@@ -21,6 +21,7 @@ import {
   CLV,
   CMP,
   CPX,
+  CPY,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -720,6 +721,63 @@ describe("instruction test", () => {
       nes,
     });
     expect(totalCycle).toBe(2);
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("CPY, should set carry flag when Y >= memory", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0x0f;
+    const data = 0x0e;
+
+    const { nes: newNes, totalCycle } = CPY({
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.STATUS).toBe(1);
+  });
+
+  test("CPY, should set zero flag when Y == memory", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0xfe;
+    const data = 0xfe;
+
+    const { nes: newNes, totalCycle } = CPY({
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+  });
+
+  test("CPY, should set negative flag when the result was negative", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0xff;
+    const data = 0x0e;
+
+    const { nes: newNes, totalCycle } = CPY({
+      baseCycles: 2,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(2);
+
     expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
 });
