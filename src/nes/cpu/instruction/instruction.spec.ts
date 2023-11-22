@@ -33,6 +33,7 @@ import {
   JSR,
   LDA,
   LDX,
+  LDY,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1208,5 +1209,49 @@ describe("instruction test", () => {
     expect(_nes.cpu.STATUS).toBe(1 << 6);
 
     expect(_nes.cpu.X).toBe(0x80);
+  });
+
+  test("LDY, load Y a zero number", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0x01;
+
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = LDY({
+      baseCycles: 4,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+
+    expect(_nes.cpu.Y).toBe(0x00);
+  });
+
+  test("LDY, load Y a negative number", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0x00;
+
+    const data = 0x80;
+
+    const { nes: _nes, totalCycle } = LDY({
+      baseCycles: 4,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
+
+    expect(_nes.cpu.Y).toBe(0x80);
   });
 });

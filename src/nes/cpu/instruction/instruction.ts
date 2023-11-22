@@ -404,9 +404,10 @@ const LDA = (instruction: InstructionData): InstructionReturn =>
 
 const LDX = (instruction: InstructionData): InstructionReturn =>
   load(setX, instruction);
-const LDY = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
-};
+
+const LDY = (instruction: InstructionData): InstructionReturn =>
+  load(setY, instruction);
+
 const LSR = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
 };
