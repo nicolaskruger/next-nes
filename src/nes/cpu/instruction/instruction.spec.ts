@@ -28,6 +28,7 @@ import {
   EOR,
   INC,
   INX,
+  INY,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1035,5 +1036,45 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(5);
     expect(_nes.cpu.STATUS).toBe(1 << 6);
     expect(_nes.cpu.X).toBe(0x80);
+  });
+
+  test("INY, increment Y and set de Zero Flag", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0xff;
+
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = INY({
+      baseCycles: 5,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+    expect(_nes.cpu.Y).toBe(0);
+  });
+
+  test("INY, increment Y and set de Negative Flag", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0x7f;
+
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = INY({
+      baseCycles: 5,
+      cross: false,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
+    expect(_nes.cpu.Y).toBe(0x80);
   });
 });
