@@ -332,7 +332,16 @@ const EOR = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   };
 };
 const INC = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  const { nes, data: addr, baseCycles } = instruction;
+
+  const result = (readBus(addr, nes) + 1) & MASK_8;
+  let _nes = writeBus(addr, result, nes);
+  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
+
+  return {
+    nes: _nes,
+    totalCycle: baseCycles,
+  };
 };
 const INX = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

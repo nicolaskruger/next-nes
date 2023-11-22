@@ -26,6 +26,7 @@ import {
   DEX,
   DEY,
   EOR,
+  INC,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -950,5 +951,48 @@ describe("instruction test", () => {
     expect(_nes.cpu.ACC).toBe(0xff);
 
     expect(_nes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("INC, increment memory when value is 0xff and zero flag going to be set", () => {
+    const _nes = initNes();
+
+    _nes.bus[0x01].data = 0xff;
+
+    const data = 0x01;
+
+    const { nes, totalCycle } = INC({
+      baseCycles: 5,
+      cross: true,
+      offsetOnCross: 0,
+      data,
+      nes: _nes,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(nes.cpu.STATUS).toBe(1 << 1);
+
+    expect(nes.bus[0x01].data).toBe(0);
+  });
+  test("INC, increment memory when value is 0x7f and negative flag is set resulting in 0x80", () => {
+    const nes = initNes();
+
+    nes.bus[0x01].data = 0x7f;
+
+    const data = 0x01;
+
+    const { nes: _nes, totalCycle } = INC({
+      baseCycles: 5,
+      cross: true,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
+
+    expect(_nes.bus[0x01].data).toBe(0x80);
   });
 });
