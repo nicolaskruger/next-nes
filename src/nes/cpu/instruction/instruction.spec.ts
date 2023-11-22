@@ -855,6 +855,7 @@ describe("instruction test", () => {
       baseCycles: 5,
       cross: false,
       data,
+      addr: 0,
       nes,
       offsetOnCross: 0,
     });
@@ -864,7 +865,7 @@ describe("instruction test", () => {
     expect(newNes.bus[0].data).toBe(0);
   });
 
-  test("DEC, should decrement memory and ser negative flag when memory = 0", () => {
+  test("DEC, should decrement memory and set negative flag when memory = 0", () => {
     const nes = initNes();
 
     nes.bus[0].data = 0x00;
@@ -877,6 +878,7 @@ describe("instruction test", () => {
       data,
       nes,
       offsetOnCross: 0,
+      addr: 0,
     });
 
     expect(totalCycle).toBe(5);

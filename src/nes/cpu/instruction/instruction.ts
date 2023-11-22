@@ -331,7 +331,9 @@ const CPY = (instruction: InstructionData): InstructionReturn => {
 };
 
 const DEC = (instruction: InstructionData): InstructionReturn => {
-  const { nes, data: addr, baseCycles } = instruction;
+  const { nes, addr, baseCycles } = instruction;
+
+  if (addr === undefined) throw new Error("instruction DEC needs addr");
 
   const result = (readBus(addr, nes) - 1) & MASK_8;
   let _nes = writeBus(addr, result, nes);
