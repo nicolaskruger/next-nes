@@ -24,6 +24,7 @@ import {
   CPY,
   DEC,
   DEX,
+  DEY,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -861,6 +862,50 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(2);
 
     expect(newNes.cpu.X).toBe(0xff);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("DEY, decrement Y to zero", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 1;
+
+    const data = 0x00;
+
+    const { totalCycle, nes: newNes } = DEY({
+      baseCycles: 2,
+      cross: false,
+      data,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.Y).toBe(0);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 1);
+  });
+
+  test("DEY, decrement Y to 0xff", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0;
+
+    const data = 0x00;
+
+    const { totalCycle, nes: newNes } = DEY({
+      baseCycles: 2,
+      cross: false,
+      data,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.Y).toBe(0xff);
 
     expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
