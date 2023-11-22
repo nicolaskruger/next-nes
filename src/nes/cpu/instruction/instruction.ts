@@ -363,9 +363,14 @@ const INY = (instruction: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const JMP = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
-};
+const JMP = ({
+  baseCycles,
+  nes,
+  data,
+}: InstructionData): InstructionReturn => ({
+  totalCycle: baseCycles,
+  nes: setPC(data, nes),
+});
 const JSR = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
 };

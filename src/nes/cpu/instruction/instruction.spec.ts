@@ -29,6 +29,7 @@ import {
   INC,
   INX,
   INY,
+  JMP,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1076,5 +1077,23 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(5);
     expect(_nes.cpu.STATUS).toBe(1 << 6);
     expect(_nes.cpu.Y).toBe(0x80);
+  });
+
+  test("JMP", () => {
+    const nes = initNes();
+
+    const data = 0x1234;
+
+    const { nes: _nes, totalCycle } = JMP({
+      baseCycles: 5,
+      cross: true,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(_nes.cpu.PC).toBe(0x1234);
+
+    expect(totalCycle).toBe(5);
   });
 });
