@@ -1,5 +1,6 @@
 import { readBus } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
+import { setPC } from "../cpu";
 
 type Addr = {
   cross: boolean;
@@ -8,13 +9,13 @@ type Addr = {
 };
 
 const IMP = (nes: Nes): Addr => ({
-  nes: { ...nes, cpu: { ...nes.cpu, PC: nes.cpu.PC + 1 } },
+  nes: setPC(nes.cpu.PC + 1, nes),
   data: 0,
   cross: false,
 });
 
 const ACC = (nes: Nes): Addr => ({
-  nes: { ...nes, cpu: { ...nes.cpu, PC: nes.cpu.PC + 1 } },
+  nes: setPC(nes.cpu.PC + 1, nes),
   data: nes.cpu.ACC,
   cross: false,
 });
@@ -25,7 +26,7 @@ const IMM = (nes: Nes): Addr => {
   const data = readBus(PC, nes);
   PC++;
   return {
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
     data,
     cross: false,
   };
@@ -41,7 +42,7 @@ const ZERO_PAGE = (nes: Nes): Addr => {
 
   PC++;
   return {
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
     data,
     cross: false,
   };
@@ -67,7 +68,7 @@ const ZERO_PAGE_X = (nes: Nes): Addr => {
   return {
     cross,
     data,
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -91,7 +92,7 @@ const ZERO_PAGE_Y = (nes: Nes): Addr => {
   return {
     cross,
     data,
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -109,7 +110,7 @@ const RELATIVE = (nes: Nes): Addr => {
   return {
     cross: false,
     data,
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -130,7 +131,7 @@ const ABS = (nes: Nes): Addr => {
   return {
     cross: false,
     data,
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -153,7 +154,7 @@ const ABSX = (nes: Nes): Addr => {
   return {
     cross,
     data,
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -176,7 +177,7 @@ const ABSY = (nes: Nes): Addr => {
   return {
     cross,
     data,
-    nes: { ...nes, cpu: { ...cpu, PC } },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -203,13 +204,7 @@ const INDIRECT = (nes: Nes): Addr => {
   return {
     cross,
     data,
-    nes: {
-      ...nes,
-      cpu: {
-        ...cpu,
-        PC,
-      },
-    },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -228,13 +223,7 @@ const INDEXED_INDIRECT = (nes: Nes): Addr => {
   return {
     data,
     cross,
-    nes: {
-      ...nes,
-      cpu: {
-        ...cpu,
-        PC,
-      },
-    },
+    nes: setPC(PC, nes),
   };
 };
 
@@ -254,13 +243,7 @@ const INDIRECT_INDEXED = (nes: Nes): Addr => {
   return {
     data,
     cross,
-    nes: {
-      ...nes,
-      cpu: {
-        ...cpu,
-        PC,
-      },
-    },
+    nes: setPC(PC, nes),
   };
 };
 

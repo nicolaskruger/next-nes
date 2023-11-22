@@ -28,6 +28,17 @@ const getBreakCommand = (nes: Nes): number => (nes.cpu.STATUS >> 4) & 1;
 const getOverFlowFlag = (nes: Nes): number => (nes.cpu.STATUS >> 5) & 1;
 const getNegativeFlag = (nes: Nes): number => (nes.cpu.STATUS >> 6) & 1;
 
+const setCpu = (key: keyof Cpu, value: number, nes: Nes): Nes => ({
+  ...nes,
+  cpu: { ...nes.cpu, [key]: value },
+});
+
+const setACC = (value: number, nes: Nes) => setCpu("ACC", value, nes);
+const setX = (value: number, nes: Nes) => setCpu("X", value, nes);
+const setY = (value: number, nes: Nes) => setCpu("Y", value, nes);
+const setPC = (value: number, nes: Nes) => setCpu("PC", value, nes);
+const setSTK = (value: number, nes: Nes) => setCpu("STK", value, nes);
+
 const setFlag = (value: number, offset: number, nes: Nes): Cpu => ({
   ...nes.cpu,
   STATUS: value
@@ -113,6 +124,11 @@ export {
   setOverFlowFlag,
   setNegativeFlag,
   flagBuilder,
+  setX,
+  setY,
+  setSTK,
+  setPC,
+  setACC,
   NEGATIVE,
   CARRY,
   OVERFLOW,

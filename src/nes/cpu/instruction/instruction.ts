@@ -9,12 +9,15 @@ import {
   getNegativeFlag,
   getOverFlowFlag,
   getZeroFlag,
+  setACC,
   setBreakCommand,
   setCarryFlag,
   setDecimalMode,
   setInterruptDisable,
   setNegativeFlag,
   setOverFlowFlag,
+  setPC,
+  setSTK,
   setZeroFlag,
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
@@ -37,14 +40,6 @@ type CalculateCycles = Pick<
   InstructionData,
   "baseCycles" | "cross" | "offsetOnCross"
 >;
-
-const verifyIfCarryBit = (result: number) => {
-  return (result & 0x100) >> 8;
-};
-
-const verifyIfZero = (result: number) => ((result & 0xff) === 0 ? 1 : 0);
-
-const verifyNegative = (result: number) => (is8bitsNegative(result) ? 1 : 0);
 
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 
@@ -82,13 +77,7 @@ const ADC = ({
 
   return {
     totalCycle,
-    nes: {
-      ..._nes,
-      cpu: {
-        ..._nes.cpu,
-        ACC: result & MASK_8,
-      },
-    },
+    nes: setACC(result & MASK_8, _nes),
   };
 };
 
@@ -110,13 +99,7 @@ const AND = ({
 
   return {
     totalCycle,
-    nes: {
-      ..._nes,
-      cpu: {
-        ..._nes.cpu,
-        ACC: result,
-      },
-    },
+    nes: setACC(result, _nes),
   };
 };
 
@@ -128,7 +111,7 @@ const ACL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   const totalCycle = calculateCycles({ ...cycles });
 
   return {
-    nes: { ..._nes, cpu: { ..._nes.cpu, ACC: result & MASK_8 } },
+    nes: setACC(result & MASK_8, _nes),
     totalCycle,
   };
 };
@@ -156,13 +139,7 @@ const branch = (
   if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
 
   return {
-    nes: {
-      ...nes,
-      cpu: {
-        ...cpu,
-        PC,
-      },
-    },
+    nes: setPC(PC, nes),
     totalCycle: baseCycles + extraCycles,
   };
 };
@@ -223,13 +200,7 @@ const pushToStack = (nes: Nes, data: number): Nes => {
   if (STK < 0) throw new Error("stack overflow");
   const newNes = writeBus(0x0100 | STK, data, nes);
   STK--;
-  return {
-    ...newNes,
-    cpu: {
-      ...newNes.cpu,
-      STK,
-    },
-  };
+  return setSTK(STK, newNes);
 };
 
 const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
@@ -240,17 +211,9 @@ const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
 
   newNes = setBreakCommand(1, newNes);
 
-  const { cpu } = newNes;
-
   return {
     totalCycle: baseCycles,
-    nes: {
-      ...newNes,
-      cpu: {
-        ...cpu,
-        PC: 0xfffe,
-      },
-    },
+    nes: setPC(0xfffe, newNes),
   };
 };
 
@@ -289,7 +252,7 @@ const CLV = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
 };
 const compare = (
   value: number,
-  { data, nes, baseCycles, cross, offsetOnCross }: InstructionData
+  { data, nes, ...cycles }: InstructionData
 ): InstructionReturn => {
   const signedValue = make8bitSigned(value);
   const signedData = make8bitSigned(data);
@@ -313,7 +276,7 @@ const compare = (
 
   return {
     nes: newNes,
-    totalCycle: baseCycles + (cross ? offsetOnCross : 0),
+    totalCycle: calculateCycles(cycles),
   };
 };
 const CMP = (instruction: InstructionData): InstructionReturn => {
@@ -358,8 +321,15 @@ const DEY = (instruction: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const EOR = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const EOR = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
+  const result = data ^ nes.cpu.ACC;
+
+  const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
+
+  return {
+    nes: setACC(result, _nes),
+    totalCycle: calculateCycles(cycles),
+  };
 };
 const INC = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

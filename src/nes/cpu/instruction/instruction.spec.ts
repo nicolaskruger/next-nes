@@ -25,6 +25,7 @@ import {
   DEC,
   DEX,
   DEY,
+  EOR,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -908,5 +909,46 @@ describe("instruction test", () => {
     expect(newNes.cpu.Y).toBe(0xff);
 
     expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("EOR, should result in zero when ACC = 0xff and M = 0xff, set the zero flag and cross page", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xff;
+    const data = 0xff;
+
+    const { nes: _nes, totalCycle } = EOR({
+      baseCycles: 4,
+      cross: true,
+      data,
+      nes,
+      offsetOnCross: 1,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.ACC).toBe(0);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+  });
+  test("EOR, should result in negative when ACC = 0xff and M = 0x00, set the zero flag and cross page", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xff;
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = EOR({
+      baseCycles: 4,
+      cross: true,
+      data,
+      nes,
+      offsetOnCross: 1,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.ACC).toBe(0xff);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
   });
 });
