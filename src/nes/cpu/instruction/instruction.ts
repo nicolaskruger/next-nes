@@ -1,5 +1,10 @@
 import { Nes } from "@/nes/nes";
 import {
+  CARRY,
+  NEGATIVE,
+  OVERFLOW,
+  ZERO,
+  flagBuilder,
   getCarryFlag,
   getNegativeFlag,
   getOverFlowFlag,
@@ -41,11 +46,7 @@ const verifyIfZero = (result: number) => ((result & 0xff) === 0 ? 1 : 0);
 
 const verifyNegative = (result: number) => (is8bitsNegative(result) ? 1 : 0);
 
-const isOverFlow = (result: number, a: number, b: number) =>
-  (is8bitsNegative(result) && is8bitsPositive(a) && is8bitsPositive(b)) ||
-  (is8bitsPositive(result) && is8bitsNegative(a) && is8bitsNegative(b));
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
-const is8bitsPositive = (value: number) => !is8bitsNegative(value);
 
 const make8bitSigned = (value: number) => {
   if (is8bitsNegative(value)) return ~0xff | value;
@@ -66,28 +67,25 @@ const ADC = ({
   offsetOnCross,
 }: InstructionData): InstructionReturn => {
   const { cpu } = nes;
-  let CARRY = getCarryFlag(nes);
+  const CARRY_FLAG = getCarryFlag(nes);
   const { ACC } = cpu;
-  const result = data + CARRY + ACC;
-
-  CARRY = verifyIfCarryBit(result);
-  const ZERO = verifyIfZero(result);
-  const OVERFLOW = isOverFlow(result, data, ACC) ? 1 : 0;
-  const NEGATIVE = is8bitsNegative(result) ? 1 : 0;
+  const result = data + CARRY_FLAG + ACC;
 
   const totalCycle = baseCycles + (cross ? offsetOnCross : 0);
 
-  let newNes = setCarryFlag(CARRY, nes);
-  newNes = setZeroFlag(ZERO, newNes);
-  newNes = setOverFlowFlag(OVERFLOW, newNes);
-  newNes = setNegativeFlag(NEGATIVE, newNes);
+  const _nes = flagBuilder({ result, a: data, b: ACC }, nes, [
+    CARRY,
+    ZERO,
+    OVERFLOW,
+    NEGATIVE,
+  ]);
 
   return {
     totalCycle,
     nes: {
-      ...newNes,
+      ..._nes,
       cpu: {
-        ...newNes.cpu,
+        ..._nes.cpu,
         ACC: result & MASK_8,
       },
     },
@@ -106,20 +104,16 @@ const AND = ({
 
   const result = ACC & data;
 
-  const ZERO = verifyIfZero(result);
-  const NEGATIVE = verifyNegative(result);
-
-  let newNes = setZeroFlag(ZERO, nes);
-  newNes = setNegativeFlag(NEGATIVE, newNes);
+  const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
   const totalCycle = calculateCycles({ baseCycles, cross, offsetOnCross });
 
   return {
     totalCycle,
     nes: {
-      ...newNes,
+      ..._nes,
       cpu: {
-        ...newNes.cpu,
+        ..._nes.cpu,
         ACC: result,
       },
     },
@@ -129,31 +123,12 @@ const AND = ({
 const ACL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   const result = data << 1;
 
-  const CARRY = verifyIfCarryBit(result);
-  const ZERO = verifyIfZero(result);
-  const NEGATIVE = verifyNegative(result & MASK_8);
-
-  const newNes = [
-    {
-      set: setCarryFlag,
-      flag: CARRY,
-    },
-    {
-      set: setZeroFlag,
-      flag: ZERO,
-    },
-    {
-      set: setNegativeFlag,
-      flag: NEGATIVE,
-    },
-  ].reduce((acc, curr) => {
-    return curr.set(curr.flag, acc);
-  }, nes);
+  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
 
   const totalCycle = calculateCycles({ ...cycles });
 
   return {
-    nes: { ...newNes, cpu: { ...newNes.cpu, ACC: result & MASK_8 } },
+    nes: { ..._nes, cpu: { ..._nes.cpu, ACC: result & MASK_8 } },
     totalCycle,
   };
 };
@@ -210,23 +185,23 @@ const BEQ = (instruction: InstructionData): InstructionReturn => {
 const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   const result = data & nes.cpu.ACC;
 
-  const newNes = [
+  const _nes = flagBuilder({ result }, nes, [
     {
       set: setCarryFlag,
-      value: result === 0 ? 1 : 0,
+      flag: ({ result }) => (result === 0 ? 1 : 0),
     },
     {
       set: setOverFlowFlag,
-      value: (result >> 6) & 1,
+      flag: ({ result }) => (result >> 6) & 1,
     },
     {
       set: setNegativeFlag,
-      value: (result >> 7) & 1,
+      flag: ({ result }) => (result >> 7) & 1,
     },
-  ].reduce((acc, curr) => curr.set(curr.value, acc), nes);
+  ]);
 
   return {
-    nes: newNes,
+    nes: _nes,
     totalCycle: baseCycles,
   };
 };
@@ -355,16 +330,7 @@ const DEC = (instruction: InstructionData): InstructionReturn => {
 
   const result = (readBus(addr, nes) - 1) & MASK_8;
   let _nes = writeBus(addr, result, nes);
-  _nes = [
-    {
-      bit: result === 0 ? 1 : 0,
-      set: setZeroFlag,
-    },
-    {
-      bit: result >> 7,
-      set: setNegativeFlag,
-    },
-  ].reduce((acc, curr) => curr.set(curr.bit, acc), _nes);
+  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
 
   return {
     nes: _nes,
