@@ -32,6 +32,7 @@ import {
   JMP,
   JSR,
   LDA,
+  LDX,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1165,7 +1166,47 @@ describe("instruction test", () => {
     expect(_nes.cpu.ACC).toBe(0x80);
   });
 
-  test.skip("LDX, load X a zero number", () => {
-    throw new Error("not implemented");
+  test("LDX, load X a zero number", () => {
+    const nes = initNes();
+
+    nes.cpu.X = 0x01;
+
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = LDX({
+      baseCycles: 4,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+
+    expect(_nes.cpu.X).toBe(0x00);
+  });
+
+  test("LDX, load X a negative number", () => {
+    const nes = initNes();
+
+    nes.cpu.X = 0x00;
+
+    const data = 0x80;
+
+    const { nes: _nes, totalCycle } = LDX({
+      baseCycles: 4,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
+
+    expect(_nes.cpu.X).toBe(0x80);
   });
 });

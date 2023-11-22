@@ -292,6 +292,7 @@ const CPX = (instruction: InstructionData): InstructionReturn => {
 const CPY = (instruction: InstructionData): InstructionReturn => {
   return compare(instruction.nes.cpu.Y, instruction);
 };
+
 const DEC = (instruction: InstructionData): InstructionReturn => {
   const { nes, data: addr, baseCycles } = instruction;
 
@@ -362,10 +363,13 @@ const INC = (instruction: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
+
 const INX = (instruction: InstructionData): InstructionReturn =>
   increment(getX, setX, instruction);
+
 const INY = (instruction: InstructionData): InstructionReturn =>
   increment(getY, setY, instruction);
+
 const JMP = ({
   baseCycles,
   nes,
@@ -397,9 +401,9 @@ const load = (
 
 const LDA = (instruction: InstructionData): InstructionReturn =>
   load(setACC, instruction);
-const LDX = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
-};
+
+const LDX = (instruction: InstructionData): InstructionReturn =>
+  load(setX, instruction);
 const LDY = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
 };
