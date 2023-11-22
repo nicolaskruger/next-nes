@@ -371,8 +371,13 @@ const JMP = ({
   totalCycle: baseCycles,
   nes: setPC(data, nes),
 });
-const JSR = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const JSR = ({ nes, baseCycles, data }: InstructionData): InstructionReturn => {
+  let _nes = pushToStack(nes, nes.cpu.PC - 1);
+
+  return {
+    totalCycle: baseCycles,
+    nes: setPC(data, _nes),
+  };
 };
 const LDA = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

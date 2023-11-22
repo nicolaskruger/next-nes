@@ -30,6 +30,7 @@ import {
   INX,
   INY,
   JMP,
+  JSR,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1095,5 +1096,27 @@ describe("instruction test", () => {
     expect(_nes.cpu.PC).toBe(0x1234);
 
     expect(totalCycle).toBe(5);
+  });
+
+  test("JSR", () => {
+    const nes = initNes();
+
+    nes.cpu.PC = 3;
+
+    const data = 0x1234;
+
+    const { nes: _nes, totalCycle } = JSR({
+      baseCycles: 5,
+      cross: true,
+      offsetOnCross: 0,
+      data,
+      nes,
+    });
+
+    expect(totalCycle).toBe(5);
+
+    expect(_nes.cpu.PC).toBe(0x1234);
+
+    expect(_nes.bus[0x01ff].data).toBe(2);
   });
 });
