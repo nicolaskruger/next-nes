@@ -391,7 +391,9 @@ const EOR = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   };
 };
 const INC = (instruction: InstructionData): InstructionReturn => {
-  const { nes, data: addr, baseCycles } = instruction;
+  const { nes, addr, baseCycles } = instruction;
+
+  if (addr === undefined) throw new Error("instruction INC must have addr");
 
   const result = (readBus(addr, nes) + 1) & MASK_8;
   let _nes = writeBus(addr, result, nes);

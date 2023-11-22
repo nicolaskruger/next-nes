@@ -1027,6 +1027,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
       data,
       nes: _nes,
+      addr: 0x01,
     });
 
     expect(totalCycle).toBe(5);
@@ -1048,6 +1049,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
       data,
       nes,
+      addr: 0x01,
     });
 
     expect(totalCycle).toBe(5);
