@@ -3,6 +3,8 @@ import { Nes } from "@/nes/nes";
 import { setPC } from "../cpu";
 
 type Addr = {
+  acc?: boolean;
+  addr?: number;
   cross: boolean;
   data: number;
   nes: Nes;
@@ -18,17 +20,20 @@ const ACC = (nes: Nes): Addr => ({
   nes: setPC(nes.cpu.PC + 1, nes),
   data: nes.cpu.ACC,
   cross: false,
+  acc: true,
 });
 
 const IMM = (nes: Nes): Addr => {
   const { cpu } = nes;
   let PC = cpu.PC + 1;
-  const data = readBus(PC, nes);
+  const addr = PC;
+  const data = readBus(addr, nes);
   PC++;
   return {
     nes: setPC(PC, nes),
     data,
     cross: false,
+    addr: addr,
   };
 };
 
@@ -45,6 +50,7 @@ const ZERO_PAGE = (nes: Nes): Addr => {
     nes: setPC(PC, nes),
     data,
     cross: false,
+    addr: zeroPageAddr,
   };
 };
 
@@ -69,6 +75,7 @@ const ZERO_PAGE_X = (nes: Nes): Addr => {
     cross,
     data,
     nes: setPC(PC, nes),
+    addr,
   };
 };
 
@@ -93,6 +100,7 @@ const ZERO_PAGE_Y = (nes: Nes): Addr => {
     cross,
     data,
     nes: setPC(PC, nes),
+    addr,
   };
 };
 
@@ -101,7 +109,9 @@ const RELATIVE = (nes: Nes): Addr => {
 
   let PC = cpu.PC + 1;
 
-  let data = readBus(PC, nes);
+  const addr = PC;
+
+  let data = readBus(addr, nes);
 
   if (((data >> 7) & 1) == 1) data = (-1 << 8) | data;
 
@@ -111,6 +121,7 @@ const RELATIVE = (nes: Nes): Addr => {
     cross: false,
     data,
     nes: setPC(PC, nes),
+    addr,
   };
 };
 
@@ -132,6 +143,7 @@ const ABS = (nes: Nes): Addr => {
     cross: false,
     data,
     nes: setPC(PC, nes),
+    addr,
   };
 };
 
@@ -155,6 +167,7 @@ const ABSX = (nes: Nes): Addr => {
     cross,
     data,
     nes: setPC(PC, nes),
+    addr,
   };
 };
 
@@ -178,6 +191,7 @@ const ABSY = (nes: Nes): Addr => {
     cross,
     data,
     nes: setPC(PC, nes),
+    addr,
   };
 };
 

@@ -2,7 +2,7 @@ import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu } from "../cpu";
 import {
-  ACL,
+  ASL,
   ADC,
   AND,
   BCC,
@@ -162,7 +162,7 @@ describe("instruction test", () => {
     const nes = initNes();
     const data = 0x80;
 
-    const { nes: newNes, totalCycle } = ACL({
+    const { nes: newNes, totalCycle } = ASL({
       baseCycles: 1,
       cross: true,
       data,
@@ -181,7 +181,7 @@ describe("instruction test", () => {
     const nes = initNes();
     const data = 0x40;
 
-    const { nes: newNes, totalCycle } = ACL({
+    const { nes: newNes, totalCycle } = ASL({
       baseCycles: 1,
       cross: true,
       data,

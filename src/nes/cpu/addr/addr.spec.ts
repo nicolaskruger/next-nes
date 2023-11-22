@@ -73,11 +73,12 @@ describe("test addressing mode", () => {
 
     nes.cpu.ACC = 1;
 
-    const { cross, data, nes: newNes } = ACC(nes);
+    const { cross, data, nes: newNes, acc } = ACC(nes);
 
     expect(cross).toBeFalsy();
     expect(newNes.cpu.PC).toBe(1);
     expect(data).toBe(1);
+    expect(acc).toBe(true);
   });
 
   test("Immediate test", () => {
@@ -85,13 +86,15 @@ describe("test addressing mode", () => {
 
     expect(nes.cpu.PC).toBe(0);
 
-    const { cross, data, nes: newNes } = IMM(nes);
+    const { cross, data, nes: newNes, addr } = IMM(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(1);
 
     expect(newNes.cpu.PC).toBe(2);
+
+    expect(addr).toBe(1);
   });
   test("Zero page test", () => {
     const nes = initNesAllRam();
@@ -104,11 +107,13 @@ describe("test addressing mode", () => {
 
     nes.bus[addr].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE(nes);
+    const { cross, data, nes: newNes, addr: _addr } = ZERO_PAGE(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(5);
+
+    expect(addr).toBe(_addr);
 
     expect(newNes.cpu.PC).toBe(0x0102);
   });
@@ -124,13 +129,15 @@ describe("test addressing mode", () => {
 
     nes.bus[0x8f].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE_X(nes);
+    const { cross, data, nes: newNes, addr } = ZERO_PAGE_X(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x0102);
+
+    expect(addr).toBe(0x8f);
   });
   test("Zero page, x cross border", () => {
     const nes = initNesAllRam();
@@ -143,13 +150,15 @@ describe("test addressing mode", () => {
 
     nes.bus[0x7f].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE_X(nes);
+    const { cross, data, nes: newNes, addr } = ZERO_PAGE_X(nes);
 
     expect(cross).toBe(true);
 
     expect(data).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x0102);
+
+    expect(addr).toBe(0x7f);
   });
   test("Zero page, x no cross border", () => {
     const nes = initNesAllRam();
@@ -201,13 +210,15 @@ describe("test addressing mode", () => {
 
     nes.bus[0x8f].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE_Y(nes);
+    const { cross, data, nes: newNes, addr } = ZERO_PAGE_Y(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x0102);
+
+    expect(addr).toBe(0x8f);
   });
   test("Zero page, y cross border", () => {
     const nes = initNesAllRam();
@@ -220,26 +231,30 @@ describe("test addressing mode", () => {
 
     nes.bus[0x7f].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE_Y(nes);
+    const { cross, data, nes: newNes, addr } = ZERO_PAGE_Y(nes);
 
     expect(cross).toBe(true);
 
     expect(data).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x0102);
+
+    expect(addr).toBe(0x7f);
   });
   test("relative positive value", () => {
     const nes = initNesAllRam();
 
     nes.bus[0x1].data = 0x05;
 
-    const { cross, data, nes: newNes } = RELATIVE(nes);
+    const { cross, data, nes: newNes, addr } = RELATIVE(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(5);
 
     expect(newNes.cpu.PC).toBe(0x2);
+
+    expect(addr).toBe(1);
   });
 
   test("relative negative value", () => {
@@ -247,13 +262,15 @@ describe("test addressing mode", () => {
 
     nes.bus[0x1].data = 0xff;
 
-    const { cross, data, nes: newNes } = RELATIVE(nes);
+    const { cross, data, nes: newNes, addr } = RELATIVE(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(-1);
 
     expect(newNes.cpu.PC).toBe(0x2);
+
+    expect(addr).toBe(1);
   });
   test("relative all negative values", () => {
     let nes = initNesAllRam();
@@ -304,13 +321,15 @@ describe("test addressing mode", () => {
       data: 0x77,
     };
 
-    const { cross, data, nes: newNes } = ABS(nes);
+    const { cross, data, nes: newNes, addr } = ABS(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(0x77);
 
     expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1234);
   });
 
   test("absolute x, test, not cross border", () => {
@@ -332,13 +351,15 @@ describe("test addressing mode", () => {
 
     nes.cpu.X = 0x04;
 
-    const { cross, data, nes: newNes } = ABSX(nes);
+    const { cross, data, nes: newNes, addr } = ABSX(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(0x77);
 
     expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1234);
   });
   test("absolute x, test, cross border", () => {
     const nes = initNesAllRam();
@@ -359,13 +380,15 @@ describe("test addressing mode", () => {
 
     nes.cpu.X = 0xff;
 
-    const { cross, data, nes: newNes } = ABSX(nes);
+    const { cross, data, nes: newNes, addr } = ABSX(nes);
 
     expect(cross).toBe(true);
 
     expect(data).toBe(0x77);
 
     expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1300);
   });
 
   test("absolute y, test, not cross border", () => {
@@ -387,13 +410,15 @@ describe("test addressing mode", () => {
 
     nes.cpu.Y = 0x04;
 
-    const { cross, data, nes: newNes } = ABSY(nes);
+    const { cross, data, nes: newNes, addr } = ABSY(nes);
 
     expect(cross).toBe(false);
 
     expect(data).toBe(0x77);
 
     expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1234);
   });
   test("absolute y, test, cross border", () => {
     const nes = initNesAllRam();
@@ -414,13 +439,15 @@ describe("test addressing mode", () => {
 
     nes.cpu.Y = 0xff;
 
-    const { cross, data, nes: newNes } = ABSY(nes);
+    const { cross, data, nes: newNes, addr } = ABSY(nes);
 
     expect(cross).toBe(true);
 
     expect(data).toBe(0x77);
 
     expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1300);
   });
   test("indirect, when cross border on address and value", () => {
     const nes = initNesAllRam();

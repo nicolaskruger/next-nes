@@ -33,6 +33,8 @@ type InstructionData = {
   baseCycles: number;
   cross: boolean;
   offsetOnCross: number;
+  acc?: boolean;
+  addr?: number;
 };
 
 type InstructionReturn = {
@@ -107,7 +109,41 @@ const AND = ({
   };
 };
 
-const ACL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
+const ASL_ACC = ({
+  data,
+  nes,
+  ...cycles
+}: InstructionData): InstructionReturn => {
+  const result = data << 1;
+
+  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+
+  const totalCycle = calculateCycles({ ...cycles });
+
+  return {
+    nes: setACC(result & MASK_8, _nes),
+    totalCycle,
+  };
+};
+
+const ASL_MEMORY = ({
+  data,
+  nes,
+  ...cycles
+}: InstructionData): InstructionReturn => {
+  const result = data << 1;
+
+  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+
+  const totalCycle = calculateCycles({ ...cycles });
+
+  return {
+    nes: setACC(result & MASK_8, _nes),
+    totalCycle,
+  };
+};
+
+const ASL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   const result = data << 1;
 
   const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
@@ -485,7 +521,7 @@ const TYA = (instruction: InstructionData): InstructionReturn => {
 export {
   ADC,
   AND,
-  ACL,
+  ASL,
   BCC,
   BCS,
   BEQ,
