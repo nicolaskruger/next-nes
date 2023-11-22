@@ -31,6 +31,7 @@ import {
   INY,
   JMP,
   JSR,
+  LDA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1118,5 +1119,49 @@ describe("instruction test", () => {
     expect(_nes.cpu.PC).toBe(0x1234);
 
     expect(_nes.bus[0x01ff].data).toBe(2);
+  });
+
+  test("LDA, load the ACC a zero number", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xff;
+
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = LDA({
+      baseCycles: 6,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expect(totalCycle).toBe(7);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+
+    expect(_nes.cpu.ACC).toBe(0);
+  });
+
+  test("LDA, load the ACC a negative number", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x00;
+
+    const data = 0x80;
+
+    const { nes: _nes, totalCycle } = LDA({
+      baseCycles: 6,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expect(totalCycle).toBe(7);
+
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
+
+    expect(_nes.cpu.ACC).toBe(0x80);
   });
 });
