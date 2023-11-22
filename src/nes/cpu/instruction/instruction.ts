@@ -8,6 +8,8 @@ import {
   getCarryFlag,
   getNegativeFlag,
   getOverFlowFlag,
+  getX,
+  getY,
   getZeroFlag,
   setACC,
   setBreakCommand,
@@ -18,6 +20,8 @@ import {
   setOverFlowFlag,
   setPC,
   setSTK,
+  setX,
+  setY,
   setZeroFlag,
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
@@ -301,26 +305,41 @@ const DEC = (instruction: InstructionData): InstructionReturn => {
   };
 };
 
-const DEX = (instruction: InstructionData): InstructionReturn => {
-  const { nes, baseCycles } = instruction;
-  const result = (nes.cpu.X - 1) & MASK_8;
-  let _nes: Nes = { ...nes, cpu: { ...nes.cpu, X: result } };
+const operate = (
+  operation: "increment" | "decrement",
+  get: (nes: Nes) => number,
+  set: (value: number, nes: Nes) => Nes,
+  { nes, baseCycles }: InstructionData
+): InstructionReturn => {
+  const operator = operation === "increment" ? 1 : -1;
+
+  const result = (get(nes) + operator) & MASK_8;
+
+  let _nes: Nes = set(result, nes);
   _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
+
   return {
     nes: _nes,
     totalCycle: baseCycles,
   };
 };
-const DEY = (instruction: InstructionData): InstructionReturn => {
-  const { nes, baseCycles } = instruction;
-  const result = (nes.cpu.Y - 1) & MASK_8;
-  let _nes: Nes = { ...nes, cpu: { ...nes.cpu, Y: result } };
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
-};
+
+const decrement = (
+  get: (nes: Nes) => number,
+  set: (value: number, nes: Nes) => Nes,
+  instruction: InstructionData
+): InstructionReturn => operate("decrement", get, set, instruction);
+
+const increment = (
+  get: (nes: Nes) => number,
+  set: (value: number, nes: Nes) => Nes,
+  instruction: InstructionData
+): InstructionReturn => operate("increment", get, set, instruction);
+
+const DEX = (instruction: InstructionData): InstructionReturn =>
+  decrement(getX, setX, instruction);
+const DEY = (instruction: InstructionData): InstructionReturn =>
+  decrement(getY, setY, instruction);
 const EOR = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
   const result = data ^ nes.cpu.ACC;
 
@@ -343,26 +362,10 @@ const INC = (instruction: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const INX = (instruction: InstructionData): InstructionReturn => {
-  const { nes, baseCycles } = instruction;
-  const result = (nes.cpu.X + 1) & MASK_8;
-  let _nes: Nes = { ...nes, cpu: { ...nes.cpu, X: result } };
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
-};
-const INY = (instruction: InstructionData): InstructionReturn => {
-  const { nes, baseCycles } = instruction;
-  const result = (nes.cpu.Y + 1) & MASK_8;
-  let _nes: Nes = { ...nes, cpu: { ...nes.cpu, Y: result } };
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
-};
+const INX = (instruction: InstructionData): InstructionReturn =>
+  increment(getX, setX, instruction);
+const INY = (instruction: InstructionData): InstructionReturn =>
+  increment(getY, setY, instruction);
 const JMP = ({
   baseCycles,
   nes,
