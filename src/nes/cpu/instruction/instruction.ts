@@ -129,31 +129,32 @@ const ASL_ACC = ({
 const ASL_MEMORY = ({
   data,
   nes,
+  addr,
   ...cycles
 }: InstructionData): InstructionReturn => {
   const result = data << 1;
 
+  if (addr === undefined)
+    throw new Error("this instruction needs memory addr.");
+
   const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
 
   const totalCycle = calculateCycles({ ...cycles });
 
   return {
-    nes: setACC(result & MASK_8, _nes),
+    nes: writeBus(addr, result & MASK_8, _nes),
     totalCycle,
   };
 };
 
-const ASL = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
-  const result = data << 1;
+const ASL = (instruction: InstructionData): InstructionReturn => {
+  const { acc } = instruction;
 
-  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
-
-  const totalCycle = calculateCycles({ ...cycles });
-
-  return {
-    nes: setACC(result & MASK_8, _nes),
-    totalCycle,
-  };
+  if (acc) {
+    return ASL_ACC(instruction);
+  } else {
+    return ASL_MEMORY(instruction);
+  }
 };
 
 const branch = (

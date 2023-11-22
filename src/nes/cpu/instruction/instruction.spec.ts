@@ -158,7 +158,57 @@ describe("instruction test", () => {
     expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
 
-  test("ASL, when cary flag and zero flag is set", () => {
+  test("ASL, carry flag and zero flag is set on memory operator", () => {
+    const nes = initNes();
+
+    const addr = 0x0000;
+
+    const data = 1 << 7;
+
+    nes.bus[addr].data = data;
+
+    const { nes: newNes, totalCycle } = ASL({
+      baseCycles: 1,
+      cross: true,
+      data,
+      nes,
+      offsetOnCross: 1,
+      addr,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.bus[addr].data).toBe(0);
+
+    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+  });
+
+  test("ASL, negative is set on acc operation on memory operator", () => {
+    const nes = initNes();
+
+    const addr = 0x0000;
+
+    const data = 1 << 6;
+
+    nes.bus[addr].data = data;
+
+    const { nes: newNes, totalCycle } = ASL({
+      baseCycles: 1,
+      cross: true,
+      data,
+      nes,
+      offsetOnCross: 1,
+      addr,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.bus[addr].data).toBe(1 << 7);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("ASL, when cary flag and zero flag is set on accumulator operator", () => {
     const nes = initNes();
     const data = 0x80;
 
@@ -168,6 +218,7 @@ describe("instruction test", () => {
       data,
       nes,
       offsetOnCross: 1,
+      acc: true,
     });
 
     expect(totalCycle).toBe(2);
@@ -177,7 +228,7 @@ describe("instruction test", () => {
     expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
   });
 
-  test("ASL, when negative is set", () => {
+  test("ASL, when negative is set on acc operation", () => {
     const nes = initNes();
     const data = 0x40;
 
@@ -187,6 +238,7 @@ describe("instruction test", () => {
       data,
       nes,
       offsetOnCross: 1,
+      acc: true,
     });
 
     expect(totalCycle).toBe(2);
