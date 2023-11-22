@@ -379,18 +379,21 @@ const JSR = ({ nes, baseCycles, data }: InstructionData): InstructionReturn => {
     nes: setPC(data, _nes),
   };
 };
-const LDA = ({
-  nes,
-  data: result,
-  ...cycles
-}: InstructionData): InstructionReturn => {
+
+const load = (
+  set: (result: number, nes: Nes) => Nes,
+  { nes, data: result, ...cycles }: InstructionData
+): InstructionReturn => {
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
   return {
-    nes: setACC(result, _nes),
+    nes: set(result, _nes),
     totalCycle: calculateCycles(cycles),
   };
 };
+
+const LDA = (instruction: InstructionData): InstructionReturn =>
+  load(setACC, instruction);
 const LDX = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
 };

@@ -32,12 +32,18 @@ const setCpu = (key: keyof Cpu, value: number, nes: Nes): Nes => ({
   ...nes,
   cpu: { ...nes.cpu, [key]: value },
 });
-
 const setACC = (value: number, nes: Nes) => setCpu("ACC", value, nes);
 const setX = (value: number, nes: Nes) => setCpu("X", value, nes);
 const setY = (value: number, nes: Nes) => setCpu("Y", value, nes);
 const setPC = (value: number, nes: Nes) => setCpu("PC", value, nes);
 const setSTK = (value: number, nes: Nes) => setCpu("STK", value, nes);
+
+const getCpu = (key: keyof Cpu, nes: Nes): number => nes.cpu[key];
+const getACC = (nes: Nes): number => getCpu("ACC", nes);
+const getX = (nes: Nes): number => getCpu("X", nes);
+const getY = (nes: Nes): number => getCpu("Y", nes);
+const getPC = (nes: Nes): number => getCpu("PC", nes);
+const getSTK = (nes: Nes): number => getCpu("STK", nes);
 
 const setFlag = (value: number, offset: number, nes: Nes): Cpu => ({
   ...nes.cpu,
@@ -129,6 +135,12 @@ export {
   setSTK,
   setPC,
   setACC,
+  getACC,
+  getCpu,
+  getPC,
+  getSTK,
+  getX,
+  getY,
   NEGATIVE,
   CARRY,
   OVERFLOW,

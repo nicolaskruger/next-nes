@@ -1164,4 +1164,8 @@ describe("instruction test", () => {
 
     expect(_nes.cpu.ACC).toBe(0x80);
   });
+
+  test.skip("LDX, load X a zero number", () => {
+    throw new Error("not implemented");
+  });
 });
