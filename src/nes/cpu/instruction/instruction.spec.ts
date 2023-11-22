@@ -23,6 +23,7 @@ import {
   CPX,
   CPY,
   DEC,
+  DEX,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -819,5 +820,48 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(5);
     expect(newNes.cpu.STATUS).toBe(1 << 6);
     expect(newNes.bus[0].data).toBe(0xff);
+  });
+  test("DEX, decrement X to zero", () => {
+    const nes = initNes();
+
+    nes.cpu.X = 1;
+
+    const data = 0x00;
+
+    const { totalCycle, nes: newNes } = DEX({
+      baseCycles: 2,
+      cross: false,
+      data,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.X).toBe(0);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 1);
+  });
+
+  test("DEX, decrement X to 0xff", () => {
+    const nes = initNes();
+
+    nes.cpu.X = 0;
+
+    const data = 0x00;
+
+    const { totalCycle, nes: newNes } = DEX({
+      baseCycles: 2,
+      cross: false,
+      data,
+      nes,
+      offsetOnCross: 0,
+    });
+
+    expect(totalCycle).toBe(2);
+
+    expect(newNes.cpu.X).toBe(0xff);
+
+    expect(newNes.cpu.STATUS).toBe(1 << 6);
   });
 });

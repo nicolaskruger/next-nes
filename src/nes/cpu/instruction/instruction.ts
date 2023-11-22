@@ -337,8 +337,16 @@ const DEC = (instruction: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
+
 const DEX = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  const { nes, baseCycles } = instruction;
+  const result = (nes.cpu.X - 1) & MASK_8;
+  let _nes: Nes = { ...nes, cpu: { ...nes.cpu, X: result } };
+  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
+  return {
+    nes: _nes,
+    totalCycle: baseCycles,
+  };
 };
 const DEY = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
