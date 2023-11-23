@@ -40,6 +40,7 @@ import {
   InstructionData,
   PHA,
   PHP,
+  PLA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1439,5 +1440,42 @@ describe("instruction test", () => {
 
     expect(_nes.cpu.STK).toBe(0xfe);
     expect(_nes.bus[0x01ff].data).toBe(0x12);
+  });
+
+  test("PLA, pull accumulator a zero value", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0xff;
+    nes.cpu.STK = 0xfe;
+    nes.bus[0x01ff].data = 0x00;
+
+    const { nes: _nes, totalCycle } = PLA({
+      baseCycles: 4,
+      nes,
+    } as InstructionData);
+
+    expect(totalCycle).toBe(4);
+
+    expect(_nes.cpu.ACC).toBe(0);
+    expect(_nes.cpu.STK).toBe(0xff);
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+  });
+  test("PLA, pull accumulator a negative value", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x0f;
+    nes.cpu.STK = 0xfe;
+    nes.bus[0x01ff].data = 0xf0;
+
+    const { nes: _nes, totalCycle } = PLA({
+      baseCycles: 4,
+      nes,
+    } as InstructionData);
+
+    expect(totalCycle).toBe(4);
+
+    expect(_nes.cpu.ACC).toBe(0xf0);
+    expect(_nes.cpu.STK).toBe(0xff);
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
   });
 });

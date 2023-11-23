@@ -11,6 +11,7 @@ import {
   getNegativeFlag,
   getOverFlowFlag,
   getSTATUS,
+  getSTK,
   getX,
   getY,
   getZeroFlag,
@@ -245,6 +246,14 @@ const pushToStack = (nes: Nes, data: number): Nes => {
   const newNes = writeBus(0x0100 | STK, data, nes);
   STK--;
   return setSTK(STK, newNes);
+};
+
+const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
+  let STK = getSTK(nes);
+  STK++;
+  if (STK > 0xff) throw new Error("stack overflow");
+  const value = readBus(0x0100 | STK, nes);
+  return [value, setSTK(STK, nes)];
 };
 
 const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
@@ -523,8 +532,15 @@ const PHP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const PLA = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const PLA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  let [result, _nes] = pullFromStack(nes);
+
+  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
+
+  return {
+    nes: setACC(result, _nes),
+    totalCycle: baseCycles,
+  };
 };
 const PLP = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
