@@ -550,8 +550,51 @@ const PLP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
+
+const ROL_ACC = ({
+  data,
+  nes,
+  baseCycles,
+}: InstructionData): InstructionReturn => {
+  const CARRY_BIT = data >> 7;
+
+  const result = (data << 1) | CARRY_BIT;
+
+  let _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+
+  return {
+    nes: setACC(MASK_8 & result, _nes),
+    totalCycle: baseCycles,
+  };
+};
+
+const ROL_MEMORY = ({
+  data,
+  nes,
+  baseCycles,
+  addr,
+}: InstructionData): InstructionReturn => {
+  if (addr === undefined) throw new Error("ROL must have addr.");
+  const CARRY_BIT = data >> 7;
+
+  const result = (data << 1) | CARRY_BIT;
+
+  let _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+
+  return {
+    nes: writeBus(addr, MASK_8 & result, _nes),
+    totalCycle: baseCycles,
+  };
+};
+
 const ROL = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  const { acc } = instruction;
+
+  if (acc) {
+    return ROL_ACC(instruction);
+  } else {
+    return ROL_MEMORY(instruction);
+  }
 };
 const POR = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

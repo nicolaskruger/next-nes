@@ -42,6 +42,7 @@ import {
   PHP,
   PLA,
   PLP,
+  ROL,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1495,5 +1496,67 @@ describe("instruction test", () => {
 
     expect(_nes.cpu.STATUS).toBe(0x12);
     expect(_nes.cpu.STK).toBe(0xff);
+  });
+
+  test("ROL, rotate left the accumulator when value is 1000-0000 binary carry flag is set", () => {
+    const nes = initNes();
+
+    const data = 1 << 7;
+
+    const { totalCycle, nes: _nes } = ROL({
+      baseCycles: 2,
+      nes,
+      data,
+      acc: true,
+    } as InstructionData);
+
+    const { cpu } = _nes;
+
+    expect(totalCycle).toBe(2);
+
+    expect(cpu.ACC).toBe(1);
+
+    expect(cpu.STATUS).toBe(1);
+  });
+  test("ROL, rotate left the memory when value is 0100-0000 binary negative flag is set", () => {
+    const nes = initNes();
+
+    const data = 1 << 6;
+
+    const { nes: _nes, totalCycle } = ROL({
+      baseCycles: 2,
+      nes,
+      data,
+      addr: 0x0000,
+    } as InstructionData);
+
+    const { cpu, bus } = _nes;
+
+    expect(totalCycle).toBe(2);
+
+    expect(bus[0x0000].data).toBe(1 << 7);
+
+    expect(cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("ROL, rotate left the accumulator when value is 0x00 zero flag is set", () => {
+    const nes = initNes();
+
+    const data = 0;
+
+    const { nes: _nes, totalCycle } = ROL({
+      baseCycles: 2,
+      nes,
+      data,
+      acc: true,
+    } as InstructionData);
+
+    const { cpu } = _nes;
+
+    expect(totalCycle).toBe(2);
+
+    expect(cpu.ACC).toBe(0);
+
+    expect(cpu.STATUS).toBe(1 << 1);
   });
 });
