@@ -10,6 +10,7 @@ import {
   getCarryFlag,
   getNegativeFlag,
   getOverFlowFlag,
+  getSTATUS,
   getX,
   getY,
   getZeroFlag,
@@ -514,8 +515,13 @@ const PHA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const PHP = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const PHP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  const STATUS = getSTATUS(nes);
+  let _nes = pushToStack(nes, STATUS);
+  return {
+    nes: _nes,
+    totalCycle: baseCycles,
+  };
 };
 const PLA = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

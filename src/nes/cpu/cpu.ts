@@ -45,6 +45,7 @@ const getX = (nes: Nes): number => getCpu("X", nes);
 const getY = (nes: Nes): number => getCpu("Y", nes);
 const getPC = (nes: Nes): number => getCpu("PC", nes);
 const getSTK = (nes: Nes): number => getCpu("STK", nes);
+const getSTATUS = (nes: Nes): number => getCpu("STATUS", nes);
 
 const setFlag = (value: number, offset: number, nes: Nes): Cpu => ({
   ...nes.cpu,
@@ -147,6 +148,7 @@ export {
   getSTK,
   getX,
   getY,
+  getSTATUS,
   NEGATIVE,
   CARRY,
   OVERFLOW,
