@@ -506,8 +506,13 @@ const ORA = ({ nes, data, ...cycles }: InstructionData): InstructionReturn => {
     totalCycle: calculateCycles(cycles),
   };
 };
-const PHA = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const PHA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  const ACC = getACC(nes);
+  let _nes = pushToStack(nes, ACC);
+  return {
+    nes: _nes,
+    totalCycle: baseCycles,
+  };
 };
 const PHP = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
@@ -628,3 +633,5 @@ export {
   TXS,
   TYA,
 };
+
+export type { InstructionData };

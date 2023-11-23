@@ -37,6 +37,8 @@ import {
   LSR,
   NOP,
   ORA,
+  InstructionData,
+  PHA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1404,5 +1406,21 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(6);
     expect(_nes.cpu.ACC).toBe((1 << 7) | (1 << 6));
     expect(_nes.cpu.STATUS).toBe(1 << 6);
+  });
+
+  test("PHA, push a copy of the ACC to the stack", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x12;
+
+    const { nes: _nes, totalCycle } = PHA({
+      baseCycles: 3,
+      nes,
+    } as InstructionData);
+
+    expect(totalCycle).toBe(3);
+
+    expect(_nes.cpu.STK).toBe(0xfe);
+    expect(_nes.bus[0x01ff].data).toBe(0x12);
   });
 });
