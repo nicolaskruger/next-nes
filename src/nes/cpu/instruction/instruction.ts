@@ -551,16 +551,22 @@ const PLP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
+const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
+  const CARRY_BIT = data >> 7;
+
+  const result = (data << 1) | CARRY_BIT;
+
+  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+
+  return [result & MASK_8, _nes];
+};
+
 const ROL_ACC = ({
   data,
   nes,
   baseCycles,
 }: InstructionData): InstructionReturn => {
-  const CARRY_BIT = data >> 7;
-
-  const result = (data << 1) | CARRY_BIT;
-
-  let _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+  const [result, _nes] = ROL_RESULT(data, nes);
 
   return {
     nes: setACC(MASK_8 & result, _nes),
@@ -575,14 +581,11 @@ const ROL_MEMORY = ({
   addr,
 }: InstructionData): InstructionReturn => {
   if (addr === undefined) throw new Error("ROL must have addr.");
-  const CARRY_BIT = data >> 7;
 
-  const result = (data << 1) | CARRY_BIT;
-
-  let _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+  const [result, _nes] = ROL_RESULT(data, nes);
 
   return {
-    nes: writeBus(addr, MASK_8 & result, _nes),
+    nes: writeBus(addr, result, _nes),
     totalCycle: baseCycles,
   };
 };
