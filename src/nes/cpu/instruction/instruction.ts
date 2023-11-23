@@ -1,6 +1,7 @@
 import { Nes } from "@/nes/nes";
 import {
   CARRY,
+  CARRY_SHIFT_RIGHT,
   NEGATIVE,
   OVERFLOW,
   ZERO,
@@ -449,8 +450,45 @@ const LDX = (instruction: InstructionData): InstructionReturn =>
 const LDY = (instruction: InstructionData): InstructionReturn =>
   load(setY, instruction);
 
+const LSR_ACC = ({
+  data,
+  nes,
+  baseCycles,
+}: InstructionData): InstructionReturn => {
+  const result = data >> 1;
+
+  let _nes = flagBuilder({ result, data }, nes, [CARRY_SHIFT_RIGHT, ZERO]);
+
+  return {
+    nes: setACC(result, _nes),
+    totalCycle: baseCycles,
+  };
+};
+
+const LSR_MEMORY = ({
+  data,
+  nes,
+  baseCycles,
+  addr,
+}: InstructionData): InstructionReturn => {
+  if (addr === undefined) throw new Error("addr can't be undefined on LSR");
+
+  const result = data >> 1;
+
+  let _nes = flagBuilder({ result }, nes, [CARRY_SHIFT_RIGHT, ZERO]);
+
+  return {
+    nes: writeBus(addr, result, _nes),
+    totalCycle: baseCycles,
+  };
+};
+
 const LSR = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+  if (instruction.acc) {
+    return LSR_ACC(instruction);
+  } else {
+    return LSR_MEMORY(instruction);
+  }
 };
 const NOP = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

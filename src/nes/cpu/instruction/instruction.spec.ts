@@ -34,6 +34,7 @@ import {
   LDA,
   LDX,
   LDY,
+  LSR,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1309,5 +1310,47 @@ describe("instruction test", () => {
     expect(_nes.cpu.STATUS).toBe(1 << 6);
 
     expect(_nes.cpu.Y).toBe(0x80);
+  });
+
+  test("LSR, shift right on the accumulator carry flag is set and zero flag is set to", () => {
+    const nes = initNes();
+
+    const data = 0x01;
+
+    const { nes: _nes, totalCycle } = LSR({
+      baseCycles: 6,
+      data,
+      cross: false,
+      offsetOnCross: 0,
+      nes,
+      acc: true,
+    });
+
+    expect(totalCycle).toBe(6);
+
+    expect(_nes.cpu.STATUS).toBe((1 << 1) | 1);
+
+    expect(_nes.cpu.ACC).toBe(0);
+  });
+
+  test("LSR, shift right on the memory ", () => {
+    const nes = initNes();
+
+    const data = 0x02;
+
+    const { nes: _nes, totalCycle } = LSR({
+      baseCycles: 6,
+      data,
+      cross: false,
+      offsetOnCross: 0,
+      nes,
+      addr: 0x00,
+    });
+
+    expect(totalCycle).toBe(6);
+
+    expect(_nes.cpu.STATUS).toBe(0);
+
+    expect(_nes.bus[0x00].data).toBe(0x01);
   });
 });

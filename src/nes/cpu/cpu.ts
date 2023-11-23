@@ -13,6 +13,7 @@ type FlagOperator = {
   result: number;
   a?: number;
   b?: number;
+  data?: number;
 };
 
 type FlagBuilder = {
@@ -87,6 +88,11 @@ const isOverFlow = (result: number, a: number, b: number) =>
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 const is8bitsPositive = (value: number) => !is8bitsNegative(value);
 
+const CARRY_SHIFT_RIGHT: FlagBuilder = {
+  flag: ({ data }) => data as number & 1,
+  set: setCarryFlag,
+};
+
 const CARRY: FlagBuilder = {
   flag: ({ result }) => (result & 0x100) >> 8,
   set: setCarryFlag,
@@ -145,6 +151,7 @@ export {
   CARRY,
   OVERFLOW,
   ZERO,
+  CARRY_SHIFT_RIGHT,
 };
 
 export type { Cpu };
