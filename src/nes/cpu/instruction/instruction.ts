@@ -137,8 +137,6 @@ const ASL_MEMORY = ({
   addr,
   ...cycles
 }: InstructionData): InstructionReturn => {
-  const result = data << 1;
-
   if (addr === undefined)
     throw new Error("this instruction needs memory addr.");
 
