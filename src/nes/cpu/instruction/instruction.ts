@@ -23,6 +23,7 @@ import {
   setNegativeFlag,
   setOverFlowFlag,
   setPC,
+  setSTATUS,
   setSTK,
   setX,
   setY,
@@ -542,8 +543,12 @@ const PLA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const PLP = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const PLP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+  const [STATUS, _nes] = pullFromStack(nes);
+  return {
+    nes: setSTATUS(STATUS, _nes),
+    totalCycle: baseCycles,
+  };
 };
 const ROL = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");

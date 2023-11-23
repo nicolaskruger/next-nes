@@ -38,6 +38,7 @@ const setX = (value: number, nes: Nes) => setCpu("X", value, nes);
 const setY = (value: number, nes: Nes) => setCpu("Y", value, nes);
 const setPC = (value: number, nes: Nes) => setCpu("PC", value, nes);
 const setSTK = (value: number, nes: Nes) => setCpu("STK", value, nes);
+const setSTATUS = (value: number, nes: Nes) => setCpu("STATUS", value, nes);
 
 const getCpu = (key: keyof Cpu, nes: Nes): number => nes.cpu[key];
 const getACC = (nes: Nes): number => getCpu("ACC", nes);
@@ -142,6 +143,7 @@ export {
   setSTK,
   setPC,
   setACC,
+  setSTATUS,
   getACC,
   getCpu,
   getPC,

@@ -41,6 +41,7 @@ import {
   PHA,
   PHP,
   PLA,
+  PLP,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1477,5 +1478,22 @@ describe("instruction test", () => {
     expect(_nes.cpu.ACC).toBe(0xf0);
     expect(_nes.cpu.STK).toBe(0xff);
     expect(_nes.cpu.STATUS).toBe(1 << 6);
+  });
+  test("PLP, pull process Status", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 0x00;
+    nes.cpu.STK = 0xfe;
+    nes.bus[0x01ff].data = 0x12;
+
+    const { nes: _nes, totalCycle } = PLP({
+      baseCycles: 4,
+      nes,
+    } as InstructionData);
+
+    expect(totalCycle).toBe(4);
+
+    expect(_nes.cpu.STATUS).toBe(0x12);
+    expect(_nes.cpu.STK).toBe(0xff);
   });
 });
