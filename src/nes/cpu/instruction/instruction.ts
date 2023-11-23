@@ -114,19 +114,29 @@ const AND = ({
   };
 };
 
-const ASL_ACC = ({
-  data,
-  nes,
-  ...cycles
-}: InstructionData): InstructionReturn => {
+const ASL_RESULT_CYCLES = (
+  data: number,
+  cycles: CalculateCycles,
+  nes: Nes
+): [result: number, totalCycles: number, nes: Nes] => {
   const result = data << 1;
 
   const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
 
   const totalCycle = calculateCycles({ ...cycles });
 
+  return [result & MASK_8, totalCycle, _nes];
+};
+
+const ASL_ACC = ({
+  data,
+  nes,
+  ...cycles
+}: InstructionData): InstructionReturn => {
+  const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
+
   return {
-    nes: setACC(result & MASK_8, _nes),
+    nes: setACC(result, _nes),
     totalCycle,
   };
 };
@@ -140,12 +150,10 @@ const ASL_MEMORY = ({
   if (addr === undefined)
     throw new Error("this instruction needs memory addr.");
 
-  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
-
-  const totalCycle = calculateCycles({ ...cycles });
+  const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
 
   return {
-    nes: writeBus(addr, result & MASK_8, _nes),
+    nes: writeBus(addr, result, _nes),
     totalCycle,
   };
 };
@@ -601,8 +609,53 @@ const ROL = (instruction: InstructionData): InstructionReturn => {
     return ROL_MEMORY(instruction);
   }
 };
-const POR = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+
+const ROR_RESULT = (data: number, nes: Nes): [result: number, _nes: Nes] => {
+  const CARRY_BIT = data & 1;
+
+  const result = (CARRY_BIT << 7) | (data >> 1);
+
+  const _nes = flagBuilder({ result, data }, nes, [
+    CARRY_SHIFT_RIGHT,
+    ZERO,
+    NEGATIVE,
+  ]);
+
+  return [result, _nes];
+};
+
+const ROR_ACC = ({
+  data,
+  nes,
+  baseCycles,
+}: InstructionData): InstructionReturn => {
+  const [result, _nes] = ROR_RESULT(data, nes);
+
+  return {
+    nes: setACC(result, _nes),
+    totalCycle: baseCycles,
+  };
+};
+
+const ROR_MEMORY = ({
+  data,
+  nes,
+  baseCycles,
+  addr,
+}: InstructionData): InstructionReturn => {
+  if (addr === undefined) throw new Error("ROR memory need a addr");
+
+  const [result, _nes] = ROL_RESULT(data, nes);
+
+  return {
+    nes: writeBus(addr, result, _nes),
+    totalCycle: baseCycles,
+  };
+};
+
+const ROR = ({ acc, ...instruction }: InstructionData): InstructionReturn => {
+  if (acc) return ROR_ACC(instruction);
+  else return ROR_MEMORY(instruction);
 };
 const RTI = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
@@ -691,7 +744,7 @@ export {
   PLA,
   PLP,
   ROL,
-  POR,
+  ROR,
   RTI,
   RTS,
   SBC,

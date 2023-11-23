@@ -43,6 +43,7 @@ import {
   PLA,
   PLP,
   ROL,
+  ROR,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1556,6 +1557,50 @@ describe("instruction test", () => {
     expect(totalCycle).toBe(2);
 
     expect(cpu.ACC).toBe(0);
+
+    expect(cpu.STATUS).toBe(1 << 1);
+  });
+
+  test("ROR, rotate right the accumulator when value is 0x01 then cary flag and negative flag are set", () => {
+    const nes = initNes();
+
+    const data = 0x01;
+
+    const { nes: _nes, totalCycle } = ROR({
+      baseCycles: 2,
+      nes,
+      data,
+      acc: true,
+    } as InstructionData);
+
+    const { cpu } = _nes;
+
+    expect(totalCycle).toBe(2);
+
+    expect(cpu.ACC).toBe(1 << 7);
+
+    expect(cpu.STATUS).toBe((1 << 6) | 1);
+  });
+
+  test("ROR, rotate right the memory when value is 0x00 then zero flag are set", () => {
+    const nes = initNes();
+
+    nes.bus[0].data = 0x01;
+
+    const data = 0x00;
+
+    const { nes: _nes, totalCycle } = ROR({
+      baseCycles: 2,
+      nes,
+      data,
+      addr: 0x00,
+    } as InstructionData);
+
+    const { cpu, bus } = _nes;
+
+    expect(totalCycle).toBe(2);
+
+    expect(bus[0].data).toBe(0x00);
 
     expect(cpu.STATUS).toBe(1 << 1);
   });
