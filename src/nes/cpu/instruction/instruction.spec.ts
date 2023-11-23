@@ -36,6 +36,7 @@ import {
   LDY,
   LSR,
   NOP,
+  ORA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1367,5 +1368,41 @@ describe("instruction test", () => {
     });
 
     expect(totalCycle).toBe(6);
+  });
+
+  test("ORA, when zero flag", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0;
+
+    const { nes: _nes, totalCycle } = ORA({
+      baseCycles: 5,
+      data: 0x00,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+    });
+
+    expect(totalCycle).toBe(6);
+    expect(_nes.cpu.ACC).toBe(0);
+    expect(_nes.cpu.STATUS).toBe(1 << 1);
+  });
+
+  test("ORA, when negative flag", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 1 << 7;
+
+    const { nes: _nes, totalCycle } = ORA({
+      baseCycles: 5,
+      data: 1 << 6,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+    });
+
+    expect(totalCycle).toBe(6);
+    expect(_nes.cpu.ACC).toBe((1 << 7) | (1 << 6));
+    expect(_nes.cpu.STATUS).toBe(1 << 6);
   });
 });

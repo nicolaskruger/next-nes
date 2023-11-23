@@ -6,6 +6,7 @@ import {
   OVERFLOW,
   ZERO,
   flagBuilder,
+  getACC,
   getCarryFlag,
   getNegativeFlag,
   getOverFlowFlag,
@@ -495,8 +496,15 @@ const NOP = ({ nes, baseCycles }: InstructionData): InstructionReturn => ({
   totalCycle: baseCycles,
 });
 
-const ORA = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
+const ORA = ({ nes, data, ...cycles }: InstructionData): InstructionReturn => {
+  const result = getACC(nes) | data;
+
+  let _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
+
+  return {
+    nes: setACC(result, _nes),
+    totalCycle: calculateCycles(cycles),
+  };
 };
 const PHA = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
