@@ -462,14 +462,20 @@ const LDX = (instruction: InstructionData): InstructionReturn =>
 const LDY = (instruction: InstructionData): InstructionReturn =>
   load(setY, instruction);
 
+const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
+  const result = data >> 1;
+
+  const _nes = flagBuilder({ result, data }, nes, [CARRY_SHIFT_RIGHT, ZERO]);
+
+  return [result, _nes];
+};
+
 const LSR_ACC = ({
   data,
   nes,
   baseCycles,
 }: InstructionData): InstructionReturn => {
-  const result = data >> 1;
-
-  let _nes = flagBuilder({ result, data }, nes, [CARRY_SHIFT_RIGHT, ZERO]);
+  const [result, _nes] = LSR_RESULT(data, nes);
 
   return {
     nes: setACC(result, _nes),
@@ -485,9 +491,7 @@ const LSR_MEMORY = ({
 }: InstructionData): InstructionReturn => {
   if (addr === undefined) throw new Error("addr can't be undefined on LSR");
 
-  const result = data >> 1;
-
-  let _nes = flagBuilder({ result }, nes, [CARRY_SHIFT_RIGHT, ZERO]);
+  const [result, _nes] = LSR_RESULT(data, nes);
 
   return {
     nes: writeBus(addr, result, _nes),

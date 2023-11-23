@@ -91,7 +91,7 @@ const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 const is8bitsPositive = (value: number) => !is8bitsNegative(value);
 
 const CARRY_SHIFT_RIGHT: FlagBuilder = {
-  flag: ({ data }) => data as number & 1,
+  flag: ({ data }) => (data as number) & 1,
   set: setCarryFlag,
 };
 
