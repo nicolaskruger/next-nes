@@ -35,6 +35,7 @@ import {
   LDX,
   LDY,
   LSR,
+  NOP,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1352,5 +1353,19 @@ describe("instruction test", () => {
     expect(_nes.cpu.STATUS).toBe(0);
 
     expect(_nes.bus[0x00].data).toBe(0x01);
+  });
+
+  test("NOP", () => {
+    const nes = initNes();
+
+    const { nes: _nes, totalCycle } = NOP({
+      baseCycles: 6,
+      data: 0,
+      cross: false,
+      offsetOnCross: 0,
+      nes,
+    });
+
+    expect(totalCycle).toBe(6);
   });
 });

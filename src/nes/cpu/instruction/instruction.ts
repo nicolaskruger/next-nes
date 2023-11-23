@@ -490,9 +490,10 @@ const LSR = (instruction: InstructionData): InstructionReturn => {
     return LSR_MEMORY(instruction);
   }
 };
-const NOP = (instruction: InstructionData): InstructionReturn => {
-  throw new Error("not implemented");
-};
+const NOP = ({ nes, baseCycles }: InstructionData): InstructionReturn => ({
+  nes,
+  totalCycle: baseCycles,
+});
 
 const ORA = (instruction: InstructionData): InstructionReturn => {
   throw new Error("not implemented");
