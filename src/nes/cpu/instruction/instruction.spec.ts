@@ -99,6 +99,12 @@ const toPC = (nes: Nes) => (PC: number) => {
   return expectNes(nes);
 };
 
+const toSTK = (nes: Nes) => (STK: number) => {
+  expect(nes.cpu.STK).toBe(STK);
+
+  return expectNes(nes);
+};
+
 function expectNes(nes: Nes) {
   return {
     toACC: toACC(nes),
@@ -106,6 +112,7 @@ function expectNes(nes: Nes) {
     toCycles: toCycles(nes),
     toBuss: toBuss(nes),
     toPC: toPC(nes),
+    toSTK: toSTK(nes),
   };
 }
 
@@ -548,7 +555,7 @@ describe("instruction test", () => {
 
     nes.cpu.PC = 2;
 
-    const { nes: newNes, totalCycle } = BRK({
+    const _nes = BRK({
       nes,
       data: 0,
       baseCycles: 7,
@@ -556,12 +563,13 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.STK).toBe(0xfd);
-    expect(newNes.bus[0x01ff].data).toBe(2);
-    expect(newNes.bus[0x01fe].data).toBe(1);
-    expect(newNes.cpu.PC).toBe(0xfffe);
-    expect(totalCycle).toBe(7);
-    expect(newNes.cpu.STATUS).toBe((1 << 4) | 1);
+    expectNes(_nes)
+      .toSTK(0xfd)
+      .toBuss(0x01ff, 2)
+      .toBuss(0x01fe, 1)
+      .toPC(0xfffe)
+      .toCycles(7)
+      .toStatus((1 << 4) | 1);
   });
 
   test("BVC, should not branch if overflow is set", () => {

@@ -239,18 +239,15 @@ const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
   return [value, setSTK(STK, nes)];
 };
 
-const BRK = ({ nes, baseCycles }: Instruction): InstructionReturn => {
-  let newNes = [nes.cpu.PC, nes.cpu.STATUS].reduce(
+const BRK = ({ nes, baseCycles }: Instruction): Nes => {
+  let _nes = [nes.cpu.PC, nes.cpu.STATUS].reduce(
     (acc, curr) => pushToStack(acc, curr),
     nes
   );
 
-  newNes = setBreakCommand(1, newNes);
+  _nes = setBreakCommand(1, _nes);
 
-  return {
-    totalCycle: baseCycles,
-    nes: setPC(0xfffe, newNes),
-  };
+  return nesBuilder(_nes).PC(0xfffe).cycles(baseCycles).build();
 };
 
 const BVC = (instruction: Instruction): Nes => {
