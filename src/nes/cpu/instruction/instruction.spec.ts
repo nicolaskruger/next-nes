@@ -63,6 +63,7 @@ const initCpu = (): Cpu => ({
   STK: 0xff,
   X: 0,
   Y: 0,
+  cycles: 0,
 });
 
 const initNes = (): Nes => ({
@@ -71,12 +72,35 @@ const initNes = (): Nes => ({
   ppu: {},
 });
 
+const toCycles = (nes: Nes) => (cycles: number) => {
+  expect(nes.cpu.cycles).toBe(cycles);
+  return expectNes(nes);
+};
+
+const toStatus = (nes: Nes) => (STATUS: number) => {
+  expect(nes.cpu.STATUS).toBe(STATUS);
+  return expectNes(nes);
+};
+
+const toACC = (nes: Nes) => (ACC: number) => {
+  expect(nes.cpu.ACC).toBe(ACC);
+  return expectNes(nes);
+};
+
+function expectNes(nes: Nes) {
+  return {
+    toACC: toACC(nes),
+    toStatus: toStatus(nes),
+    toCycles: toCycles(nes),
+  };
+}
+
 describe("instruction test", () => {
   test("ADC,  when carry flag, zero flag is set", () => {
     const nes = initNes();
 
     nes.cpu.ACC = 0xff;
-    const { nes: newNes, totalCycle } = ADC({
+    const _nes = ADC({
       data: 0x01,
       nes,
       baseCycles: 2,
@@ -84,15 +108,16 @@ describe("instruction test", () => {
       offsetOnCross: 2,
     });
 
-    expect(totalCycle).toBe(4);
-    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
-    expect(newNes.cpu.ACC).toBe(0x00);
+    expectNes(_nes)
+      .toACC(0x00)
+      .toStatus((1 << 1) | 1)
+      .toCycles(4);
   });
   test("ADC,  when negative flag is set", () => {
     const nes = initNes();
 
     nes.cpu.ACC = 0xff;
-    const { nes: newNes, totalCycle } = ADC({
+    const _nes = ADC({
       data: 0x00,
       nes,
       baseCycles: 2,
@@ -100,16 +125,17 @@ describe("instruction test", () => {
       offsetOnCross: 2,
     });
 
-    expect(totalCycle).toBe(2);
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
-    expect(newNes.cpu.ACC).toBe(0xff);
+    expectNes(_nes)
+      .toStatus(1 << 6)
+      .toCycles(2)
+      .toACC(0xff);
   });
   test("ADC, when overflow is set", () => {
     const nes = initNes();
     nes.cpu.ACC = 64;
     const data = 64;
 
-    const { nes: newNes, totalCycle } = ADC({
+    const _nes = ADC({
       data,
       nes,
       baseCycles: 1,
@@ -117,11 +143,10 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(1);
-
-    expect(newNes.cpu.STATUS).toBe((1 << 6) | (1 << 5));
-
-    expect(newNes.cpu.ACC).toBe(128);
+    expectNes(_nes)
+      .toCycles(1)
+      .toACC(128)
+      .toStatus((1 << 6) | (1 << 5));
   });
 
   test("AND, when result is zero", () => {

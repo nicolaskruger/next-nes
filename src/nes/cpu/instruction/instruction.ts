@@ -1,4 +1,4 @@
-import { Nes } from "@/nes/nes";
+import { Nes, nesBuilder } from "@/nes/nes";
 import {
   CARRY,
   CARRY_SHIFT_RIGHT,
@@ -71,7 +71,7 @@ const ADC = ({
   baseCycles,
   cross,
   offsetOnCross,
-}: InstructionData): InstructionReturn => {
+}: InstructionData): Nes => {
   const { cpu } = nes;
   const CARRY_FLAG = getCarryFlag(nes);
   const { ACC } = cpu;
@@ -79,17 +79,17 @@ const ADC = ({
 
   const totalCycle = baseCycles + (cross ? offsetOnCross : 0);
 
-  const _nes = flagBuilder({ result, a: data, b: ACC }, nes, [
+  let _nes = flagBuilder({ result, a: data, b: ACC }, nes, [
     CARRY,
     ZERO,
     OVERFLOW,
     NEGATIVE,
   ]);
 
-  return {
-    totalCycle,
-    nes: setACC(result & MASK_8, _nes),
-  };
+  return nesBuilder(_nes)
+    .ACC(result & MASK_8)
+    .cycles(totalCycle)
+    .build();
 };
 
 const AND = ({
