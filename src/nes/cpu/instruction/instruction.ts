@@ -258,12 +258,8 @@ const BVS = (instruction: Instruction): Nes => {
   return branch(getOverFlowFlag, setFlag, instruction);
 };
 
-const CLC = ({ nes, baseCycles }: Instruction): InstructionReturn => {
-  return {
-    nes: setCarryFlag(0, nes),
-    totalCycle: baseCycles,
-  };
-};
+const CLC = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).carryFlag(0).cycles(baseCycles).build();
 
 const CLD = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   return {

@@ -1,5 +1,5 @@
 import { Bus, writeBus } from "./bus/bus";
-import { Cpu, setACC, setCycles, setPC } from "./cpu/cpu";
+import { Cpu, setACC, setCarryFlag, setCycles, setPC } from "./cpu/cpu";
 import { Ppu } from "./ppu/ppu";
 
 type Nes = {
@@ -31,12 +31,19 @@ const PC = (nes: Nes) => (PC: number) => {
   return nesBuilder(_nes);
 };
 
+const carryFlag = (nes: Nes) => (flag: number) => {
+  const _nes = setCarryFlag(flag, nes);
+
+  return nesBuilder(_nes);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
     cycles: cycles(nes),
     buss: buss(nes),
     PC: PC(nes),
+    carryFlag: carryFlag(nes),
     build: () => nes,
   };
 }
