@@ -267,12 +267,9 @@ const CLD = ({ nes, baseCycles }: Instruction): Nes =>
 const CLI = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).interruptDisable(0).cycles(baseCycles).build();
 
-const CLV = ({ nes, baseCycles }: Instruction): InstructionReturn => {
-  return {
-    nes: setOverFlowFlag(0, nes),
-    totalCycle: baseCycles,
-  };
-};
+const CLV = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).overFlow(0).cycles(baseCycles).build();
+
 const compare = (
   value: number,
   { data, nes, ...cycles }: Instruction

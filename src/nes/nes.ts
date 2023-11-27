@@ -6,6 +6,7 @@ import {
   setCycles,
   setDecimalMode,
   setInterruptDisable,
+  setOverFlowFlag,
   setPC,
 } from "./cpu/cpu";
 import { Ppu } from "./ppu/ppu";
@@ -55,6 +56,12 @@ const interruptDisable = (nes: Nes) => (flag: number) => {
   return nesBuilder(_nes);
 };
 
+const overFlow = (nes: Nes) => (flag: number) => {
+  const _nes = setOverFlowFlag(flag, nes);
+
+  return nesBuilder(_nes);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -64,6 +71,7 @@ function nesBuilder(nes: Nes) {
     carryFlag: carryFlag(nes),
     decimalMode: decimalMode(nes),
     interruptDisable: interruptDisable(nes),
+    overFlow: overFlow(nes),
     build: () => nes,
   };
 }

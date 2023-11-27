@@ -695,7 +695,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1 << 5;
 
-    const { nes: newNes, totalCycle } = CLV({
+    const _nes = CLV({
       baseCycles: 2,
       cross: false,
       data: 0,
@@ -703,9 +703,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.STATUS).toBe(0);
+    expectNes(_nes).toCycles(2).toStatus(0);
   });
 
   test("CMP, should set carry flag if ACC >== memory", () => {
