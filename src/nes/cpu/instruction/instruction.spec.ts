@@ -87,11 +87,18 @@ const toACC = (nes: Nes) => (ACC: number) => {
   return expectNes(nes);
 };
 
+const toBuss = (nes: Nes) => (addr: number, value: number) => {
+  expect(nes.bus[addr].data).toBe(value);
+
+  return expectNes(nes);
+};
+
 function expectNes(nes: Nes) {
   return {
     toACC: toACC(nes),
     toStatus: toStatus(nes),
     toCycles: toCycles(nes),
+    toBuss: toBuss(nes),
   };
 }
 
@@ -200,7 +207,7 @@ describe("instruction test", () => {
 
     nes.bus[addr].data = data;
 
-    const { nes: newNes, totalCycle } = ASL({
+    const _nes = ASL({
       baseCycles: 1,
       cross: true,
       data,
@@ -209,11 +216,10 @@ describe("instruction test", () => {
       addr,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.bus[addr].data).toBe(0);
-
-    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+    expectNes(_nes)
+      .toCycles(2)
+      .toBuss(addr, 0)
+      .toStatus((1 << 1) | 1);
   });
 
   test("ASL, negative is set on acc operation on memory operator", () => {
@@ -225,7 +231,7 @@ describe("instruction test", () => {
 
     nes.bus[addr].data = data;
 
-    const { nes: newNes, totalCycle } = ASL({
+    const _nes = ASL({
       baseCycles: 1,
       cross: true,
       data,
@@ -234,18 +240,17 @@ describe("instruction test", () => {
       addr,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.bus[addr].data).toBe(1 << 7);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(2)
+      .toStatus(1 << 6)
+      .toBuss(addr, 1 << 7);
   });
 
   test("ASL, when cary flag and zero flag is set on accumulator operator", () => {
     const nes = initNes();
     const data = 0x80;
 
-    const { nes: newNes, totalCycle } = ASL({
+    const _nes = ASL({
       baseCycles: 1,
       cross: true,
       data,
@@ -254,18 +259,17 @@ describe("instruction test", () => {
       acc: true,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.ACC).toBe(0x00);
-
-    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+    expectNes(_nes)
+      .toCycles(2)
+      .toStatus((1 << 1) | 1)
+      .toACC(0x00);
   });
 
   test("ASL, when negative is set on acc operation", () => {
     const nes = initNes();
     const data = 0x40;
 
-    const { nes: newNes, totalCycle } = ASL({
+    const _nes = ASL({
       baseCycles: 1,
       cross: true,
       data,
@@ -274,11 +278,10 @@ describe("instruction test", () => {
       acc: true,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.ACC).toBe(0x80);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(2)
+      .toACC(0x80)
+      .toStatus(1 << 6);
   });
 
   test("BCC, branch not occur", () => {

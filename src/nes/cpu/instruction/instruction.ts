@@ -125,37 +125,22 @@ const ASL_RESULT_CYCLES = (
   return [result & MASK_8, totalCycle, _nes];
 };
 
-const ASL_ACC = ({
-  data,
-  nes,
-  ...cycles
-}: InstructionData): InstructionReturn => {
+const ASL_ACC = ({ data, nes, ...cycles }: InstructionData): Nes => {
   const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
 
-  return {
-    nes: setACC(result, _nes),
-    totalCycle,
-  };
+  return nesBuilder(_nes).ACC(result).cycles(totalCycle).build();
 };
 
-const ASL_MEMORY = ({
-  data,
-  nes,
-  addr,
-  ...cycles
-}: InstructionData): InstructionReturn => {
+const ASL_MEMORY = ({ data, nes, addr, ...cycles }: InstructionData): Nes => {
   if (addr === undefined)
     throw new Error("this instruction needs memory addr.");
 
   const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
 
-  return {
-    nes: writeBus(addr, result, _nes),
-    totalCycle,
-  };
+  return nesBuilder(_nes).buss(addr, result).cycles(totalCycle).build();
 };
 
-const ASL = (instruction: InstructionData): InstructionReturn => {
+const ASL = (instruction: InstructionData): Nes => {
   const { acc } = instruction;
 
   if (acc) {
