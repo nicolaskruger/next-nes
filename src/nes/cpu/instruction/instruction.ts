@@ -32,7 +32,7 @@ import {
 import { MASK_8 } from "@/nes/helper/mask";
 import { readBus, writeBus } from "@/nes/bus/bus";
 
-type InstructionData = {
+type Instruction = {
   nes: Nes;
   data: number;
   baseCycles: number;
@@ -48,7 +48,7 @@ type InstructionReturn = {
 };
 
 type CalculateCycles = Pick<
-  InstructionData,
+  Instruction,
   "baseCycles" | "cross" | "offsetOnCross"
 >;
 
@@ -71,7 +71,7 @@ const ADC = ({
   baseCycles,
   cross,
   offsetOnCross,
-}: InstructionData): Nes => {
+}: Instruction): Nes => {
   const { cpu } = nes;
   const CARRY_FLAG = getCarryFlag(nes);
   const { ACC } = cpu;
@@ -98,7 +98,7 @@ const AND = ({
   baseCycles,
   cross,
   offsetOnCross,
-}: InstructionData): Nes => {
+}: Instruction): Nes => {
   const { cpu } = nes;
   const { ACC } = cpu;
 
@@ -125,13 +125,13 @@ const ASL_RESULT_CYCLES = (
   return [result & MASK_8, totalCycle, _nes];
 };
 
-const ASL_ACC = ({ data, nes, ...cycles }: InstructionData): Nes => {
+const ASL_ACC = ({ data, nes, ...cycles }: Instruction): Nes => {
   const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
 
   return nesBuilder(_nes).ACC(result).cycles(totalCycle).build();
 };
 
-const ASL_MEMORY = ({ data, nes, addr, ...cycles }: InstructionData): Nes => {
+const ASL_MEMORY = ({ data, nes, addr, ...cycles }: Instruction): Nes => {
   if (addr === undefined)
     throw new Error("this instruction needs memory addr.");
 
@@ -140,7 +140,7 @@ const ASL_MEMORY = ({ data, nes, addr, ...cycles }: InstructionData): Nes => {
   return nesBuilder(_nes).buss(addr, result).cycles(totalCycle).build();
 };
 
-const ASL = (instruction: InstructionData): Nes => {
+const ASL = (instruction: Instruction): Nes => {
   const { acc } = instruction;
 
   if (acc) {
@@ -153,7 +153,7 @@ const ASL = (instruction: InstructionData): Nes => {
 const branch = (
   getFlag: (nes: Nes) => number,
   verify: (flag: number) => boolean,
-  { nes, data, baseCycles }: InstructionData
+  { nes, data, baseCycles }: Instruction
 ): Nes => {
   const flag = getFlag(nes);
 
@@ -178,19 +178,19 @@ const branch = (
 const clearFlag = (value: number) => !!value;
 const setFlag = (value: number) => !value;
 
-const BCC = (instruction: InstructionData): Nes => {
+const BCC = (instruction: Instruction): Nes => {
   return branch(getCarryFlag, clearFlag, instruction);
 };
 
-const BCS = (instruction: InstructionData): Nes => {
+const BCS = (instruction: Instruction): Nes => {
   return branch(getCarryFlag, setFlag, instruction);
 };
 
-const BEQ = (instruction: InstructionData): Nes => {
+const BEQ = (instruction: Instruction): Nes => {
   return branch(getZeroFlag, setFlag, instruction);
 };
 
-const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
+const BIT = ({ nes, data, baseCycles }: Instruction): Nes => {
   const result = data & nes.cpu.ACC;
 
   const _nes = flagBuilder({ result }, nes, [
@@ -208,21 +208,18 @@ const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
     },
   ]);
 
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).cycles(baseCycles).build();
 };
 
-const BMI = (instruction: InstructionData): Nes => {
+const BMI = (instruction: Instruction): Nes => {
   return branch(getNegativeFlag, setFlag, instruction);
 };
 
-const BNE = (instruction: InstructionData): Nes => {
+const BNE = (instruction: Instruction): Nes => {
   return branch(getZeroFlag, clearFlag, instruction);
 };
 
-const BPL = (instruction: InstructionData): Nes => {
+const BPL = (instruction: Instruction): Nes => {
   return branch(getNegativeFlag, clearFlag, instruction);
 };
 
@@ -242,7 +239,7 @@ const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
   return [value, setSTK(STK, nes)];
 };
 
-const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const BRK = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   let newNes = [nes.cpu.PC, nes.cpu.STATUS].reduce(
     (acc, curr) => pushToStack(acc, curr),
     nes
@@ -256,34 +253,34 @@ const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-const BVC = (instruction: InstructionData): Nes => {
+const BVC = (instruction: Instruction): Nes => {
   return branch(getOverFlowFlag, clearFlag, instruction);
 };
 
-const BVS = (instruction: InstructionData): Nes => {
+const BVS = (instruction: Instruction): Nes => {
   return branch(getOverFlowFlag, setFlag, instruction);
 };
 
-const CLC = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const CLC = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   return {
     nes: setCarryFlag(0, nes),
     totalCycle: baseCycles,
   };
 };
 
-const CLD = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const CLD = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   return {
     nes: setDecimalMode(0, nes),
     totalCycle: baseCycles,
   };
 };
-const CLI = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const CLI = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   return {
     nes: setInterruptDisable(0, nes),
     totalCycle: baseCycles,
   };
 };
-const CLV = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const CLV = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   return {
     nes: setOverFlowFlag(0, nes),
     totalCycle: baseCycles,
@@ -291,7 +288,7 @@ const CLV = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
 };
 const compare = (
   value: number,
-  { data, nes, ...cycles }: InstructionData
+  { data, nes, ...cycles }: Instruction
 ): InstructionReturn => {
   const signedValue = make8bitSigned(value);
   const signedData = make8bitSigned(data);
@@ -318,17 +315,17 @@ const compare = (
     totalCycle: calculateCycles(cycles),
   };
 };
-const CMP = (instruction: InstructionData): InstructionReturn => {
+const CMP = (instruction: Instruction): InstructionReturn => {
   return compare(instruction.nes.cpu.ACC, instruction);
 };
-const CPX = (instruction: InstructionData): InstructionReturn => {
+const CPX = (instruction: Instruction): InstructionReturn => {
   return compare(instruction.nes.cpu.X, instruction);
 };
-const CPY = (instruction: InstructionData): InstructionReturn => {
+const CPY = (instruction: Instruction): InstructionReturn => {
   return compare(instruction.nes.cpu.Y, instruction);
 };
 
-const DEC = (instruction: InstructionData): InstructionReturn => {
+const DEC = (instruction: Instruction): InstructionReturn => {
   const { nes, addr, baseCycles } = instruction;
 
   if (addr === undefined) throw new Error("instruction DEC needs addr");
@@ -347,7 +344,7 @@ const operate = (
   operation: "increment" | "decrement",
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
-  { nes, baseCycles }: InstructionData
+  { nes, baseCycles }: Instruction
 ): InstructionReturn => {
   const operator = operation === "increment" ? 1 : -1;
 
@@ -365,20 +362,20 @@ const operate = (
 const decrement = (
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
-  instruction: InstructionData
+  instruction: Instruction
 ): InstructionReturn => operate("decrement", get, set, instruction);
 
 const increment = (
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
-  instruction: InstructionData
+  instruction: Instruction
 ): InstructionReturn => operate("increment", get, set, instruction);
 
-const DEX = (instruction: InstructionData): InstructionReturn =>
+const DEX = (instruction: Instruction): InstructionReturn =>
   decrement(getX, setX, instruction);
-const DEY = (instruction: InstructionData): InstructionReturn =>
+const DEY = (instruction: Instruction): InstructionReturn =>
   decrement(getY, setY, instruction);
-const EOR = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
+const EOR = ({ data, nes, ...cycles }: Instruction): InstructionReturn => {
   const result = data ^ nes.cpu.ACC;
 
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
@@ -388,7 +385,7 @@ const EOR = ({ data, nes, ...cycles }: InstructionData): InstructionReturn => {
     totalCycle: calculateCycles(cycles),
   };
 };
-const INC = (instruction: InstructionData): InstructionReturn => {
+const INC = (instruction: Instruction): InstructionReturn => {
   const { nes, addr, baseCycles } = instruction;
 
   if (addr === undefined) throw new Error("instruction INC must have addr");
@@ -403,21 +400,17 @@ const INC = (instruction: InstructionData): InstructionReturn => {
   };
 };
 
-const INX = (instruction: InstructionData): InstructionReturn =>
+const INX = (instruction: Instruction): InstructionReturn =>
   increment(getX, setX, instruction);
 
-const INY = (instruction: InstructionData): InstructionReturn =>
+const INY = (instruction: Instruction): InstructionReturn =>
   increment(getY, setY, instruction);
 
-const JMP = ({
-  baseCycles,
-  nes,
-  data,
-}: InstructionData): InstructionReturn => ({
+const JMP = ({ baseCycles, nes, data }: Instruction): InstructionReturn => ({
   totalCycle: baseCycles,
   nes: setPC(data, nes),
 });
-const JSR = ({ nes, baseCycles, data }: InstructionData): InstructionReturn => {
+const JSR = ({ nes, baseCycles, data }: Instruction): InstructionReturn => {
   let _nes = pushToStack(nes, nes.cpu.PC - 1);
 
   return {
@@ -428,7 +421,7 @@ const JSR = ({ nes, baseCycles, data }: InstructionData): InstructionReturn => {
 
 const load = (
   set: (result: number, nes: Nes) => Nes,
-  { nes, data: result, ...cycles }: InstructionData
+  { nes, data: result, ...cycles }: Instruction
 ): InstructionReturn => {
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
@@ -438,13 +431,13 @@ const load = (
   };
 };
 
-const LDA = (instruction: InstructionData): InstructionReturn =>
+const LDA = (instruction: Instruction): InstructionReturn =>
   load(setACC, instruction);
 
-const LDX = (instruction: InstructionData): InstructionReturn =>
+const LDX = (instruction: Instruction): InstructionReturn =>
   load(setX, instruction);
 
-const LDY = (instruction: InstructionData): InstructionReturn =>
+const LDY = (instruction: Instruction): InstructionReturn =>
   load(setY, instruction);
 
 const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
@@ -455,11 +448,7 @@ const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   return [result, _nes];
 };
 
-const LSR_ACC = ({
-  data,
-  nes,
-  baseCycles,
-}: InstructionData): InstructionReturn => {
+const LSR_ACC = ({ data, nes, baseCycles }: Instruction): InstructionReturn => {
   const [result, _nes] = LSR_RESULT(data, nes);
 
   return {
@@ -473,7 +462,7 @@ const LSR_MEMORY = ({
   nes,
   baseCycles,
   addr,
-}: InstructionData): InstructionReturn => {
+}: Instruction): InstructionReturn => {
   if (addr === undefined) throw new Error("addr can't be undefined on LSR");
 
   const [result, _nes] = LSR_RESULT(data, nes);
@@ -484,19 +473,19 @@ const LSR_MEMORY = ({
   };
 };
 
-const LSR = (instruction: InstructionData): InstructionReturn => {
+const LSR = (instruction: Instruction): InstructionReturn => {
   if (instruction.acc) {
     return LSR_ACC(instruction);
   } else {
     return LSR_MEMORY(instruction);
   }
 };
-const NOP = ({ nes, baseCycles }: InstructionData): InstructionReturn => ({
+const NOP = ({ nes, baseCycles }: Instruction): InstructionReturn => ({
   nes,
   totalCycle: baseCycles,
 });
 
-const ORA = ({ nes, data, ...cycles }: InstructionData): InstructionReturn => {
+const ORA = ({ nes, data, ...cycles }: Instruction): InstructionReturn => {
   const result = getACC(nes) | data;
 
   let _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
@@ -506,7 +495,7 @@ const ORA = ({ nes, data, ...cycles }: InstructionData): InstructionReturn => {
     totalCycle: calculateCycles(cycles),
   };
 };
-const PHA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const PHA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   const ACC = getACC(nes);
   let _nes = pushToStack(nes, ACC);
   return {
@@ -514,7 +503,7 @@ const PHA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const PHP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const PHP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   const STATUS = getSTATUS(nes);
   let _nes = pushToStack(nes, STATUS);
   return {
@@ -522,7 +511,7 @@ const PHP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const PLA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const PLA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   let [result, _nes] = pullFromStack(nes);
 
   _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
@@ -532,7 +521,7 @@ const PLA = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
     totalCycle: baseCycles,
   };
 };
-const PLP = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
+const PLP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   const [STATUS, _nes] = pullFromStack(nes);
   return {
     nes: setSTATUS(STATUS, _nes),
@@ -550,11 +539,7 @@ const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   return [result & MASK_8, _nes];
 };
 
-const ROL_ACC = ({
-  data,
-  nes,
-  baseCycles,
-}: InstructionData): InstructionReturn => {
+const ROL_ACC = ({ data, nes, baseCycles }: Instruction): InstructionReturn => {
   const [result, _nes] = ROL_RESULT(data, nes);
 
   return {
@@ -568,7 +553,7 @@ const ROL_MEMORY = ({
   nes,
   baseCycles,
   addr,
-}: InstructionData): InstructionReturn => {
+}: Instruction): InstructionReturn => {
   if (addr === undefined) throw new Error("ROL must have addr.");
 
   const [result, _nes] = ROL_RESULT(data, nes);
@@ -579,7 +564,7 @@ const ROL_MEMORY = ({
   };
 };
 
-const ROL = (instruction: InstructionData): InstructionReturn => {
+const ROL = (instruction: Instruction): InstructionReturn => {
   const { acc } = instruction;
 
   if (acc) {
@@ -603,11 +588,7 @@ const ROR_RESULT = (data: number, nes: Nes): [result: number, _nes: Nes] => {
   return [result, _nes];
 };
 
-const ROR_ACC = ({
-  data,
-  nes,
-  baseCycles,
-}: InstructionData): InstructionReturn => {
+const ROR_ACC = ({ data, nes, baseCycles }: Instruction): InstructionReturn => {
   const [result, _nes] = ROR_RESULT(data, nes);
 
   return {
@@ -621,7 +602,7 @@ const ROR_MEMORY = ({
   nes,
   baseCycles,
   addr,
-}: InstructionData): InstructionReturn => {
+}: Instruction): InstructionReturn => {
   if (addr === undefined) throw new Error("ROR memory need a addr");
 
   const [result, _nes] = ROL_RESULT(data, nes);
@@ -632,54 +613,54 @@ const ROR_MEMORY = ({
   };
 };
 
-const ROR = ({ acc, ...instruction }: InstructionData): InstructionReturn => {
+const ROR = ({ acc, ...instruction }: Instruction): InstructionReturn => {
   if (acc) return ROR_ACC(instruction);
   else return ROR_MEMORY(instruction);
 };
-const RTI = (instruction: InstructionData): InstructionReturn => {
+const RTI = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const RTS = (instruction: InstructionData): InstructionReturn => {
+const RTS = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const SBC = (instruction: InstructionData): InstructionReturn => {
+const SBC = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const SEC = (instruction: InstructionData): InstructionReturn => {
+const SEC = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
 
-const SED = (instruction: InstructionData): InstructionReturn => {
+const SED = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const SEI = (instruction: InstructionData): InstructionReturn => {
+const SEI = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const STA = (instruction: InstructionData): InstructionReturn => {
+const STA = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const STX = (instruction: InstructionData): InstructionReturn => {
+const STX = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const STY = (instruction: InstructionData): InstructionReturn => {
+const STY = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const TAX = (instruction: InstructionData): InstructionReturn => {
+const TAX = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const TAY = (instruction: InstructionData): InstructionReturn => {
+const TAY = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const TSX = (instruction: InstructionData): InstructionReturn => {
+const TSX = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const TXA = (instruction: InstructionData): InstructionReturn => {
+const TXA = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const TXS = (instruction: InstructionData): InstructionReturn => {
+const TXS = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
-const TYA = (instruction: InstructionData): InstructionReturn => {
+const TYA = (instruction: Instruction): InstructionReturn => {
   throw new Error("not implemented");
 };
 export {
@@ -741,4 +722,4 @@ export {
   TYA,
 };
 
-export type { InstructionData };
+export type { Instruction as InstructionData };

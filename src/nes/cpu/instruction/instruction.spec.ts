@@ -395,7 +395,7 @@ describe("instruction test", () => {
 
     nes.cpu.ACC = 0xff;
 
-    const { nes: newNes, totalCycle } = BIT({
+    const _nes = BIT({
       baseCycles: 3,
       cross: false,
       data: (1 << 7) | (1 << 6),
@@ -403,18 +403,17 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(3);
-
-    expect(newNes.cpu.STATUS).toBe((1 << 6) | (1 << 5));
-
-    expect(newNes.cpu.ACC).toBe(0xff);
+    expectNes(_nes)
+      .toCycles(3)
+      .toStatus((1 << 6) | (1 << 5))
+      .toACC(0xff);
   });
   test("BIT, when zero flag to be set", () => {
     const nes = initNes();
 
     nes.cpu.ACC = 0xff;
 
-    const { nes: newNes, totalCycle } = BIT({
+    const _nes = BIT({
       baseCycles: 3,
       cross: false,
       data: 0,
@@ -422,9 +421,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(3);
-
-    expect(newNes.cpu.STATUS).toBe(1);
+    expectNes(_nes).toCycles(3).toStatus(1);
   });
 
   test("BMI, should not increment the PC niter add additional cycles when negative flag is clear", () => {
