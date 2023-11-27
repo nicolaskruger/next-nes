@@ -93,12 +93,19 @@ const toBuss = (nes: Nes) => (addr: number, value: number) => {
   return expectNes(nes);
 };
 
+const toPC = (nes: Nes) => (PC: number) => {
+  expect(nes.cpu.PC).toBe(PC);
+
+  return expectNes(nes);
+};
+
 function expectNes(nes: Nes) {
   return {
     toACC: toACC(nes),
     toStatus: toStatus(nes),
     toCycles: toCycles(nes),
     toBuss: toBuss(nes),
+    toPC: toPC(nes),
   };
 }
 
@@ -289,7 +296,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1;
 
-    const { nes: newNes, totalCycle } = BCC({
+    const _nes = BCC({
       baseCycles: 2,
       cross: false,
       data: 2,
@@ -297,8 +304,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.PC).toBe(0);
-    expect(totalCycle).toBe(2);
+    expectNes(_nes).toPC(0).toCycles(2);
   });
 
   test("BCC, branch occur and got to another page", () => {
@@ -307,7 +313,7 @@ describe("instruction test", () => {
     nes.cpu.PC = 0xff;
     nes.cpu.STATUS = 0;
 
-    const { nes: newNes, totalCycle } = BCC({
+    const _nes = BCC({
       baseCycles: 2,
       cross: false,
       data: 2,
@@ -315,8 +321,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.PC).toBe(0x101);
-    expect(totalCycle).toBe(5);
+    expectNes(_nes).toPC(0x101).toCycles(5);
   });
 
   test("BCS, branch not occur", () => {
@@ -324,7 +329,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 0;
 
-    const { nes: newNes, totalCycle } = BCS({
+    const _nes = BCS({
       baseCycles: 2,
       cross: false,
       data: 2,
@@ -332,8 +337,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.PC).toBe(0);
-    expect(totalCycle).toBe(2);
+    expectNes(_nes).toPC(0).toCycles(2);
   });
 
   test("BCS, branch occur and got to another page", () => {
@@ -342,7 +346,7 @@ describe("instruction test", () => {
     nes.cpu.PC = 0xff;
     nes.cpu.STATUS = 1;
 
-    const { nes: newNes, totalCycle } = BCS({
+    const _nes = BCS({
       baseCycles: 2,
       cross: false,
       data: 2,
@@ -350,8 +354,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.PC).toBe(0x101);
-    expect(totalCycle).toBe(5);
+    expectNes(_nes).toPC(0x101).toCycles(5);
   });
 
   test("BEQ, branch not occur", () => {
@@ -359,7 +362,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 0;
 
-    const { nes: newNes, totalCycle } = BEQ({
+    const _nes = BEQ({
       baseCycles: 2,
       cross: false,
       data: 2,
@@ -367,8 +370,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.PC).toBe(0);
-    expect(totalCycle).toBe(2);
+    expectNes(_nes).toPC(0).toCycles(2);
   });
 
   test("BEQ, branch occur and got to another page", () => {
@@ -377,7 +379,7 @@ describe("instruction test", () => {
     nes.cpu.PC = 0xff;
     nes.cpu.STATUS = 1 << 1;
 
-    const { nes: newNes, totalCycle } = BEQ({
+    const _nes = BEQ({
       baseCycles: 2,
       cross: false,
       data: 2,
@@ -385,8 +387,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(newNes.cpu.PC).toBe(0x101);
-    expect(totalCycle).toBe(5);
+    expectNes(_nes).toPC(0x101).toCycles(5);
   });
 
   test("BIT, when the bit 6 and bit 7 are set", () => {
@@ -430,7 +431,7 @@ describe("instruction test", () => {
     const nes = initNes();
     nes.cpu.STATUS = 0;
 
-    const { nes: newNes, totalCycle } = BMI({
+    const _nes = BMI({
       nes,
       data: 0x0f,
       baseCycles: 2,
@@ -438,9 +439,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.PC).toBe(0);
+    expectNes(_nes).toCycles(2).toPC(0);
   });
 
   test("BMI, should increment the PC and add additional cycles when negative flag is set", () => {
@@ -450,7 +449,7 @@ describe("instruction test", () => {
 
     nes.cpu.PC = 0x01f1;
 
-    const { nes: newNes, totalCycle } = BMI({
+    const _nes = BMI({
       nes,
       data: 0x0f,
       baseCycles: 2,
@@ -458,9 +457,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(newNes.cpu.PC).toBe(0x0200);
+    expectNes(_nes).toCycles(5).toPC(0x0200);
   });
 
   test("BNE, should not increment the PC nether add additional cycles when zero flag is set", () => {
@@ -468,7 +465,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1 << 1;
 
-    const { nes: newNes, totalCycle } = BNE({
+    const _nes = BNE({
       nes,
       data: 0x0f,
       baseCycles: 2,
@@ -476,9 +473,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.PC).toBe(0);
+    expectNes(_nes).toCycles(2).toPC(0);
   });
 
   test("BNE, should increment the PC and add additional cycles when zero flag is clear and cross to a new page", () => {
@@ -488,7 +483,7 @@ describe("instruction test", () => {
 
     nes.cpu.PC = 0x01f1;
 
-    const { nes: newNes, totalCycle } = BNE({
+    const _nes = BNE({
       nes,
       data: 0x0f,
       baseCycles: 2,
@@ -496,16 +491,14 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(newNes.cpu.PC).toBe(0x0200);
+    expectNes(_nes).toCycles(5).toPC(0x0200);
   });
   test("BPL, should not increment the PC nether add additional cycles when negative flag is set", () => {
     const nes = initNes();
 
     nes.cpu.STATUS = 1 << 6;
 
-    const { nes: newNes, totalCycle } = BPL({
+    const _nes = BPL({
       nes,
       data: 0x0f,
       baseCycles: 2,
@@ -513,9 +506,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(nes.cpu.PC).toBe(0);
+    expectNes(_nes).toPC(0).toCycles(2);
   });
 
   test("BPL, should increment the PC and add additional cycles when negative flag is clear", () => {
@@ -525,7 +516,7 @@ describe("instruction test", () => {
 
     nes.cpu.PC = 0x01f1;
 
-    const { nes: newNes, totalCycle } = BPL({
+    const _nes = BPL({
       nes,
       data: 0x0f,
       baseCycles: 2,
@@ -533,9 +524,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(newNes.cpu.PC).toBe(0x0200);
+    expectNes(_nes).toCycles(5).toPC(0x200);
   });
 
   test("BRK, should throw an error when STK overflow", () => {
@@ -585,7 +574,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1 << 5;
 
-    const { totalCycle, nes: newNes } = BVC({
+    const _nes = BVC({
       nes,
       cross: false,
       baseCycles: 2,
@@ -593,8 +582,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-    expect(newNes.cpu.PC).toBe(0);
+    expectNes(_nes).toCycles(2).toPC(0);
   });
   test("BVC, should branch when overflow is clear", () => {
     const nes = initNes();
@@ -603,7 +591,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 0;
 
-    const { totalCycle, nes: newNes } = BVC({
+    const _nes = BVC({
       nes,
       cross: false,
       baseCycles: 2,
@@ -611,8 +599,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(newNes.cpu.PC).toBe(0x0200);
+    expectNes(_nes).toCycles(5).toPC(0x0200);
   });
 
   test("BVS, should not branch if overflow is clear", () => {
@@ -622,7 +609,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 0;
 
-    const { totalCycle, nes: newNes } = BVS({
+    const _nes = BVS({
       nes,
       cross: false,
       baseCycles: 2,
@@ -630,8 +617,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-    expect(newNes.cpu.PC).toBe(0);
+    expectNes(_nes).toCycles(2).toPC(0);
   });
   test("BVS, should branch when overflow is set", () => {
     const nes = initNes();
@@ -640,7 +626,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1 << 5;
 
-    const { totalCycle, nes: newNes } = BVS({
+    const _nes = BVS({
       nes,
       cross: false,
       baseCycles: 2,
@@ -648,8 +634,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(newNes.cpu.PC).toBe(0x0200);
+    expectNes(_nes).toCycles(5).toPC(0x0200);
   });
 
   test("CLC, should clear the carry flag", () => {

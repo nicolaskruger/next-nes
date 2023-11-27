@@ -1,5 +1,5 @@
 import { Bus, writeBus } from "./bus/bus";
-import { Cpu, setACC, setCycles } from "./cpu/cpu";
+import { Cpu, setACC, setCycles, setPC } from "./cpu/cpu";
 import { Ppu } from "./ppu/ppu";
 
 type Nes = {
@@ -26,11 +26,17 @@ const buss = (nes: Nes) => (addr: number, value: number) => {
   return nesBuilder(_nes);
 };
 
+const PC = (nes: Nes) => (PC: number) => {
+  const _nes = setPC(PC, nes);
+  return nesBuilder(_nes);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
     cycles: cycles(nes),
     buss: buss(nes),
+    PC: PC(nes),
     build: () => nes,
   };
 }

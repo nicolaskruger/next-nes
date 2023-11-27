@@ -154,14 +154,11 @@ const branch = (
   getFlag: (nes: Nes) => number,
   verify: (flag: number) => boolean,
   { nes, data, baseCycles }: InstructionData
-): InstructionReturn => {
+): Nes => {
   const flag = getFlag(nes);
 
   if (verify(flag)) {
-    return {
-      nes,
-      totalCycle: baseCycles,
-    };
+    return nesBuilder(nes).cycles(baseCycles).build();
   }
 
   let extraCycles = 1;
@@ -172,24 +169,24 @@ const branch = (
 
   if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
 
-  return {
-    nes: setPC(PC, nes),
-    totalCycle: baseCycles + extraCycles,
-  };
+  return nesBuilder(nes)
+    .PC(PC)
+    .cycles(baseCycles + extraCycles)
+    .build();
 };
 
 const clearFlag = (value: number) => !!value;
 const setFlag = (value: number) => !value;
 
-const BCC = (instruction: InstructionData): InstructionReturn => {
+const BCC = (instruction: InstructionData): Nes => {
   return branch(getCarryFlag, clearFlag, instruction);
 };
 
-const BCS = (instruction: InstructionData): InstructionReturn => {
+const BCS = (instruction: InstructionData): Nes => {
   return branch(getCarryFlag, setFlag, instruction);
 };
 
-const BEQ = (instruction: InstructionData): InstructionReturn => {
+const BEQ = (instruction: InstructionData): Nes => {
   return branch(getZeroFlag, setFlag, instruction);
 };
 
@@ -217,15 +214,15 @@ const BIT = ({ nes, data, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-const BMI = (instruction: InstructionData): InstructionReturn => {
+const BMI = (instruction: InstructionData): Nes => {
   return branch(getNegativeFlag, setFlag, instruction);
 };
 
-const BNE = (instruction: InstructionData): InstructionReturn => {
+const BNE = (instruction: InstructionData): Nes => {
   return branch(getZeroFlag, clearFlag, instruction);
 };
 
-const BPL = (instruction: InstructionData): InstructionReturn => {
+const BPL = (instruction: InstructionData): Nes => {
   return branch(getNegativeFlag, clearFlag, instruction);
 };
 
@@ -259,11 +256,11 @@ const BRK = ({ nes, baseCycles }: InstructionData): InstructionReturn => {
   };
 };
 
-const BVC = (instruction: InstructionData): InstructionReturn => {
+const BVC = (instruction: InstructionData): Nes => {
   return branch(getOverFlowFlag, clearFlag, instruction);
 };
 
-const BVS = (instruction: InstructionData): InstructionReturn => {
+const BVS = (instruction: InstructionData): Nes => {
   return branch(getOverFlowFlag, setFlag, instruction);
 };
 
