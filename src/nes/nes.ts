@@ -1,5 +1,12 @@
 import { Bus, writeBus } from "./bus/bus";
-import { Cpu, setACC, setCarryFlag, setCycles, setPC } from "./cpu/cpu";
+import {
+  Cpu,
+  setACC,
+  setCarryFlag,
+  setCycles,
+  setDecimalMode,
+  setPC,
+} from "./cpu/cpu";
 import { Ppu } from "./ppu/ppu";
 
 type Nes = {
@@ -37,6 +44,9 @@ const carryFlag = (nes: Nes) => (flag: number) => {
   return nesBuilder(_nes);
 };
 
+const decimalMode = (nes: Nes) => (flag: number) =>
+  nesBuilder(setDecimalMode(flag, nes));
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -44,6 +54,7 @@ function nesBuilder(nes: Nes) {
     buss: buss(nes),
     PC: PC(nes),
     carryFlag: carryFlag(nes),
+    decimalMode: decimalMode(nes),
     build: () => nes,
   };
 }

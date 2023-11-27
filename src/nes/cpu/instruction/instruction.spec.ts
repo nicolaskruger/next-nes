@@ -663,7 +663,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1 << 3;
 
-    const { nes: newNes, totalCycle } = CLD({
+    const _nes = CLD({
       baseCycles: 2,
       cross: false,
       data: 0,
@@ -671,9 +671,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.STATUS).toBe(0);
+    expectNes(_nes).toStatus(0).toCycles(2);
   });
 
   test("CLI, should clear interrupt disable", () => {

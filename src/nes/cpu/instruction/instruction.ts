@@ -261,12 +261,9 @@ const BVS = (instruction: Instruction): Nes => {
 const CLC = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).carryFlag(0).cycles(baseCycles).build();
 
-const CLD = ({ nes, baseCycles }: Instruction): InstructionReturn => {
-  return {
-    nes: setDecimalMode(0, nes),
-    totalCycle: baseCycles,
-  };
-};
+const CLD = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).decimalMode(0).cycles(baseCycles).build();
+
 const CLI = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   return {
     nes: setInterruptDisable(0, nes),
