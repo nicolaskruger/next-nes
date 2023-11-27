@@ -868,7 +868,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { totalCycle, nes: newNes } = DEC({
+    const _nes = DEC({
       baseCycles: 5,
       cross: false,
       data,
@@ -877,9 +877,10 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(newNes.cpu.STATUS).toBe(1 << 1);
-    expect(newNes.bus[0].data).toBe(0);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 1)
+      .toBuss(0, 0);
   });
 
   test("DEC, should decrement memory and set negative flag when memory = 0", () => {
@@ -889,7 +890,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { totalCycle, nes: newNes } = DEC({
+    const _nes = DEC({
       baseCycles: 5,
       cross: false,
       data,
@@ -898,9 +899,10 @@ describe("instruction test", () => {
       addr: 0,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
-    expect(newNes.bus[0].data).toBe(0xff);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 6)
+      .toBuss(0, 0xff);
   });
   test("DEX, decrement X to zero", () => {
     const nes = initNes();

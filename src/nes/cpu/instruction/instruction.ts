@@ -305,7 +305,7 @@ const CPY = (instruction: Instruction): Nes => {
   return compare(instruction.nes.cpu.Y, instruction);
 };
 
-const DEC = (instruction: Instruction): InstructionReturn => {
+const DEC = (instruction: Instruction): Nes => {
   const { nes, addr, baseCycles } = instruction;
 
   if (addr === undefined) throw new Error("instruction DEC needs addr");
@@ -314,10 +314,7 @@ const DEC = (instruction: Instruction): InstructionReturn => {
   let _nes = writeBus(addr, result, nes);
   _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
 
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).cycles(baseCycles).build();
 };
 
 const operate = (
