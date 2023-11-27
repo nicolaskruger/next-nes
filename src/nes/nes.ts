@@ -5,6 +5,7 @@ import {
   setCarryFlag,
   setCycles,
   setDecimalMode,
+  setInterruptDisable,
   setPC,
 } from "./cpu/cpu";
 import { Ppu } from "./ppu/ppu";
@@ -44,8 +45,15 @@ const carryFlag = (nes: Nes) => (flag: number) => {
   return nesBuilder(_nes);
 };
 
-const decimalMode = (nes: Nes) => (flag: number) =>
-  nesBuilder(setDecimalMode(flag, nes));
+const decimalMode = (nes: Nes) => (flag: number) => {
+  const _nes = setDecimalMode(flag, nes);
+  return nesBuilder(_nes);
+};
+const interruptDisable = (nes: Nes) => (flag: number) => {
+  const _nes = setInterruptDisable(flag, nes);
+
+  return nesBuilder(_nes);
+};
 
 function nesBuilder(nes: Nes) {
   return {
@@ -55,6 +63,7 @@ function nesBuilder(nes: Nes) {
     PC: PC(nes),
     carryFlag: carryFlag(nes),
     decimalMode: decimalMode(nes),
+    interruptDisable: interruptDisable(nes),
     build: () => nes,
   };
 }

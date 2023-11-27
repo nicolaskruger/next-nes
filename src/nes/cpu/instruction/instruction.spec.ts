@@ -679,7 +679,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1 << 2;
 
-    const { nes: newNes, totalCycle } = CLI({
+    const _nes = CLI({
       baseCycles: 2,
       cross: false,
       data: 0,
@@ -687,9 +687,7 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.STATUS).toBe(0);
+    expectNes(_nes).toStatus(0).toCycles(2);
   });
 
   test("CLV, should clear overflow", () => {
