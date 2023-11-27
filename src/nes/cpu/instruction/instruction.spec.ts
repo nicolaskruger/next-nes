@@ -156,7 +156,7 @@ describe("instruction test", () => {
 
     const data = 0xff;
 
-    const { nes: newNes, totalCycle } = AND({
+    const _nes = AND({
       baseCycles: 1,
       cross: true,
       offsetOnCross: 2,
@@ -164,11 +164,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(3);
-
-    expect(newNes.cpu.ACC).toBe(0x00);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toACC(0x00)
+      .toStatus(1 << 1)
+      .toCycles(3);
   });
 
   test("AND, when result is negative", () => {
@@ -178,7 +177,7 @@ describe("instruction test", () => {
 
     const data = 0xa0;
 
-    const { nes: newNes, totalCycle } = AND({
+    const _nes = AND({
       baseCycles: 1,
       cross: true,
       offsetOnCross: 2,
@@ -186,11 +185,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(3);
-
-    expect(newNes.cpu.ACC).toBe(0xa0);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(3)
+      .toACC(0xa0)
+      .toStatus(1 << 6);
   });
 
   test("ASL, carry flag and zero flag is set on memory operator", () => {

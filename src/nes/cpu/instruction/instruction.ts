@@ -98,7 +98,7 @@ const AND = ({
   baseCycles,
   cross,
   offsetOnCross,
-}: InstructionData): InstructionReturn => {
+}: InstructionData): Nes => {
   const { cpu } = nes;
   const { ACC } = cpu;
 
@@ -108,10 +108,7 @@ const AND = ({
 
   const totalCycle = calculateCycles({ baseCycles, cross, offsetOnCross });
 
-  return {
-    totalCycle,
-    nes: setACC(result, _nes),
-  };
+  return nesBuilder(_nes).cycles(totalCycle).ACC(result).build();
 };
 
 const ASL_RESULT_CYCLES = (
