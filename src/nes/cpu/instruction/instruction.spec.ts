@@ -712,17 +712,14 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0x0f;
     const data = 0x0e;
 
-    const { totalCycle, nes: newNes } = CMP({
+    const _nes = CMP({
       baseCycles: 3,
       cross: true,
       offsetOnCross: 2,
       data,
       nes,
     });
-
-    expect(totalCycle).toBe(5);
-
-    expect(newNes.cpu.STATUS).toBe(1);
+    expectNes(_nes).toCycles(5).toStatus(1);
   });
   test("CMP, should set zero flag if ACC === memory", () => {
     const nes = initNes();
@@ -730,7 +727,7 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0x0f;
     const data = 0x0f;
 
-    const { totalCycle, nes: newNes } = CMP({
+    const _nes = CMP({
       baseCycles: 3,
       cross: true,
       offsetOnCross: 2,
@@ -738,9 +735,9 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+    expectNes(_nes)
+      .toStatus((1 << 1) | 1)
+      .toCycles(5);
   });
   test("CMP, should negative flag if the result was negative", () => {
     const nes = initNes();
@@ -748,7 +745,7 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0x0e;
     const data = 0x0f;
 
-    const { totalCycle, nes: newNes } = CMP({
+    const _nes = CMP({
       baseCycles: 3,
       cross: true,
       offsetOnCross: 2,
@@ -756,54 +753,58 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toStatus(1 << 6)
+      .toCycles(5);
   });
 
   test("CPX, should set carry flag if X >= memory", () => {
     const nes = initNes();
     nes.cpu.X = 0x0e;
     const data = 0x0d;
-    const { totalCycle, nes: newNes } = CPX({
+    const _nes = CPX({
       baseCycles: 2,
       cross: false,
       offsetOnCross: 0,
       data,
       nes,
     });
-    expect(totalCycle).toBe(2);
-    expect(newNes.cpu.STATUS).toBe(1);
+
+    expectNes(_nes).toCycles(2).toStatus(1);
   });
 
   test("CPX, should set zero flag if X === memory", () => {
     const nes = initNes();
     nes.cpu.X = 0x0e;
     const data = 0x0e;
-    const { totalCycle, nes: newNes } = CPX({
+    const _nes = CPX({
       baseCycles: 2,
       cross: false,
       offsetOnCross: 0,
       data,
       nes,
     });
-    expect(totalCycle).toBe(2);
-    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+
+    expectNes(_nes)
+      .toCycles(2)
+      .toStatus((1 << 1) | 1);
   });
 
   test("CPX, should set negative flag if the result was negative", () => {
     const nes = initNes();
     nes.cpu.X = 0xfe;
     const data = 0x0e;
-    const { totalCycle, nes: newNes } = CPX({
+    const _nes = CPX({
       baseCycles: 2,
       cross: false,
       offsetOnCross: 0,
       data,
       nes,
     });
-    expect(totalCycle).toBe(2);
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+
+    expectNes(_nes)
+      .toStatus(1 << 6)
+      .toCycles(2);
   });
 
   test("CPY, should set carry flag when Y >= memory", () => {
@@ -812,7 +813,7 @@ describe("instruction test", () => {
     nes.cpu.Y = 0x0f;
     const data = 0x0e;
 
-    const { nes: newNes, totalCycle } = CPY({
+    const _nes = CPY({
       baseCycles: 2,
       cross: false,
       offsetOnCross: 0,
@@ -820,9 +821,7 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.STATUS).toBe(1);
+    expectNes(_nes).toCycles(2).toStatus(1);
   });
 
   test("CPY, should set zero flag when Y == memory", () => {
@@ -831,7 +830,7 @@ describe("instruction test", () => {
     nes.cpu.Y = 0xfe;
     const data = 0xfe;
 
-    const { nes: newNes, totalCycle } = CPY({
+    const _nes = CPY({
       baseCycles: 2,
       cross: false,
       offsetOnCross: 0,
@@ -839,9 +838,9 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.STATUS).toBe((1 << 1) | 1);
+    expectNes(_nes)
+      .toCycles(2)
+      .toStatus((1 << 1) | 1);
   });
 
   test("CPY, should set negative flag when the result was negative", () => {
@@ -850,7 +849,7 @@ describe("instruction test", () => {
     nes.cpu.Y = 0xff;
     const data = 0x0e;
 
-    const { nes: newNes, totalCycle } = CPY({
+    const _nes = CPY({
       baseCycles: 2,
       cross: false,
       offsetOnCross: 0,
@@ -858,9 +857,9 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toStatus(1 << 6)
+      .toCycles(2);
   });
   test("DEC, should decrement memory and ser zero flag when memory = 1", () => {
     const nes = initNes();

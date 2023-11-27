@@ -270,14 +270,11 @@ const CLI = ({ nes, baseCycles }: Instruction): Nes =>
 const CLV = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).overFlow(0).cycles(baseCycles).build();
 
-const compare = (
-  value: number,
-  { data, nes, ...cycles }: Instruction
-): InstructionReturn => {
+const compare = (value: number, { data, nes, ...cycles }: Instruction): Nes => {
   const signedValue = make8bitSigned(value);
   const signedData = make8bitSigned(data);
 
-  const newNes = [
+  const _nes = [
     {
       verify: signedValue >= signedData,
       set: setCarryFlag,
@@ -294,18 +291,17 @@ const compare = (
     return curr.set(curr.verify ? 1 : 0, acc);
   }, nes);
 
-  return {
-    nes: newNes,
-    totalCycle: calculateCycles(cycles),
-  };
+  const totalCycle = calculateCycles(cycles);
+
+  return nesBuilder(_nes).cycles(totalCycle).build();
 };
-const CMP = (instruction: Instruction): InstructionReturn => {
+const CMP = (instruction: Instruction): Nes => {
   return compare(instruction.nes.cpu.ACC, instruction);
 };
-const CPX = (instruction: Instruction): InstructionReturn => {
+const CPX = (instruction: Instruction): Nes => {
   return compare(instruction.nes.cpu.X, instruction);
 };
-const CPY = (instruction: Instruction): InstructionReturn => {
+const CPY = (instruction: Instruction): Nes => {
   return compare(instruction.nes.cpu.Y, instruction);
 };
 
