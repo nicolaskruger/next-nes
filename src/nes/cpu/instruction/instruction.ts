@@ -351,15 +351,12 @@ const DEX = (instruction: Instruction): Nes =>
 const DEY = (instruction: Instruction): Nes =>
   decrement(getY, setY, instruction);
 
-const EOR = ({ data, nes, ...cycles }: Instruction): InstructionReturn => {
+const EOR = ({ data, nes, ...cycles }: Instruction): Nes => {
   const result = data ^ nes.cpu.ACC;
 
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
-  return {
-    nes: setACC(result, _nes),
-    totalCycle: calculateCycles(cycles),
-  };
+  return nesBuilder(_nes).ACC(result).cycles(calculateCycles(cycles)).build();
 };
 const INC = (instruction: Instruction): InstructionReturn => {
   const { nes, addr, baseCycles } = instruction;

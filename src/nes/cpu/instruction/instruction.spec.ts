@@ -1008,7 +1008,7 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0xff;
     const data = 0xff;
 
-    const { nes: _nes, totalCycle } = EOR({
+    const _nes = EOR({
       baseCycles: 4,
       cross: true,
       data,
@@ -1016,11 +1016,10 @@ describe("instruction test", () => {
       offsetOnCross: 1,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.ACC).toBe(0);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toCycles(5)
+      .toACC(0)
+      .toStatus(1 << 1);
   });
   test("EOR, should result in negative when ACC = 0xff and M = 0x00, set the zero flag and cross page", () => {
     const nes = initNes();
@@ -1028,7 +1027,7 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0xff;
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = EOR({
+    const _nes = EOR({
       baseCycles: 4,
       cross: true,
       data,
@@ -1036,11 +1035,10 @@ describe("instruction test", () => {
       offsetOnCross: 1,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.ACC).toBe(0xff);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(5)
+      .toACC(0xff)
+      .toStatus(1 << 6);
   });
 
   test("INC, increment memory when value is 0xff and zero flag going to be set", () => {
