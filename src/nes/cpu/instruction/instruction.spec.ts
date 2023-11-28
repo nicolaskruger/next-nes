@@ -1191,7 +1191,7 @@ describe("instruction test", () => {
 
     const data = 0x1234;
 
-    const { nes: _nes, totalCycle } = JSR({
+    const _nes = JSR({
       baseCycles: 5,
       cross: true,
       offsetOnCross: 0,
@@ -1199,11 +1199,7 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.PC).toBe(0x1234);
-
-    expect(_nes.bus[0x01ff].data).toBe(2);
+    expectNes(_nes).toCycles(5).toPC(0x1234).toBuss(0x01ff, 2);
   });
 
   test("LDA, load the ACC a zero number", () => {

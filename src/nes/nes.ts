@@ -9,6 +9,7 @@ import {
   setOverFlowFlag,
   setPC,
 } from "./cpu/cpu";
+import { pushToStack } from "./cpu/instruction/instruction";
 import { Ppu } from "./ppu/ppu";
 
 type Nes = {
@@ -62,6 +63,12 @@ const overFlow = (nes: Nes) => (flag: number) => {
   return nesBuilder(_nes);
 };
 
+const pushStack = (nes: Nes) => (data: number) => {
+  const _nes = pushToStack(nes, data);
+
+  return nesBuilder(_nes);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -72,6 +79,7 @@ function nesBuilder(nes: Nes) {
     decimalMode: decimalMode(nes),
     interruptDisable: interruptDisable(nes),
     overFlow: overFlow(nes),
+    pushToStack: pushStack(nes),
     build: () => nes,
   };
 }

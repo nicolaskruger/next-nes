@@ -382,14 +382,12 @@ const INY = (instruction: Instruction): Nes =>
 const JMP = ({ baseCycles, nes, data }: Instruction): Nes =>
   nesBuilder(nes).cycles(baseCycles).PC(data).build();
 
-const JSR = ({ nes, baseCycles, data }: Instruction): InstructionReturn => {
-  let _nes = pushToStack(nes, nes.cpu.PC - 1);
-
-  return {
-    totalCycle: baseCycles,
-    nes: setPC(data, _nes),
-  };
-};
+const JSR = ({ nes, baseCycles, data }: Instruction): Nes =>
+  nesBuilder(nes)
+    .pushToStack(nes.cpu.PC - 1)
+    .PC(data)
+    .cycles(baseCycles)
+    .build();
 
 const load = (
   set: (result: number, nes: Nes) => Nes,
