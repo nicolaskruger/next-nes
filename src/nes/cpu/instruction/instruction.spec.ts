@@ -105,6 +105,18 @@ const toSTK = (nes: Nes) => (STK: number) => {
   return expectNes(nes);
 };
 
+const toX = (nes: Nes) => (X: number) => {
+  expect(nes.cpu.X).toBe(X);
+
+  return expectNes(nes);
+};
+
+const toY = (nes: Nes) => (Y: number) => {
+  expect(nes.cpu.Y).toBe(Y);
+
+  return expectNes(nes);
+};
+
 function expectNes(nes: Nes) {
   return {
     toACC: toACC(nes),
@@ -113,6 +125,8 @@ function expectNes(nes: Nes) {
     toBuss: toBuss(nes),
     toPC: toPC(nes),
     toSTK: toSTK(nes),
+    toX: toX(nes),
+    toY: toY(nes),
   };
 }
 
@@ -911,7 +925,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { totalCycle, nes: newNes } = DEX({
+    const _nes = DEX({
       baseCycles: 2,
       cross: false,
       data,
@@ -919,11 +933,10 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.X).toBe(0);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toCycles(2)
+      .toX(0)
+      .toStatus(1 << 1);
   });
 
   test("DEX, decrement X to 0xff", () => {
@@ -933,7 +946,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { totalCycle, nes: newNes } = DEX({
+    const _nes = DEX({
       baseCycles: 2,
       cross: false,
       data,
@@ -941,11 +954,10 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.X).toBe(0xff);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(2)
+      .toX(0xff)
+      .toStatus(1 << 6);
   });
 
   test("DEY, decrement Y to zero", () => {
@@ -955,7 +967,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { totalCycle, nes: newNes } = DEY({
+    const _nes = DEY({
       baseCycles: 2,
       cross: false,
       data,
@@ -963,11 +975,10 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.Y).toBe(0);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toCycles(2)
+      .toY(0)
+      .toStatus(1 << 1);
   });
 
   test("DEY, decrement Y to 0xff", () => {
@@ -977,7 +988,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { totalCycle, nes: newNes } = DEY({
+    const _nes = DEY({
       baseCycles: 2,
       cross: false,
       data,
@@ -985,11 +996,10 @@ describe("instruction test", () => {
       offsetOnCross: 0,
     });
 
-    expect(totalCycle).toBe(2);
-
-    expect(newNes.cpu.Y).toBe(0xff);
-
-    expect(newNes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(2)
+      .toY(0xff)
+      .toStatus(1 << 6);
   });
 
   test("EOR, should result in zero when ACC = 0xff and M = 0xff, set the zero flag and cross page", () => {
@@ -1085,7 +1095,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = INX({
+    const _nes = INX({
       baseCycles: 5,
       cross: false,
       offsetOnCross: 0,
@@ -1093,9 +1103,10 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
-    expect(_nes.cpu.X).toBe(0);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 1)
+      .toX(0);
   });
 
   test("INX, increment X and set de Negative Flag", () => {
@@ -1105,7 +1116,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = INX({
+    const _nes = INX({
       baseCycles: 5,
       cross: false,
       offsetOnCross: 0,
@@ -1113,9 +1124,10 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
-    expect(_nes.cpu.X).toBe(0x80);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 6)
+      .toX(0x80);
   });
 
   test("INY, increment Y and set de Zero Flag", () => {
@@ -1125,7 +1137,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = INY({
+    const _nes = INY({
       baseCycles: 5,
       cross: false,
       offsetOnCross: 0,
@@ -1133,9 +1145,10 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
-    expect(_nes.cpu.Y).toBe(0);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 1)
+      .toY(0);
   });
 
   test("INY, increment Y and set de Negative Flag", () => {
@@ -1145,7 +1158,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = INY({
+    const _nes = INY({
       baseCycles: 5,
       cross: false,
       offsetOnCross: 0,
@@ -1153,9 +1166,10 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(5);
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
-    expect(_nes.cpu.Y).toBe(0x80);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 6)
+      .toY(0x80);
   });
 
   test("JMP", () => {

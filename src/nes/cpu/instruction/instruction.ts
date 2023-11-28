@@ -322,7 +322,7 @@ const operate = (
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
   { nes, baseCycles }: Instruction
-): InstructionReturn => {
+): Nes => {
   const operator = operation === "increment" ? 1 : -1;
 
   const result = (get(nes) + operator) & MASK_8;
@@ -330,28 +330,27 @@ const operate = (
   let _nes: Nes = set(result, nes);
   _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
 
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).cycles(baseCycles).build();
 };
 
 const decrement = (
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
   instruction: Instruction
-): InstructionReturn => operate("decrement", get, set, instruction);
+): Nes => operate("decrement", get, set, instruction);
 
 const increment = (
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
   instruction: Instruction
-): InstructionReturn => operate("increment", get, set, instruction);
+): Nes => operate("increment", get, set, instruction);
 
-const DEX = (instruction: Instruction): InstructionReturn =>
+const DEX = (instruction: Instruction): Nes =>
   decrement(getX, setX, instruction);
-const DEY = (instruction: Instruction): InstructionReturn =>
+
+const DEY = (instruction: Instruction): Nes =>
   decrement(getY, setY, instruction);
+
 const EOR = ({ data, nes, ...cycles }: Instruction): InstructionReturn => {
   const result = data ^ nes.cpu.ACC;
 
@@ -377,10 +376,10 @@ const INC = (instruction: Instruction): InstructionReturn => {
   };
 };
 
-const INX = (instruction: Instruction): InstructionReturn =>
+const INX = (instruction: Instruction): Nes =>
   increment(getX, setX, instruction);
 
-const INY = (instruction: Instruction): InstructionReturn =>
+const INY = (instruction: Instruction): Nes =>
   increment(getY, setY, instruction);
 
 const JMP = ({ baseCycles, nes, data }: Instruction): InstructionReturn => ({
