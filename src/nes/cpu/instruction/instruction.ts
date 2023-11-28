@@ -223,7 +223,7 @@ const BPL = (instruction: Instruction): Nes => {
   return branch(getNegativeFlag, clearFlag, instruction);
 };
 
-const pushToStack = (nes: Nes, data: number): Nes => {
+export const pushToStack = (nes: Nes, data: number): Nes => {
   let STK = nes.cpu.STK;
   if (STK < 0) throw new Error("stack overflow");
   const newNes = writeBus(0x0100 | STK, data, nes);
@@ -379,10 +379,9 @@ const INX = (instruction: Instruction): Nes =>
 const INY = (instruction: Instruction): Nes =>
   increment(getY, setY, instruction);
 
-const JMP = ({ baseCycles, nes, data }: Instruction): InstructionReturn => ({
-  totalCycle: baseCycles,
-  nes: setPC(data, nes),
-});
+const JMP = ({ baseCycles, nes, data }: Instruction): Nes =>
+  nesBuilder(nes).cycles(baseCycles).PC(data).build();
+
 const JSR = ({ nes, baseCycles, data }: Instruction): InstructionReturn => {
   let _nes = pushToStack(nes, nes.cpu.PC - 1);
 

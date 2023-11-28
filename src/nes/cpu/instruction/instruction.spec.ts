@@ -1173,7 +1173,7 @@ describe("instruction test", () => {
 
     const data = 0x1234;
 
-    const { nes: _nes, totalCycle } = JMP({
+    const _nes = JMP({
       baseCycles: 5,
       cross: true,
       offsetOnCross: 0,
@@ -1181,9 +1181,7 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(_nes.cpu.PC).toBe(0x1234);
-
-    expect(totalCycle).toBe(5);
+    expectNes(_nes).toPC(0x1234).toCycles(5);
   });
 
   test("JSR", () => {
