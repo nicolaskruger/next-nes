@@ -1209,7 +1209,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = LDA({
+    const _nes = LDA({
       baseCycles: 6,
       cross: true,
       offsetOnCross: 1,
@@ -1217,11 +1217,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(7);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
-
-    expect(_nes.cpu.ACC).toBe(0);
+    expectNes(_nes)
+      .toCycles(7)
+      .toStatus(1 << 1)
+      .toACC(0);
   });
 
   test("LDA, load the ACC a negative number", () => {
@@ -1231,7 +1230,7 @@ describe("instruction test", () => {
 
     const data = 0x80;
 
-    const { nes: _nes, totalCycle } = LDA({
+    const _nes = LDA({
       baseCycles: 6,
       cross: true,
       offsetOnCross: 1,
@@ -1239,11 +1238,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(7);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
-
-    expect(_nes.cpu.ACC).toBe(0x80);
+    expectNes(_nes)
+      .toStatus(1 << 6)
+      .toCycles(7)
+      .toACC(0x80);
   });
 
   test("LDX, load X a zero number", () => {
@@ -1253,7 +1251,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = LDX({
+    const _nes = LDX({
       baseCycles: 4,
       cross: true,
       offsetOnCross: 1,
@@ -1261,11 +1259,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
-
-    expect(_nes.cpu.X).toBe(0x00);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 1)
+      .toX(0x00);
   });
 
   test("LDX, load X a negative number", () => {
@@ -1275,7 +1272,7 @@ describe("instruction test", () => {
 
     const data = 0x80;
 
-    const { nes: _nes, totalCycle } = LDX({
+    const _nes = LDX({
       baseCycles: 4,
       cross: true,
       offsetOnCross: 1,
@@ -1283,11 +1280,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
-
-    expect(_nes.cpu.X).toBe(0x80);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 6)
+      .toX(0x80);
   });
 
   test("LDY, load Y a zero number", () => {
@@ -1297,7 +1293,7 @@ describe("instruction test", () => {
 
     const data = 0x00;
 
-    const { nes: _nes, totalCycle } = LDY({
+    const _nes = LDY({
       baseCycles: 4,
       cross: true,
       offsetOnCross: 1,
@@ -1305,11 +1301,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
-
-    expect(_nes.cpu.Y).toBe(0x00);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 1)
+      .toY(0x00);
   });
 
   test("LDY, load Y a negative number", () => {
@@ -1319,7 +1314,7 @@ describe("instruction test", () => {
 
     const data = 0x80;
 
-    const { nes: _nes, totalCycle } = LDY({
+    const _nes = LDY({
       baseCycles: 4,
       cross: true,
       offsetOnCross: 1,
@@ -1327,11 +1322,10 @@ describe("instruction test", () => {
       data,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
-
-    expect(_nes.cpu.Y).toBe(0x80);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 6)
+      .toY(0x80);
   });
 
   test("LSR, shift right on the accumulator carry flag is set and zero flag is set to", () => {

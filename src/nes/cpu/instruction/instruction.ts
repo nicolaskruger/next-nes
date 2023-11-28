@@ -47,7 +47,7 @@ type InstructionReturn = {
   totalCycle: number;
 };
 
-type CalculateCycles = Pick<
+export type CalculateCycles = Pick<
   Instruction,
   "baseCycles" | "cross" | "offsetOnCross"
 >;
@@ -59,7 +59,7 @@ const make8bitSigned = (value: number) => {
   return value;
 };
 
-const calculateCycles = ({
+export const calculateCycles = ({
   baseCycles,
   cross,
   offsetOnCross,
@@ -392,23 +392,17 @@ const JSR = ({ nes, baseCycles, data }: Instruction): Nes =>
 const load = (
   set: (result: number, nes: Nes) => Nes,
   { nes, data: result, ...cycles }: Instruction
-): InstructionReturn => {
+): Nes => {
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
-  return {
-    nes: set(result, _nes),
-    totalCycle: calculateCycles(cycles),
-  };
+  return nesBuilder(set(result, _nes)).calcCycles(cycles).build();
 };
 
-const LDA = (instruction: Instruction): InstructionReturn =>
-  load(setACC, instruction);
+const LDA = (instruction: Instruction): Nes => load(setACC, instruction);
 
-const LDX = (instruction: Instruction): InstructionReturn =>
-  load(setX, instruction);
+const LDX = (instruction: Instruction): Nes => load(setX, instruction);
 
-const LDY = (instruction: Instruction): InstructionReturn =>
-  load(setY, instruction);
+const LDY = (instruction: Instruction): Nes => load(setY, instruction);
 
 const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   const result = data >> 1;

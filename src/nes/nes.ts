@@ -9,7 +9,11 @@ import {
   setOverFlowFlag,
   setPC,
 } from "./cpu/cpu";
-import { pushToStack } from "./cpu/instruction/instruction";
+import {
+  CalculateCycles,
+  calculateCycles,
+  pushToStack,
+} from "./cpu/instruction/instruction";
 import { Ppu } from "./ppu/ppu";
 
 type Nes = {
@@ -69,6 +73,12 @@ const pushStack = (nes: Nes) => (data: number) => {
   return nesBuilder(_nes);
 };
 
+const calcCycles = (nes: Nes) => (cyclesData: CalculateCycles) => {
+  const cycles = calculateCycles(cyclesData);
+
+  return nesBuilder(nes).cycles(cycles);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -80,6 +90,7 @@ function nesBuilder(nes: Nes) {
     interruptDisable: interruptDisable(nes),
     overFlow: overFlow(nes),
     pushToStack: pushStack(nes),
+    calcCycles: calcCycles(nes),
     build: () => nes,
   };
 }
