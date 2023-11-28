@@ -18,11 +18,8 @@ import {
   setACC,
   setBreakCommand,
   setCarryFlag,
-  setDecimalMode,
-  setInterruptDisable,
   setNegativeFlag,
   setOverFlowFlag,
-  setPC,
   setSTATUS,
   setSTK,
   setX,
@@ -92,13 +89,7 @@ const ADC = ({
     .build();
 };
 
-const AND = ({
-  nes,
-  data,
-  baseCycles,
-  cross,
-  offsetOnCross,
-}: Instruction): Nes => {
+const AND = ({ nes, data, ...cycles }: Instruction): Nes => {
   const { cpu } = nes;
   const { ACC } = cpu;
 
@@ -106,9 +97,7 @@ const AND = ({
 
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
-  const totalCycle = calculateCycles({ baseCycles, cross, offsetOnCross });
-
-  return nesBuilder(_nes).cycles(totalCycle).ACC(result).build();
+  return nesBuilder(_nes).calcCycles(cycles).ACC(result).build();
 };
 
 const ASL_RESULT_CYCLES = (
@@ -291,9 +280,7 @@ const compare = (value: number, { data, nes, ...cycles }: Instruction): Nes => {
     return curr.set(curr.verify ? 1 : 0, acc);
   }, nes);
 
-  const totalCycle = calculateCycles(cycles);
-
-  return nesBuilder(_nes).cycles(totalCycle).build();
+  return nesBuilder(_nes).calcCycles(cycles).build();
 };
 const CMP = (instruction: Instruction): Nes => {
   return compare(instruction.nes.cpu.ACC, instruction);
@@ -356,7 +343,7 @@ const EOR = ({ data, nes, ...cycles }: Instruction): Nes => {
 
   const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
 
-  return nesBuilder(_nes).ACC(result).cycles(calculateCycles(cycles)).build();
+  return nesBuilder(_nes).ACC(result).calcCycles(cycles).build();
 };
 
 const INC = (instruction: Instruction): Nes => {
