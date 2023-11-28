@@ -358,19 +358,19 @@ const EOR = ({ data, nes, ...cycles }: Instruction): Nes => {
 
   return nesBuilder(_nes).ACC(result).cycles(calculateCycles(cycles)).build();
 };
-const INC = (instruction: Instruction): InstructionReturn => {
+
+const INC = (instruction: Instruction): Nes => {
   const { nes, addr, baseCycles } = instruction;
 
   if (addr === undefined) throw new Error("instruction INC must have addr");
 
   const result = (readBus(addr, nes) + 1) & MASK_8;
-  let _nes = writeBus(addr, result, nes);
+
+  let _nes = nesBuilder(nes).buss(addr, result).cycles(baseCycles).build();
+
   _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
 
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
+  return _nes;
 };
 
 const INX = (instruction: Instruction): Nes =>

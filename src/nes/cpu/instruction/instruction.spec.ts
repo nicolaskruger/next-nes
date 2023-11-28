@@ -1048,7 +1048,7 @@ describe("instruction test", () => {
 
     const data = 0x01;
 
-    const { nes, totalCycle } = INC({
+    const nes = INC({
       baseCycles: 5,
       cross: true,
       offsetOnCross: 0,
@@ -1057,11 +1057,10 @@ describe("instruction test", () => {
       addr: 0x01,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(nes.cpu.STATUS).toBe(1 << 1);
-
-    expect(nes.bus[0x01].data).toBe(0);
+    expectNes(nes)
+      .toCycles(5)
+      .toStatus(1 << 1)
+      .toBuss(0x01, 0);
   });
   test("INC, increment memory when value is 0x7f and negative flag is set resulting in 0x80", () => {
     const nes = initNes();
@@ -1070,7 +1069,7 @@ describe("instruction test", () => {
 
     const data = 0x01;
 
-    const { nes: _nes, totalCycle } = INC({
+    const _nes = INC({
       baseCycles: 5,
       cross: true,
       offsetOnCross: 0,
@@ -1079,11 +1078,10 @@ describe("instruction test", () => {
       addr: 0x01,
     });
 
-    expect(totalCycle).toBe(5);
-
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
-
-    expect(_nes.bus[0x01].data).toBe(0x80);
+    expectNes(_nes)
+      .toCycles(5)
+      .toStatus(1 << 6)
+      .toBuss(0x01, 0x80);
   });
 
   test("INX, increment X and set de Zero Flag", () => {
