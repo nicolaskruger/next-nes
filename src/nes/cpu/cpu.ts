@@ -1,4 +1,4 @@
-import { Nes } from "../nes";
+import { Nes, nesBuilder } from "../nes";
 
 type Cpu = {
   PC: number;
@@ -10,7 +10,7 @@ type Cpu = {
   cycles: number;
 };
 
-type FlagOperator = {
+type FlagResult = {
   result: number;
   a?: number;
   b?: number;
@@ -18,7 +18,7 @@ type FlagOperator = {
 };
 
 type FlagBuilder = {
-  flag: (result: FlagOperator) => number;
+  flag: (result: FlagResult) => number;
   set: (value: number, nes: Nes) => Nes;
 };
 
@@ -118,11 +118,63 @@ const NEGATIVE: FlagBuilder = {
   set: setNegativeFlag,
 };
 
-const flagBuilder = (
-  result: FlagOperator,
+const flagOperator = (
+  result: FlagResult,
   nes: Nes,
-  flags: FlagBuilder[]
-): Nes => flags.reduce((acc, curr) => curr.set(curr.flag(result), acc), nes);
+  flagOperator: FlagBuilder
+) => {
+  return flagOperator.set(flagOperator.flag(result), nes);
+};
+
+const carryShiftRight = (result: FlagResult, nes: Nes) => () => {
+  const _nes = flagOperator(result, nes, CARRY_SHIFT_RIGHT);
+  return flagBuilder(result, _nes);
+};
+
+const carry = (result: FlagResult, nes: Nes) => () => {
+  const _nes = flagOperator(result, nes, CARRY);
+  return flagBuilder(result, _nes);
+};
+
+const zero = (result: FlagResult, nes: Nes) => () => {
+  const _nes = flagOperator(result, nes, ZERO);
+  return flagBuilder(result, _nes);
+};
+
+const overFlow = (result: FlagResult, nes: Nes) => () => {
+  const _nes = flagOperator(result, nes, OVERFLOW);
+  return flagBuilder(result, _nes);
+};
+
+const negative = (result: FlagResult, nes: Nes) => () => {
+  const _nes = flagOperator(result, nes, NEGATIVE);
+  return flagBuilder(result, _nes);
+};
+
+const customFlagBuilder =
+  (result: FlagResult, nes: Nes) => (customFlagBuilder: FlagBuilder) => {
+    const _nes = flagOperator(result, nes, customFlagBuilder);
+    return flagBuilder(result, _nes);
+  };
+
+function flagBuilder(result: FlagResult, nes: Nes) {
+  return {
+    negative: negative(result, nes),
+    overFlow: overFlow(result, nes),
+    zero: zero(result, nes),
+    carry: carry(result, nes),
+    carryShiftRight: carryShiftRight(result, nes),
+    nesBuilder: () => nesBuilder(nes),
+    customFlagBuilder: customFlagBuilder(result, nes),
+    build: () => nes,
+  };
+}
+
+// const flagBuilder = (
+//   result: FlagOperator,
+//   nes: Nes,
+//   flags: FlagBuilder[]
+// ): Nes => flags.reduce((acc, curr) => curr.set(curr.flag(result), acc), nes);
 
 export {
   getCarryFlag,

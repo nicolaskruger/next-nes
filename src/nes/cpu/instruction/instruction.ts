@@ -62,30 +62,20 @@ export const calculateCycles = ({
   offsetOnCross,
 }: CalculateCycles) => baseCycles + (cross ? offsetOnCross : 0);
 
-const ADC = ({
-  data,
-  nes,
-  baseCycles,
-  cross,
-  offsetOnCross,
-}: Instruction): Nes => {
+const ADC = ({ data, nes, ...cycles }: Instruction): Nes => {
   const { cpu } = nes;
   const CARRY_FLAG = getCarryFlag(nes);
   const { ACC } = cpu;
   const result = data + CARRY_FLAG + ACC;
 
-  const totalCycle = baseCycles + (cross ? offsetOnCross : 0);
-
-  let _nes = flagBuilder({ result, a: data, b: ACC }, nes, [
-    CARRY,
-    ZERO,
-    OVERFLOW,
-    NEGATIVE,
-  ]);
-
-  return nesBuilder(_nes)
+  return flagBuilder({ result, a: data, b: ACC }, nes)
+    .carry()
+    .zero()
+    .overFlow()
+    .negative()
+    .nesBuilder()
+    .calcCycles(cycles)
     .ACC(result & MASK_8)
-    .cycles(totalCycle)
     .build();
 };
 
@@ -95,9 +85,13 @@ const AND = ({ nes, data, ...cycles }: Instruction): Nes => {
 
   const result = ACC & data;
 
-  const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
-
-  return nesBuilder(_nes).calcCycles(cycles).ACC(result).build();
+  return flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .calcCycles(cycles)
+    .ACC(result)
+    .build();
 };
 
 const ASL_RESULT_CYCLES = (
@@ -107,7 +101,7 @@ const ASL_RESULT_CYCLES = (
 ): [result: number, totalCycles: number, nes: Nes] => {
   const result = data << 1;
 
-  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+  const _nes = flagBuilder({ result }, nes).carry().zero().negative().build();
 
   const totalCycle = calculateCycles({ ...cycles });
 
@@ -182,22 +176,22 @@ const BEQ = (instruction: Instruction): Nes => {
 const BIT = ({ nes, data, baseCycles }: Instruction): Nes => {
   const result = data & nes.cpu.ACC;
 
-  const _nes = flagBuilder({ result }, nes, [
-    {
+  return flagBuilder({ result }, nes)
+    .customFlagBuilder({
       set: setCarryFlag,
       flag: ({ result }) => (result === 0 ? 1 : 0),
-    },
-    {
+    })
+    .customFlagBuilder({
       set: setOverFlowFlag,
       flag: ({ result }) => (result >> 6) & 1,
-    },
-    {
+    })
+    .customFlagBuilder({
       set: setNegativeFlag,
       flag: ({ result }) => (result >> 7) & 1,
-    },
-  ]);
-
-  return nesBuilder(_nes).cycles(baseCycles).build();
+    })
+    .nesBuilder()
+    .cycles(baseCycles)
+    .build();
 };
 
 const BMI = (instruction: Instruction): Nes => {
@@ -298,10 +292,14 @@ const DEC = (instruction: Instruction): Nes => {
   if (addr === undefined) throw new Error("instruction DEC needs addr");
 
   const result = (readBus(addr, nes) - 1) & MASK_8;
-  let _nes = writeBus(addr, result, nes);
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
 
-  return nesBuilder(_nes).cycles(baseCycles).build();
+  return flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .buss(addr, result)
+    .cycles(baseCycles)
+    .build();
 };
 
 const operate = (
@@ -314,10 +312,13 @@ const operate = (
 
   const result = (get(nes) + operator) & MASK_8;
 
-  let _nes: Nes = set(result, nes);
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
-
-  return nesBuilder(_nes).cycles(baseCycles).build();
+  const _nes: Nes = set(result, nes);
+  return flagBuilder({ result }, _nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .cycles(baseCycles)
+    .build();
 };
 
 const decrement = (
@@ -341,9 +342,13 @@ const DEY = (instruction: Instruction): Nes =>
 const EOR = ({ data, nes, ...cycles }: Instruction): Nes => {
   const result = data ^ nes.cpu.ACC;
 
-  const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
-
-  return nesBuilder(_nes).ACC(result).calcCycles(cycles).build();
+  return flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .ACC(result)
+    .calcCycles(cycles)
+    .build();
 };
 
 const INC = (instruction: Instruction): Nes => {
@@ -353,11 +358,13 @@ const INC = (instruction: Instruction): Nes => {
 
   const result = (readBus(addr, nes) + 1) & MASK_8;
 
-  let _nes = nesBuilder(nes).buss(addr, result).cycles(baseCycles).build();
-
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
-
-  return _nes;
+  return flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .buss(addr, result)
+    .cycles(baseCycles)
+    .build();
 };
 
 const INX = (instruction: Instruction): Nes =>
@@ -379,11 +386,14 @@ const JSR = ({ nes, baseCycles, data }: Instruction): Nes =>
 const load = (
   set: (result: number, nes: Nes) => Nes,
   { nes, data: result, ...cycles }: Instruction
-): Nes => {
-  const _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
-
-  return nesBuilder(set(result, _nes)).calcCycles(cycles).build();
-};
+): Nes =>
+  flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .customSet(result, set)
+    .calcCycles(cycles)
+    .build();
 
 const LDA = (instruction: Instruction): Nes => load(setACC, instruction);
 
@@ -394,7 +404,10 @@ const LDY = (instruction: Instruction): Nes => load(setY, instruction);
 const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   const result = data >> 1;
 
-  const _nes = flagBuilder({ result, data }, nes, [CARRY_SHIFT_RIGHT, ZERO]);
+  const _nes = flagBuilder({ result, data }, nes)
+    .carryShiftRight()
+    .zero()
+    .build();
 
   return [result, _nes];
 };
@@ -431,6 +444,7 @@ const LSR = (instruction: Instruction): InstructionReturn => {
     return LSR_MEMORY(instruction);
   }
 };
+
 const NOP = ({ nes, baseCycles }: Instruction): InstructionReturn => ({
   nes,
   totalCycle: baseCycles,
@@ -439,7 +453,7 @@ const NOP = ({ nes, baseCycles }: Instruction): InstructionReturn => ({
 const ORA = ({ nes, data, ...cycles }: Instruction): InstructionReturn => {
   const result = getACC(nes) | data;
 
-  let _nes = flagBuilder({ result }, nes, [ZERO, NEGATIVE]);
+  const _nes = flagBuilder({ result }, nes).zero().negative().build();
 
   return {
     nes: setACC(result, _nes),
@@ -465,7 +479,7 @@ const PHP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
 const PLA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   let [result, _nes] = pullFromStack(nes);
 
-  _nes = flagBuilder({ result }, _nes, [ZERO, NEGATIVE]);
+  _nes = flagBuilder({ result }, _nes).zero().negative().build();
 
   return {
     nes: setACC(result, _nes),
@@ -485,7 +499,7 @@ const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
 
   const result = (data << 1) | CARRY_BIT;
 
-  const _nes = flagBuilder({ result }, nes, [CARRY, ZERO, NEGATIVE]);
+  const _nes = flagBuilder({ result }, nes).carry().zero().negative().build();
 
   return [result & MASK_8, _nes];
 };
@@ -530,11 +544,11 @@ const ROR_RESULT = (data: number, nes: Nes): [result: number, _nes: Nes] => {
 
   const result = (CARRY_BIT << 7) | (data >> 1);
 
-  const _nes = flagBuilder({ result, data }, nes, [
-    CARRY_SHIFT_RIGHT,
-    ZERO,
-    NEGATIVE,
-  ]);
+  const _nes = flagBuilder({ result, data }, nes)
+    .carryShiftRight()
+    .zero()
+    .negative()
+    .build();
 
   return [result, _nes];
 };

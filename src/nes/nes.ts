@@ -79,6 +79,11 @@ const calcCycles = (nes: Nes) => (cyclesData: CalculateCycles) => {
   return nesBuilder(nes).cycles(cycles);
 };
 
+const customSet =
+  (nes: Nes) => (value: number, set: (value: number, nes: Nes) => Nes) => {
+    return nesBuilder(set(value, nes));
+  };
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -91,6 +96,7 @@ function nesBuilder(nes: Nes) {
     overFlow: overFlow(nes),
     pushToStack: pushStack(nes),
     calcCycles: calcCycles(nes),
+    customSet: customSet(nes),
     build: () => nes,
   };
 }
