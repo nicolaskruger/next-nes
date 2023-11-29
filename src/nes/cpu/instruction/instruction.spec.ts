@@ -1384,7 +1384,7 @@ describe("instruction test", () => {
 
     nes.cpu.ACC = 0;
 
-    const { nes: _nes, totalCycle } = ORA({
+    const _nes = ORA({
       baseCycles: 5,
       data: 0x00,
       cross: true,
@@ -1392,9 +1392,10 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(6);
-    expect(_nes.cpu.ACC).toBe(0);
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toCycles(6)
+      .toACC(0)
+      .toStatus(1 << 1);
   });
 
   test("ORA, when negative flag", () => {
@@ -1402,7 +1403,7 @@ describe("instruction test", () => {
 
     nes.cpu.ACC = 1 << 7;
 
-    const { nes: _nes, totalCycle } = ORA({
+    const _nes = ORA({
       baseCycles: 5,
       data: 1 << 6,
       cross: true,
@@ -1410,9 +1411,10 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(6);
-    expect(_nes.cpu.ACC).toBe((1 << 7) | (1 << 6));
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(6)
+      .toACC((1 << 7) | (1 << 6))
+      .toStatus(1 << 6);
   });
 
   test("PHA, push a copy of the ACC to the stack", () => {

@@ -437,15 +437,16 @@ const LSR = (instruction: Instruction): Nes => {
 const NOP = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).cycles(baseCycles).build();
 
-const ORA = ({ nes, data, ...cycles }: Instruction): InstructionReturn => {
+const ORA = ({ nes, data, ...cycles }: Instruction): Nes => {
   const result = getACC(nes) | data;
 
-  const _nes = flagBuilder({ result }, nes).zero().negative().build();
-
-  return {
-    nes: setACC(result, _nes),
-    totalCycle: calculateCycles(cycles),
-  };
+  return flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .ACC(result)
+    .calcCycles(cycles)
+    .build();
 };
 const PHA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   const ACC = getACC(nes);
