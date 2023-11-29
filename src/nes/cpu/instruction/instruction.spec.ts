@@ -1422,15 +1422,12 @@ describe("instruction test", () => {
 
     nes.cpu.ACC = 0x12;
 
-    const { nes: _nes, totalCycle } = PHA({
+    const _nes = PHA({
       baseCycles: 3,
       nes,
     } as InstructionData);
 
-    expect(totalCycle).toBe(3);
-
-    expect(_nes.cpu.STK).toBe(0xfe);
-    expect(_nes.bus[0x01ff].data).toBe(0x12);
+    expectNes(_nes).toCycles(3).toSTK(0xfe).toBuss(0x01ff, 0x12);
   });
 
   test("PHP, Push Processor Status", () => {

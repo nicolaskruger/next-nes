@@ -448,13 +448,10 @@ const ORA = ({ nes, data, ...cycles }: Instruction): Nes => {
     .calcCycles(cycles)
     .build();
 };
-const PHA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
+const PHA = ({ nes, baseCycles }: Instruction): Nes => {
   const ACC = getACC(nes);
-  let _nes = pushToStack(nes, ACC);
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
+
+  return nesBuilder(nes).pushToStack(ACC).cycles(baseCycles).build();
 };
 const PHP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   const STATUS = getSTATUS(nes);
