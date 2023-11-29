@@ -1,10 +1,5 @@
 import { Nes, nesBuilder } from "@/nes/nes";
 import {
-  CARRY,
-  CARRY_SHIFT_RIGHT,
-  NEGATIVE,
-  OVERFLOW,
-  ZERO,
   flagBuilder,
   getACC,
   getCarryFlag,
@@ -37,11 +32,6 @@ type Instruction = {
   offsetOnCross: number;
   acc?: boolean;
   addr?: number;
-};
-
-type InstructionReturn = {
-  nes: Nes;
-  totalCycle: number;
 };
 
 export type CalculateCycles = Pick<
@@ -524,79 +514,68 @@ const ROR_RESULT = (data: number, nes: Nes): [result: number, _nes: Nes] => {
   return [result, _nes];
 };
 
-const ROR_ACC = ({ data, nes, baseCycles }: Instruction): InstructionReturn => {
+const ROR_ACC = ({ data, nes, baseCycles }: Instruction): Nes => {
   const [result, _nes] = ROR_RESULT(data, nes);
 
-  return {
-    nes: setACC(result, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).ACC(result).cycles(baseCycles).build();
 };
 
-const ROR_MEMORY = ({
-  data,
-  nes,
-  baseCycles,
-  addr,
-}: Instruction): InstructionReturn => {
+const ROR_MEMORY = ({ data, nes, baseCycles, addr }: Instruction): Nes => {
   if (addr === undefined) throw new Error("ROR memory need a addr");
 
   const [result, _nes] = ROL_RESULT(data, nes);
 
-  return {
-    nes: writeBus(addr, result, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).buss(addr, result).cycles(baseCycles).build();
 };
 
-const ROR = ({ acc, ...instruction }: Instruction): InstructionReturn => {
+const ROR = ({ acc, ...instruction }: Instruction): Nes => {
   if (acc) return ROR_ACC(instruction);
   else return ROR_MEMORY(instruction);
 };
-const RTI = (instruction: Instruction): InstructionReturn => {
+const RTI = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const RTS = (instruction: Instruction): InstructionReturn => {
+const RTS = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const SBC = (instruction: Instruction): InstructionReturn => {
+const SBC = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const SEC = (instruction: Instruction): InstructionReturn => {
+const SEC = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
 
-const SED = (instruction: Instruction): InstructionReturn => {
+const SED = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const SEI = (instruction: Instruction): InstructionReturn => {
+const SEI = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const STA = (instruction: Instruction): InstructionReturn => {
+const STA = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const STX = (instruction: Instruction): InstructionReturn => {
+const STX = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const STY = (instruction: Instruction): InstructionReturn => {
+const STY = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const TAX = (instruction: Instruction): InstructionReturn => {
+const TAX = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const TAY = (instruction: Instruction): InstructionReturn => {
+const TAY = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const TSX = (instruction: Instruction): InstructionReturn => {
+const TSX = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const TXA = (instruction: Instruction): InstructionReturn => {
+const TXA = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const TXS = (instruction: Instruction): InstructionReturn => {
+const TXS = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
-const TYA = (instruction: Instruction): InstructionReturn => {
+const TYA = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
 export {

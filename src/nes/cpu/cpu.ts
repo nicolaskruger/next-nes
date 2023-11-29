@@ -170,12 +170,6 @@ function flagBuilder(result: FlagResult, nes: Nes) {
   };
 }
 
-// const flagBuilder = (
-//   result: FlagOperator,
-//   nes: Nes,
-//   flags: FlagBuilder[]
-// ): Nes => flags.reduce((acc, curr) => curr.set(curr.flag(result), acc), nes);
-
 export {
   getCarryFlag,
   getZeroFlag,
