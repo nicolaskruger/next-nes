@@ -453,13 +453,9 @@ const PHA = ({ nes, baseCycles }: Instruction): Nes => {
 
   return nesBuilder(nes).pushToStack(ACC).cycles(baseCycles).build();
 };
-const PHP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
+const PHP = ({ nes, baseCycles }: Instruction): Nes => {
   const STATUS = getSTATUS(nes);
-  let _nes = pushToStack(nes, STATUS);
-  return {
-    nes: _nes,
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(nes).pushToStack(STATUS).cycles(baseCycles).build();
 };
 const PLA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   let [result, _nes] = pullFromStack(nes);
