@@ -44,6 +44,7 @@ import {
   PLP,
   ROL,
   ROR,
+  RTI,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1580,5 +1581,25 @@ describe("instruction test", () => {
       .toCycles(2)
       .toBuss(0, 0)
       .toStatus(1 << 1);
+  });
+
+  test("RTI, return from interrupt take STATUS and PC from the stack", () => {
+    const nes = initNes();
+
+    const STATUS = 0x12;
+
+    const PC = 0x1234;
+
+    nes.cpu.STK = 0xfd;
+
+    nes.bus[0x01fe].data = STATUS;
+    nes.bus[0x01ff].data = PC;
+
+    const _nes = RTI({
+      baseCycles: 6,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toStatus(STATUS).toPC(PC);
   });
 });

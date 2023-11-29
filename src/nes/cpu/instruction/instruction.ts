@@ -532,8 +532,11 @@ const ROR = ({ acc, ...instruction }: Instruction): Nes => {
   if (acc) return ROR_ACC(instruction);
   else return ROR_MEMORY(instruction);
 };
-const RTI = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const RTI = ({ nes }: Instruction): Nes => {
+  const [STATUS, nesStatus] = pullFromStack(nes);
+  const [PC, nesPC] = pullFromStack(nesStatus);
+
+  return nesBuilder(nesPC).PC(PC).status(STATUS).build();
 };
 const RTS = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
