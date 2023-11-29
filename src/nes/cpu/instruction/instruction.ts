@@ -483,32 +483,24 @@ const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   return [result & MASK_8, _nes];
 };
 
-const ROL_ACC = ({ data, nes, baseCycles }: Instruction): InstructionReturn => {
+const ROL_ACC = ({ data, nes, baseCycles }: Instruction): Nes => {
   const [result, _nes] = ROL_RESULT(data, nes);
 
-  return {
-    nes: setACC(MASK_8 & result, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes)
+    .ACC(result & MASK_8)
+    .cycles(baseCycles)
+    .build();
 };
 
-const ROL_MEMORY = ({
-  data,
-  nes,
-  baseCycles,
-  addr,
-}: Instruction): InstructionReturn => {
+const ROL_MEMORY = ({ data, nes, baseCycles, addr }: Instruction): Nes => {
   if (addr === undefined) throw new Error("ROL must have addr.");
 
   const [result, _nes] = ROL_RESULT(data, nes);
 
-  return {
-    nes: writeBus(addr, result, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).buss(addr, result).cycles(baseCycles).build();
 };
 
-const ROL = (instruction: Instruction): InstructionReturn => {
+const ROL = (instruction: Instruction): Nes => {
   const { acc } = instruction;
 
   if (acc) {
@@ -666,4 +658,4 @@ export {
   TYA,
 };
 
-export type { Instruction as InstructionData };
+export type { Instruction };

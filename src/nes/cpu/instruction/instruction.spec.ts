@@ -37,7 +37,7 @@ import {
   LSR,
   NOP,
   ORA,
-  InstructionData,
+  Instruction,
   PHA,
   PHP,
   PLA,
@@ -1425,7 +1425,7 @@ describe("instruction test", () => {
     const _nes = PHA({
       baseCycles: 3,
       nes,
-    } as InstructionData);
+    } as Instruction);
 
     expectNes(_nes).toCycles(3).toSTK(0xfe).toBuss(0x01ff, 0x12);
   });
@@ -1438,7 +1438,7 @@ describe("instruction test", () => {
     const _nes = PHP({
       baseCycles: 3,
       nes,
-    } as InstructionData);
+    } as Instruction);
 
     expectNes(_nes).toCycles(3).toSTK(0xfe).toBuss(0x01ff, 0x12);
   });
@@ -1453,7 +1453,7 @@ describe("instruction test", () => {
     const _nes = PLA({
       baseCycles: 4,
       nes,
-    } as InstructionData);
+    } as Instruction);
 
     expectNes(_nes)
       .toCycles(4)
@@ -1471,7 +1471,7 @@ describe("instruction test", () => {
     const _nes = PLA({
       baseCycles: 4,
       nes,
-    } as InstructionData);
+    } as Instruction);
 
     expectNes(_nes)
       .toCycles(4)
@@ -1489,7 +1489,7 @@ describe("instruction test", () => {
     const _nes = PLP({
       baseCycles: 4,
       nes,
-    } as InstructionData);
+    } as Instruction);
 
     expectNes(_nes).toCycles(4).toStatus(0x12).toSTK(0xff);
   });
@@ -1499,40 +1499,31 @@ describe("instruction test", () => {
 
     const data = 1 << 7;
 
-    const { totalCycle, nes: _nes } = ROL({
+    const _nes = ROL({
       baseCycles: 2,
       nes,
       data,
       acc: true,
-    } as InstructionData);
+    } as Instruction);
 
-    const { cpu } = _nes;
-
-    expect(totalCycle).toBe(2);
-
-    expect(cpu.ACC).toBe(1);
-
-    expect(cpu.STATUS).toBe(1);
+    expectNes(_nes).toCycles(2).toACC(1).toStatus(1);
   });
   test("ROL, rotate left the memory when value is 0100-0000 binary negative flag is set", () => {
     const nes = initNes();
 
     const data = 1 << 6;
 
-    const { nes: _nes, totalCycle } = ROL({
+    const _nes = ROL({
       baseCycles: 2,
       nes,
       data,
       addr: 0x0000,
-    } as InstructionData);
+    } as Instruction);
 
-    const { cpu, bus } = _nes;
-
-    expect(totalCycle).toBe(2);
-
-    expect(bus[0x0000].data).toBe(1 << 7);
-
-    expect(cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(2)
+      .toBuss(0x0000, 1 << 7)
+      .toStatus(1 << 6);
   });
 
   test("ROL, rotate left the accumulator when value is 0x00 zero flag is set", () => {
@@ -1540,20 +1531,17 @@ describe("instruction test", () => {
 
     const data = 0;
 
-    const { nes: _nes, totalCycle } = ROL({
+    const _nes = ROL({
       baseCycles: 2,
       nes,
       data,
       acc: true,
-    } as InstructionData);
+    } as Instruction);
 
-    const { cpu } = _nes;
-
-    expect(totalCycle).toBe(2);
-
-    expect(cpu.ACC).toBe(0);
-
-    expect(cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toCycles(2)
+      .toACC(0)
+      .toStatus(1 << 1);
   });
 
   test("ROR, rotate right the accumulator when value is 0x01 then cary flag and negative flag are set", () => {
@@ -1566,7 +1554,7 @@ describe("instruction test", () => {
       nes,
       data,
       acc: true,
-    } as InstructionData);
+    } as Instruction);
 
     const { cpu } = _nes;
 
@@ -1589,7 +1577,7 @@ describe("instruction test", () => {
       nes,
       data,
       addr: 0x00,
-    } as InstructionData);
+    } as Instruction);
 
     const { cpu, bus } = _nes;
 
