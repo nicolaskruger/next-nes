@@ -434,10 +434,8 @@ const LSR = (instruction: Instruction): Nes => {
   }
 };
 
-const NOP = ({ nes, baseCycles }: Instruction): InstructionReturn => ({
-  nes,
-  totalCycle: baseCycles,
-});
+const NOP = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).cycles(baseCycles).build();
 
 const ORA = ({ nes, data, ...cycles }: Instruction): InstructionReturn => {
   const result = getACC(nes) | data;

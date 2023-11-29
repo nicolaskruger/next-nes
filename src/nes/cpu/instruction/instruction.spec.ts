@@ -1368,7 +1368,7 @@ describe("instruction test", () => {
   test("NOP", () => {
     const nes = initNes();
 
-    const { nes: _nes, totalCycle } = NOP({
+    const _nes = NOP({
       baseCycles: 6,
       data: 0,
       cross: false,
@@ -1376,7 +1376,7 @@ describe("instruction test", () => {
       nes,
     });
 
-    expect(totalCycle).toBe(6);
+    expectNes(_nes).toCycles(6);
   });
 
   test("ORA, when zero flag", () => {
