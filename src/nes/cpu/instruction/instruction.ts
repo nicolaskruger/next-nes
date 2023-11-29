@@ -468,12 +468,9 @@ const PLA = ({ nes, baseCycles }: Instruction): Nes => {
     .cycles(baseCycles)
     .build();
 };
-const PLP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
+const PLP = ({ nes, baseCycles }: Instruction): Nes => {
   const [STATUS, _nes] = pullFromStack(nes);
-  return {
-    nes: setSTATUS(STATUS, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).status(STATUS).cycles(baseCycles).build();
 };
 
 const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {

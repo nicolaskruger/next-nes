@@ -1486,15 +1486,12 @@ describe("instruction test", () => {
     nes.cpu.STK = 0xfe;
     nes.bus[0x01ff].data = 0x12;
 
-    const { nes: _nes, totalCycle } = PLP({
+    const _nes = PLP({
       baseCycles: 4,
       nes,
     } as InstructionData);
 
-    expect(totalCycle).toBe(4);
-
-    expect(_nes.cpu.STATUS).toBe(0x12);
-    expect(_nes.cpu.STK).toBe(0xff);
+    expectNes(_nes).toCycles(4).toStatus(0x12).toSTK(0xff);
   });
 
   test("ROL, rotate left the accumulator when value is 1000-0000 binary carry flag is set", () => {

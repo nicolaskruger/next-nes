@@ -8,6 +8,7 @@ import {
   setInterruptDisable,
   setOverFlowFlag,
   setPC,
+  setSTATUS,
 } from "./cpu/cpu";
 import {
   CalculateCycles,
@@ -79,6 +80,11 @@ const calcCycles = (nes: Nes) => (cyclesData: CalculateCycles) => {
   return nesBuilder(nes).cycles(cycles);
 };
 
+const status = (nes: Nes) => (status: number) => {
+  const _nes = setSTATUS(status, nes);
+  return nesBuilder(_nes);
+};
+
 const customSet =
   (nes: Nes) => (value: number, set: (value: number, nes: Nes) => Nes) => {
     return nesBuilder(set(value, nes));
@@ -97,6 +103,7 @@ function nesBuilder(nes: Nes) {
     pushToStack: pushStack(nes),
     calcCycles: calcCycles(nes),
     customSet: customSet(nes),
+    status: status(nes),
     build: () => nes,
   };
 }
