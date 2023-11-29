@@ -457,15 +457,16 @@ const PHP = ({ nes, baseCycles }: Instruction): Nes => {
   const STATUS = getSTATUS(nes);
   return nesBuilder(nes).pushToStack(STATUS).cycles(baseCycles).build();
 };
-const PLA = ({ nes, baseCycles }: Instruction): InstructionReturn => {
-  let [result, _nes] = pullFromStack(nes);
+const PLA = ({ nes, baseCycles }: Instruction): Nes => {
+  const [result, _nes] = pullFromStack(nes);
 
-  _nes = flagBuilder({ result }, _nes).zero().negative().build();
-
-  return {
-    nes: setACC(result, _nes),
-    totalCycle: baseCycles,
-  };
+  return flagBuilder({ result }, _nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .ACC(result)
+    .cycles(baseCycles)
+    .build();
 };
 const PLP = ({ nes, baseCycles }: Instruction): InstructionReturn => {
   const [STATUS, _nes] = pullFromStack(nes);

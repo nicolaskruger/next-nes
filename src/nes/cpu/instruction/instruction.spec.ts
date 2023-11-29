@@ -1450,16 +1450,16 @@ describe("instruction test", () => {
     nes.cpu.STK = 0xfe;
     nes.bus[0x01ff].data = 0x00;
 
-    const { nes: _nes, totalCycle } = PLA({
+    const _nes = PLA({
       baseCycles: 4,
       nes,
     } as InstructionData);
 
-    expect(totalCycle).toBe(4);
-
-    expect(_nes.cpu.ACC).toBe(0);
-    expect(_nes.cpu.STK).toBe(0xff);
-    expect(_nes.cpu.STATUS).toBe(1 << 1);
+    expectNes(_nes)
+      .toCycles(4)
+      .toACC(0)
+      .toSTK(0xff)
+      .toStatus(1 << 1);
   });
   test("PLA, pull accumulator a negative value", () => {
     const nes = initNes();
@@ -1468,16 +1468,16 @@ describe("instruction test", () => {
     nes.cpu.STK = 0xfe;
     nes.bus[0x01ff].data = 0xf0;
 
-    const { nes: _nes, totalCycle } = PLA({
+    const _nes = PLA({
       baseCycles: 4,
       nes,
     } as InstructionData);
 
-    expect(totalCycle).toBe(4);
-
-    expect(_nes.cpu.ACC).toBe(0xf0);
-    expect(_nes.cpu.STK).toBe(0xff);
-    expect(_nes.cpu.STATUS).toBe(1 << 6);
+    expectNes(_nes)
+      .toCycles(4)
+      .toSTK(0xff)
+      .toACC(0xf0)
+      .toStatus(1 << 6);
   });
   test("PLP, pull process Status", () => {
     const nes = initNes();
