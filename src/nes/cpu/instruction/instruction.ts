@@ -15,7 +15,6 @@ import {
   setCarryFlag,
   setNegativeFlag,
   setOverFlowFlag,
-  setSTATUS,
   setSTK,
   setX,
   setY,
@@ -44,6 +43,10 @@ const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 const make8bitSigned = (value: number) => {
   if (is8bitsNegative(value)) return ~0xff | value;
   return value;
+};
+
+const minus8bitSigned = (value: number) => {
+  return -make8bitSigned(value) & 0xff;
 };
 
 export const calculateCycles = ({
@@ -546,8 +549,20 @@ const RTS = ({ nes, baseCycles }: Instruction): Nes => {
     .cycles(baseCycles)
     .build();
 };
-const SBC = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const SBC = ({ data, nes, ...cycles }: Instruction): Nes => {
+  const dataSigned = minus8bitSigned(data);
+  const carrySigned = minus8bitSigned(~getCarryFlag(nes) & 1);
+  const ACC = getACC(nes);
+  const result = ACC + dataSigned + carrySigned;
+  return flagBuilder({ result, a: ACC, b: dataSigned }, nes)
+    .carrySubtract()
+    .zero()
+    .overFlow()
+    .negative()
+    .nesBuilder()
+    .ACC(result & MASK_8)
+    .calcCycles(cycles)
+    .build();
 };
 const SEC = (instruction: Instruction): Nes => {
   throw new Error("not implemented");

@@ -102,6 +102,11 @@ const CARRY: FlagBuilder = {
   set: setCarryFlag,
 };
 
+const CARRY_SUBTRACT: FlagBuilder = {
+  flag: ({ result }) => (result & 0x100) >> 8,
+  set: (v, nes) => setCarryFlag(~v & 1, nes),
+};
+
 const ZERO: FlagBuilder = {
   flag: ({ result }) => ((result & 0xff) === 0 ? 1 : 0),
   set: setZeroFlag,
@@ -136,6 +141,10 @@ const carry = (result: FlagResult, nes: Nes) => () => {
   return flagBuilder(result, _nes);
 };
 
+const carrySubtract = (result: FlagResult, nes: Nes) => () => {
+  const _nes = flagOperator(result, nes, CARRY_SUBTRACT);
+  return flagBuilder(result, _nes);
+};
 const zero = (result: FlagResult, nes: Nes) => () => {
   const _nes = flagOperator(result, nes, ZERO);
   return flagBuilder(result, _nes);
@@ -166,6 +175,7 @@ function flagBuilder(result: FlagResult, nes: Nes) {
     carryShiftRight: carryShiftRight(result, nes),
     nesBuilder: () => nesBuilder(nes),
     customFlagBuilder: customFlagBuilder(result, nes),
+    carrySubtract: carrySubtract(result, nes),
     build: () => nes,
   };
 }

@@ -46,6 +46,7 @@ import {
   ROR,
   RTI,
   RTS,
+  SBC,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -119,6 +120,19 @@ const toY = (nes: Nes) => (Y: number) => {
   return expectNes(nes);
 };
 
+const encodeStatus = (status: number) => {
+  return "czidbvn"
+    .split("")
+    .map((v, i) => ((status >> i) & 1 ? v.toUpperCase() : v))
+    .join("");
+};
+
+const toEncodeStatus = (nes: Nes) => (encode: string) => {
+  expect(encodeStatus(nes.cpu.STATUS)).toBe(encode);
+
+  return expectNes(nes);
+};
+
 function expectNes(nes: Nes) {
   return {
     toACC: toACC(nes),
@@ -129,6 +143,7 @@ function expectNes(nes: Nes) {
     toSTK: toSTK(nes),
     toX: toX(nes),
     toY: toY(nes),
+    toEncodeStatus: toEncodeStatus(nes),
   };
 }
 
@@ -1618,5 +1633,62 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toPC(0x22).toCycles(6);
+  });
+
+  test("SBC, when ACC = 0xff, C = 1, M = 1  then C = 0, N = 0", () => {
+    const nes = initNes();
+
+    nes.cpu.STATUS = 1;
+    nes.cpu.ACC = 0xff;
+
+    const data = 1;
+
+    const _nes = SBC({
+      baseCycles: 3,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expectNes(_nes).toACC(0xfe).toEncodeStatus("czidbvN").toCycles(4);
+  });
+
+  test("SBC, when ACC = 0x01, C = 0, M = 0  then Z = 1", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x01;
+
+    const data = 0;
+
+    const _nes = SBC({
+      baseCycles: 3,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expectNes(_nes).toACC(0x0).toEncodeStatus("cZidbvn").toCycles(4);
+  });
+
+  test("SBC, when ACC = 64, C = -64, M = 0  then V = 1, C = 1, N = 1", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 64;
+
+    nes.cpu.STATUS = 1;
+
+    const data = -64 & 0xff;
+
+    const _nes = SBC({
+      baseCycles: 3,
+      cross: true,
+      offsetOnCross: 1,
+      nes,
+      data,
+    });
+
+    expectNes(_nes).toACC(128).toEncodeStatus("CzidbVN").toCycles(4);
   });
 });
