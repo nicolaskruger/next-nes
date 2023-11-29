@@ -1333,7 +1333,7 @@ describe("instruction test", () => {
 
     const data = 0x01;
 
-    const { nes: _nes, totalCycle } = LSR({
+    const _nes = LSR({
       baseCycles: 6,
       data,
       cross: false,
@@ -1342,11 +1342,10 @@ describe("instruction test", () => {
       acc: true,
     });
 
-    expect(totalCycle).toBe(6);
-
-    expect(_nes.cpu.STATUS).toBe((1 << 1) | 1);
-
-    expect(_nes.cpu.ACC).toBe(0);
+    expectNes(_nes)
+      .toCycles(6)
+      .toStatus((1 << 1) | 1)
+      .toACC(0);
   });
 
   test("LSR, shift right on the memory ", () => {
@@ -1354,7 +1353,7 @@ describe("instruction test", () => {
 
     const data = 0x02;
 
-    const { nes: _nes, totalCycle } = LSR({
+    const _nes = LSR({
       baseCycles: 6,
       data,
       cross: false,
@@ -1363,11 +1362,7 @@ describe("instruction test", () => {
       addr: 0x00,
     });
 
-    expect(totalCycle).toBe(6);
-
-    expect(_nes.cpu.STATUS).toBe(0);
-
-    expect(_nes.bus[0x00].data).toBe(0x01);
+    expectNes(_nes).toCycles(6).toStatus(0).toBuss(0x00, 0x01);
   });
 
   test("NOP", () => {

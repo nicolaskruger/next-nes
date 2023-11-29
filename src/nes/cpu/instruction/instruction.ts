@@ -412,32 +412,21 @@ const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   return [result, _nes];
 };
 
-const LSR_ACC = ({ data, nes, baseCycles }: Instruction): InstructionReturn => {
+const LSR_ACC = ({ data, nes, baseCycles }: Instruction): Nes => {
   const [result, _nes] = LSR_RESULT(data, nes);
 
-  return {
-    nes: setACC(result, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).ACC(result).cycles(baseCycles).build();
 };
 
-const LSR_MEMORY = ({
-  data,
-  nes,
-  baseCycles,
-  addr,
-}: Instruction): InstructionReturn => {
+const LSR_MEMORY = ({ data, nes, baseCycles, addr }: Instruction): Nes => {
   if (addr === undefined) throw new Error("addr can't be undefined on LSR");
 
   const [result, _nes] = LSR_RESULT(data, nes);
 
-  return {
-    nes: writeBus(addr, result, _nes),
-    totalCycle: baseCycles,
-  };
+  return nesBuilder(_nes).buss(addr, result).cycles(baseCycles).build();
 };
 
-const LSR = (instruction: Instruction): InstructionReturn => {
+const LSR = (instruction: Instruction): Nes => {
   if (instruction.acc) {
     return LSR_ACC(instruction);
   } else {
