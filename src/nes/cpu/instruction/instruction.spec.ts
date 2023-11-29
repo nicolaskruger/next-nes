@@ -45,6 +45,7 @@ import {
   ROL,
   ROR,
   RTI,
+  RTS,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1600,6 +1601,22 @@ describe("instruction test", () => {
       nes,
     } as Instruction);
 
-    expectNes(_nes).toStatus(STATUS).toPC(PC);
+    expectNes(_nes).toStatus(STATUS).toPC(PC).toCycles(6);
+  });
+  test("RTS, return from subroutine. It pulls the PC from the stack", () => {
+    const nes = initNes();
+
+    const PC = 0x21;
+
+    nes.cpu.STK = 0xfe;
+
+    nes.bus[0x01ff].data = PC;
+
+    const _nes = RTS({
+      baseCycles: 6,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toPC(0x22).toCycles(6);
   });
 });

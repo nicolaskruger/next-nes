@@ -532,14 +532,19 @@ const ROR = ({ acc, ...instruction }: Instruction): Nes => {
   if (acc) return ROR_ACC(instruction);
   else return ROR_MEMORY(instruction);
 };
-const RTI = ({ nes }: Instruction): Nes => {
+const RTI = ({ nes, baseCycles }: Instruction): Nes => {
   const [STATUS, nesStatus] = pullFromStack(nes);
   const [PC, nesPC] = pullFromStack(nesStatus);
 
-  return nesBuilder(nesPC).PC(PC).status(STATUS).build();
+  return nesBuilder(nesPC).PC(PC).cycles(baseCycles).status(STATUS).build();
 };
-const RTS = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const RTS = ({ nes, baseCycles }: Instruction): Nes => {
+  const [PC, _nes] = pullFromStack(nes);
+
+  return nesBuilder(_nes)
+    .PC(PC + 1)
+    .cycles(baseCycles)
+    .build();
 };
 const SBC = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
