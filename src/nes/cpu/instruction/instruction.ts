@@ -574,14 +574,16 @@ const SEI = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).interruptDisable(1).cycles(baseCycles).build();
 
 const STA = ({ addr, nes, baseCycles }: Instruction): Nes => {
-  if (addr === undefined) throw new Error("addr must be definer  for STA");
+  if (addr === undefined) throw new Error("addr must be defined for STA");
   return nesBuilder(nes).buss(addr, getACC(nes)).cycles(baseCycles).build();
 };
-const STX = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const STX = ({ addr, nes, baseCycles }: Instruction): Nes => {
+  if (addr === undefined) throw new Error("STX needs addr");
+  return nesBuilder(nes).buss(addr, getX(nes)).cycles(baseCycles).build();
 };
-const STY = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const STY = ({ addr, nes, baseCycles }: Instruction): Nes => {
+  if (addr === undefined) throw new Error("STY needs addr");
+  return nesBuilder(nes).buss(addr, getY(nes)).cycles(baseCycles).build();
 };
 const TAX = (instruction: Instruction): Nes => {
   throw new Error("not implemented");

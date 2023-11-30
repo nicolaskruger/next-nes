@@ -51,6 +51,8 @@ import {
   SED,
   SEI,
   STA,
+  STX,
+  STY,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1739,6 +1741,41 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0x34;
 
     const _nes = STA({
+      baseCycles: 5,
+      nes,
+      addr,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
+  });
+  test("STX, store X Register", () => {
+    const nes = initNes();
+
+    const addr = 0x0012;
+
+    nes.bus[addr].data = 0;
+
+    nes.cpu.X = 0x34;
+
+    const _nes = STX({
+      baseCycles: 5,
+      nes,
+      addr,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
+  });
+
+  test("STY, store Y Register", () => {
+    const nes = initNes();
+
+    const addr = 0x0012;
+
+    nes.bus[addr].data = 0;
+
+    nes.cpu.Y = 0x34;
+
+    const _nes = STY({
       baseCycles: 5,
       nes,
       addr,
