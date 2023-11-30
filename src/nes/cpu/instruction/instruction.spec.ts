@@ -50,6 +50,7 @@ import {
   SEC,
   SED,
   SEI,
+  STA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1726,5 +1727,23 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toEncodeStatus("czIdbvn");
+  });
+
+  test("STA, store accumulator", () => {
+    const nes = initNes();
+
+    const addr = 0x0012;
+
+    nes.bus[addr].data = 0;
+
+    nes.cpu.ACC = 0x34;
+
+    const _nes = STA({
+      baseCycles: 5,
+      nes,
+      addr,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
   });
 });

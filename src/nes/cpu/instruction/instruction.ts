@@ -573,8 +573,9 @@ const SED = ({ nes, baseCycles }: Instruction): Nes =>
 const SEI = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).interruptDisable(1).cycles(baseCycles).build();
 
-const STA = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const STA = ({ addr, nes, baseCycles }: Instruction): Nes => {
+  if (addr === undefined) throw new Error("addr must be definer  for STA");
+  return nesBuilder(nes).buss(addr, getACC(nes)).cycles(baseCycles).build();
 };
 const STX = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
