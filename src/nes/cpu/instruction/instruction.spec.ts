@@ -48,6 +48,7 @@ import {
   RTS,
   SBC,
   SEC,
+  SED,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1702,5 +1703,16 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toEncodeStatus("Czidbvn");
+  });
+
+  test("SED, set decimal flag", () => {
+    const nes = initNes();
+
+    const _nes = SED({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toEncodeStatus("cziDbvn");
   });
 });
