@@ -564,9 +564,8 @@ const SBC = ({ data, nes, ...cycles }: Instruction): Nes => {
     .calcCycles(cycles)
     .build();
 };
-const SEC = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
-};
+const SEC = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).carryFlag(1).cycles(baseCycles).build();
 
 const SED = (instruction: Instruction): Nes => {
   throw new Error("not implemented");

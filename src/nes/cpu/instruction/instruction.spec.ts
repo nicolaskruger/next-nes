@@ -47,6 +47,7 @@ import {
   RTI,
   RTS,
   SBC,
+  SEC,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1690,5 +1691,16 @@ describe("instruction test", () => {
     });
 
     expectNes(_nes).toACC(128).toEncodeStatus("CzidbVN").toCycles(4);
+  });
+
+  test("SEC, set carry flag", () => {
+    const nes = initNes();
+
+    const _nes = SEC({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toEncodeStatus("Czidbvn");
   });
 });
