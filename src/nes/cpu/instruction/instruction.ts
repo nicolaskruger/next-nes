@@ -588,19 +588,29 @@ const STY = ({ addr, nes, baseCycles }: Instruction): Nes => {
   return nesBuilder(nes).buss(addr, getY(nes)).cycles(baseCycles).build();
 };
 
-const TAX = ({ nes, baseCycles }: Instruction): Nes => {
+const transferAccumulator = ({
+  nes,
+  baseCycles,
+}: Instruction): [number, ReturnType<typeof nesBuilder>] => {
   const result = getACC(nes);
-  return flagBuilder({ result }, nes)
+  const nesB = flagBuilder({ result }, nes)
     .negative()
     .zero()
     .nesBuilder()
-    .X(result)
-    .cycles(baseCycles)
-    .build();
+    .cycles(baseCycles);
+  return [result, nesB];
 };
+
+const TAX = (instruction: Instruction): Nes => {
+  const [result, nesB] = transferAccumulator(instruction);
+  return nesB.X(result).build();
+};
+
 const TAY = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+  const [result, nesB] = transferAccumulator(instruction);
+  return nesB.Y(result).build();
 };
+
 const TSX = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };

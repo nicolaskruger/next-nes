@@ -10,6 +10,7 @@ import {
   setPC,
   setSTATUS,
   setX,
+  setY,
 } from "./cpu/cpu";
 import {
   CalculateCycles,
@@ -96,6 +97,11 @@ const X = (nes: Nes) => (X: number) => {
   return nesBuilder(_nes);
 };
 
+const Y = (nes: Nes) => (Y: number) => {
+  const _nes = setY(Y, nes);
+  return nesBuilder(_nes);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -110,6 +116,7 @@ function nesBuilder(nes: Nes) {
     calcCycles: calcCycles(nes),
     customSet: customSet(nes),
     status: status(nes),
+    Y: Y(nes),
     X: X(nes),
     build: () => nes,
   };

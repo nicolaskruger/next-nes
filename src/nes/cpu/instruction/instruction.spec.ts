@@ -54,6 +54,7 @@ import {
   STX,
   STY,
   TAX,
+  TAY,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1810,5 +1811,32 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toX(0x80).toEncodeStatus("czidbvN");
+  });
+
+  test("TAY, when ACC = 0, then Z is set", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0;
+    nes.cpu.Y = 0x12;
+
+    const _nes = TAY({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toX(0).toEncodeStatus("cZidbvn");
+  });
+  test("TAY, when ACC = 0x80, then Z is set", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x80;
+    nes.cpu.Y = 0x00;
+
+    const _nes = TAY({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toY(0x80).toEncodeStatus("czidbvN");
   });
 });
