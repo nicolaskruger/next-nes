@@ -53,6 +53,7 @@ import {
   STA,
   STX,
   STY,
+  TAX,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1782,5 +1783,32 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
+  });
+
+  test("TAX, when ACC = 0, then Z is set", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0;
+    nes.cpu.X = 0x12;
+
+    const _nes = TAX({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toX(0).toEncodeStatus("cZidbvn");
+  });
+  test("TAX, when ACC = 0x80, then Z is set", () => {
+    const nes = initNes();
+
+    nes.cpu.ACC = 0x80;
+    nes.cpu.X = 0x00;
+
+    const _nes = TAX({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toX(0x80).toEncodeStatus("czidbvN");
   });
 });

@@ -9,6 +9,7 @@ import {
   setOverFlowFlag,
   setPC,
   setSTATUS,
+  setX,
 } from "./cpu/cpu";
 import {
   CalculateCycles,
@@ -90,6 +91,11 @@ const customSet =
     return nesBuilder(set(value, nes));
   };
 
+const X = (nes: Nes) => (X: number) => {
+  const _nes = setX(X, nes);
+  return nesBuilder(_nes);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -104,6 +110,7 @@ function nesBuilder(nes: Nes) {
     calcCycles: calcCycles(nes),
     customSet: customSet(nes),
     status: status(nes),
+    X: X(nes),
     build: () => nes,
   };
 }
