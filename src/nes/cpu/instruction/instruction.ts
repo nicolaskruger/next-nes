@@ -570,9 +570,9 @@ const SEC = ({ nes, baseCycles }: Instruction): Nes =>
 const SED = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).decimalMode(1).cycles(baseCycles).build();
 
-const SEI = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
-};
+const SEI = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).interruptDisable(1).cycles(baseCycles).build();
+
 const STA = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };

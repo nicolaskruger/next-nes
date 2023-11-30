@@ -49,6 +49,7 @@ import {
   SBC,
   SEC,
   SED,
+  SEI,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1714,5 +1715,16 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toEncodeStatus("cziDbvn");
+  });
+
+  test("SEI, set interrupt disable", () => {
+    const nes = initNes();
+
+    const _nes = SEI({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toEncodeStatus("czIdbvn");
   });
 });
