@@ -588,7 +588,7 @@ const STY = ({ addr, nes, baseCycles }: Instruction): Nes => {
   return nesBuilder(nes).buss(addr, getY(nes)).cycles(baseCycles).build();
 };
 
-const transferAccumulator = ({
+const transferAccumulatorNumber = ({
   nes,
   baseCycles,
 }: Instruction): [number, ReturnType<typeof nesBuilder>] => {
@@ -602,28 +602,45 @@ const transferAccumulator = ({
 };
 
 const TAX = (instruction: Instruction): Nes => {
-  const [result, nesB] = transferAccumulator(instruction);
+  const [result, nesB] = transferAccumulatorNumber(instruction);
   return nesB.X(result).build();
 };
 
 const TAY = (instruction: Instruction): Nes => {
-  const [result, nesB] = transferAccumulator(instruction);
+  const [result, nesB] = transferAccumulatorNumber(instruction);
   return nesB.Y(result).build();
 };
 
 const TSX = ({ nes, baseCycles }: Instruction): Nes => {
-  const { STK } = nes.cpu;
+  const result = getSTK(nes);
 
-  return flagBuilder({ result: STK }, nes)
+  return flagBuilder({ result }, nes)
     .zero()
     .negative()
     .nesBuilder()
-    .X(STK)
+    .X(result)
     .cycles(baseCycles)
     .build();
 };
-const TXA = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+
+const transferNumberToAccumulator = (
+  get: (nes: Nes) => number,
+  nes: Nes,
+  cycles: number
+) => {
+  const result = get(nes);
+
+  return flagBuilder({ result }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .ACC(result)
+    .cycles(cycles)
+    .build();
+};
+
+const TXA = ({ baseCycles, nes }: Instruction): Nes => {
+  return transferNumberToAccumulator(getX, nes, baseCycles);
 };
 const TXS = (instruction: Instruction): Nes => {
   throw new Error("not implemented");

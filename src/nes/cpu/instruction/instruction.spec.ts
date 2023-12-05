@@ -56,6 +56,7 @@ import {
   TAX,
   TAY,
   TSX,
+  TXA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1863,5 +1864,31 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toX(0x00).toEncodeStatus("cZidbvn");
+  });
+
+  test("TXA, transfer X to Accumulator a negative number", () => {
+    const nes = initNes();
+
+    nes.cpu.X = 0x80;
+
+    const _nes = TXA({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toACC(0x80).toEncodeStatus("czidbvN");
+  });
+
+  test("TXA, transfer X to Accumulator a zero number", () => {
+    const nes = initNes();
+
+    nes.cpu.X = 0x00;
+
+    const _nes = TXA({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toACC(0x00).toEncodeStatus("cZidbvn");
   });
 });
