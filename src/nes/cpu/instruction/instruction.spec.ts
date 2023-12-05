@@ -55,6 +55,7 @@ import {
   STY,
   TAX,
   TAY,
+  TSX,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1838,5 +1839,29 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toY(0x80).toEncodeStatus("czidbvN");
+  });
+  test("TSX, transfer X to Stack, when stack is a negative number", () => {
+    const nes = initNes();
+
+    nes.cpu.STK = 0x80;
+
+    const _nes = TSX({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toX(0x80).toEncodeStatus("czidbvN");
+  });
+  test("TSX, transfer X to Stack, when stack is a zero", () => {
+    const nes = initNes();
+
+    nes.cpu.STK = 0x00;
+
+    const _nes = TSX({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toX(0x00).toEncodeStatus("cZidbvn");
   });
 });

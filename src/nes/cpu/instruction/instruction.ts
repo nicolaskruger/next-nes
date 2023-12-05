@@ -611,8 +611,16 @@ const TAY = (instruction: Instruction): Nes => {
   return nesB.Y(result).build();
 };
 
-const TSX = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
+const TSX = ({ nes, baseCycles }: Instruction): Nes => {
+  const { STK } = nes.cpu;
+
+  return flagBuilder({ result: STK }, nes)
+    .zero()
+    .negative()
+    .nesBuilder()
+    .X(STK)
+    .cycles(baseCycles)
+    .build();
 };
 const TXA = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
