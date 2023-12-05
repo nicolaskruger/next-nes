@@ -58,6 +58,7 @@ import {
   TSX,
   TXA,
   TXS,
+  TYA,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1904,5 +1905,31 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toX(0xff);
+  });
+
+  test("TYA, transfer Y to ACC a negative number", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0x80;
+
+    const _nes = TYA({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toACC(0x80).toEncodeStatus("czidbvN");
+  });
+
+  test("TYA, transfer Y to ACC a zero number", () => {
+    const nes = initNes();
+
+    nes.cpu.Y = 0x00;
+
+    const _nes = TYA({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toACC(0x00).toEncodeStatus("cZidbvn");
   });
 });
