@@ -57,6 +57,7 @@ import {
   TAY,
   TSX,
   TXA,
+  TXS,
 } from "./instruction";
 
 const initBus = (): Bus =>
@@ -1890,5 +1891,18 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toACC(0x00).toEncodeStatus("cZidbvn");
+  });
+
+  test("TXS, transfer x to stack pointer", () => {
+    const nes = initNes();
+
+    nes.cpu.STK = 0xff;
+
+    const _nes = TXS({
+      baseCycles: 2,
+      nes,
+    } as Instruction);
+
+    expectNes(_nes).toCycles(2).toX(0xff);
   });
 });

@@ -642,9 +642,8 @@ const transferNumberToAccumulator = (
 const TXA = ({ baseCycles, nes }: Instruction): Nes => {
   return transferNumberToAccumulator(getX, nes, baseCycles);
 };
-const TXS = (instruction: Instruction): Nes => {
-  throw new Error("not implemented");
-};
+const TXS = ({ nes, baseCycles }: Instruction): Nes =>
+  nesBuilder(nes).cycles(baseCycles).X(getSTK(nes)).build();
 const TYA = (instruction: Instruction): Nes => {
   throw new Error("not implemented");
 };
