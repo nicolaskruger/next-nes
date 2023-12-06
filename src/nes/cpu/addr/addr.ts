@@ -2,7 +2,7 @@ import { readBus } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { setPC } from "../cpu";
 
-type Addr = {
+export type Addr = {
   acc?: boolean;
   addr?: number;
   cross: boolean;
