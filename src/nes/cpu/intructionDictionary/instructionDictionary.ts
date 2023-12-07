@@ -8,6 +8,7 @@ import {
   IMM,
   IMP,
   INDEXED_INDIRECT,
+  INDIRECT,
   INDIRECT_INDEXED,
   RELATIVE,
   ZERO_PAGE,
@@ -404,7 +405,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0xde: {
     baseCycles: 7,
     offsetCycles: 0,
-    addr: INDEXED_INDIRECT,
+    addr: ABSX,
     instruction: DEC,
   },
   0xca: {
@@ -488,7 +489,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0xfe: {
     baseCycles: 7,
     offsetCycles: 0,
-    addr: ABS,
+    addr: ABSX,
     instruction: INC,
   },
   0xe8: {
@@ -512,7 +513,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0x6c: {
     baseCycles: 5,
     offsetCycles: 0,
-    addr: ABS,
+    addr: INDIRECT,
     instruction: JMP,
   },
   0x20: {
