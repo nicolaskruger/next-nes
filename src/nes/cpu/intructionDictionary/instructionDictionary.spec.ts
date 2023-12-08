@@ -45,6 +45,30 @@ import {
   LDA,
   LDX,
   LDY,
+  LSR,
+  NOP,
+  ORA,
+  PHA,
+  PHP,
+  PLA,
+  PLP,
+  ROL,
+  ROR,
+  RTI,
+  RTS,
+  SBC,
+  SEC,
+  SED,
+  SEI,
+  STA,
+  STX,
+  STY,
+  TAX,
+  TAY,
+  TSX,
+  TXA,
+  TXS,
+  TYA,
 } from "../instruction/instruction";
 import {
   InstructionDictionary,
@@ -615,5 +639,384 @@ describe("test instruction dictionary", () => {
         offsetCycles: 1,
         addr: ABSX,
       });
+  });
+
+  test("LSR", () => {
+    expectDictionary(LSR)
+      .toBe(0x4a, {
+        baseCycles: 2,
+        offsetCycles: 0,
+        addr: ACC,
+      })
+      .toBe(0x46, {
+        baseCycles: 5,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x56, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0x4e, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: ABS,
+      })
+      .toBe(0x5e, {
+        baseCycles: 7,
+        offsetCycles: 0,
+        addr: ABSX,
+      });
+  });
+
+  test("NOP", () => {
+    expectDictionary(NOP).toBe(0xea, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("ORA", () => {
+    expectDictionary(ORA)
+      .toBe(0x09, {
+        baseCycles: 2,
+        offsetCycles: 0,
+        addr: IMM,
+      })
+      .toBe(0x05, {
+        baseCycles: 3,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x15, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0x0d, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ABS,
+      })
+      .toBe(0x1d, {
+        baseCycles: 4,
+        offsetCycles: 1,
+        addr: ABSX,
+      })
+      .toBe(0x19, {
+        baseCycles: 4,
+        offsetCycles: 1,
+        addr: ABSY,
+      })
+      .toBe(0x01, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: INDEXED_INDIRECT,
+      })
+      .toBe(0x11, {
+        baseCycles: 5,
+        offsetCycles: 1,
+        addr: INDIRECT_INDEXED,
+      });
+  });
+  test("PHA", () => {
+    expectDictionary(PHA).toBe(0x48, {
+      baseCycles: 3,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("PHP", () => {
+    expectDictionary(PHP).toBe(0x08, {
+      baseCycles: 3,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("PLA", () => {
+    expectDictionary(PLA).toBe(0x68, {
+      baseCycles: 4,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("PLP", () => {
+    expectDictionary(PLP).toBe(0x28, {
+      baseCycles: 4,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("ROL", () => {
+    expectDictionary(ROL)
+      .toBe(0x2a, {
+        baseCycles: 2,
+        offsetCycles: 0,
+        addr: ACC,
+      })
+      .toBe(0x26, {
+        baseCycles: 5,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x36, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0x2e, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: ABS,
+      })
+      .toBe(0x3e, {
+        baseCycles: 7,
+        offsetCycles: 0,
+        addr: ABSX,
+      });
+  });
+
+  test("ROR", () => {
+    expectDictionary(ROR)
+      .toBe(0x6a, {
+        baseCycles: 2,
+        offsetCycles: 0,
+        addr: ACC,
+      })
+      .toBe(0x66, {
+        baseCycles: 5,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x76, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0x6e, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: ABS,
+      })
+      .toBe(0x7e, {
+        baseCycles: 7,
+        offsetCycles: 0,
+        addr: ABSX,
+      });
+  });
+
+  test("RTI", () => {
+    expectDictionary(RTI).toBe(0x40, {
+      baseCycles: 6,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("RTS", () => {
+    expectDictionary(RTS).toBe(0x60, {
+      baseCycles: 6,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("SBC", () => {
+    expectDictionary(SBC)
+      .toBe(0xe9, {
+        baseCycles: 2,
+        offsetCycles: 0,
+        addr: IMM,
+      })
+      .toBe(0xe5, {
+        baseCycles: 3,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0xf5, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0xed, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ABS,
+      })
+      .toBe(0xfd, {
+        baseCycles: 4,
+        offsetCycles: 1,
+        addr: ABSX,
+      })
+      .toBe(0xf9, {
+        baseCycles: 4,
+        offsetCycles: 1,
+        addr: ABSY,
+      })
+      .toBe(0xe1, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: INDEXED_INDIRECT,
+      })
+      .toBe(0xf1, {
+        baseCycles: 5,
+        offsetCycles: 1,
+        addr: INDIRECT_INDEXED,
+      });
+  });
+
+  test("SEC", () => {
+    expectDictionary(SEC).toBe(0x38, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("SED", () => {
+    expectDictionary(SED).toBe(0xf8, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("SEI", () => {
+    expectDictionary(SEI).toBe(0x78, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("STA", () => {
+    expectDictionary(STA)
+      .toBe(0x85, {
+        baseCycles: 3,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x95, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0x8d, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ABS,
+      })
+      .toBe(0x9d, {
+        baseCycles: 5,
+        offsetCycles: 0,
+        addr: ABSX,
+      })
+      .toBe(0x99, {
+        baseCycles: 5,
+        offsetCycles: 0,
+        addr: ABSY,
+      })
+      .toBe(0x81, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: INDEXED_INDIRECT,
+      })
+      .toBe(0x91, {
+        baseCycles: 6,
+        offsetCycles: 0,
+        addr: INDIRECT_INDEXED,
+      });
+  });
+
+  test("STX", () => {
+    expectDictionary(STX)
+      .toBe(0x86, {
+        baseCycles: 3,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x96, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_Y,
+      })
+      .toBe(0x8e, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ABS,
+      });
+  });
+
+  test("STY", () => {
+    expectDictionary(STY)
+      .toBe(0x84, {
+        baseCycles: 3,
+        offsetCycles: 0,
+        addr: ZERO_PAGE,
+      })
+      .toBe(0x94, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ZERO_PAGE_X,
+      })
+      .toBe(0x8c, {
+        baseCycles: 4,
+        offsetCycles: 0,
+        addr: ABS,
+      });
+  });
+
+  test("TAX", () => {
+    expectDictionary(TAX).toBe(0xaa, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("TAY", () => {
+    expectDictionary(TAY).toBe(0xa8, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("TSX", () => {
+    expectDictionary(TSX).toBe(0xba, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("TXA", () => {
+    expectDictionary(TXA).toBe(0x8a, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("TXS", () => {
+    expectDictionary(TXS).toBe(0x9a, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
+  });
+
+  test("TYA", () => {
+    expectDictionary(TYA).toBe(0x98, {
+      baseCycles: 2,
+      offsetCycles: 0,
+      addr: IMP,
+    });
   });
 });
