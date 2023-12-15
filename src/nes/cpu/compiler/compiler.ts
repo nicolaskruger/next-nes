@@ -1,6 +1,11 @@
 import { Dictionary } from "@/nes/helper/dictionary";
 import { instructionDictionary } from "../intructionDictionary/instructionDictionary";
-import { ADDR, INSTRUCTION, instructionDictionaryOpcode } from "./constants";
+import {
+  ADDR,
+  INSTRUCTION,
+  instructionDictionaryOpcode,
+  instructionList,
+} from "./constants";
 
 type Compiler = {
   comp: number[];
@@ -19,8 +24,10 @@ const isImpliedInstruction = (instruction: INSTRUCTION): boolean => {
   throw new Error("not implemented");
 };
 
-const stringToInstruction = (instruction: string): INSTRUCTION => {
-  throw new Error("not implemented");
+export const stringToInstruction = (instruction: string): INSTRUCTION => {
+  if (instruction && instructionList.includes(instruction as INSTRUCTION))
+    return instruction as INSTRUCTION;
+  throw new Error(`invalid instruction ${instruction}`);
 };
 
 const stringToAddr = (instruction: string): ADDR => {

@@ -1,4 +1,4 @@
-import { breakInstruction, compile } from "./compiler";
+import { breakInstruction, compile, stringToInstruction } from "./compiler";
 
 const program = `
     LSR A
@@ -85,5 +85,16 @@ describe("compiler", () => {
     expect(() => compile(errorAddrNotExistsProgram)).toThrow(
       "addr NOT is invalid"
     );
+  });
+
+  test("should transform string in to instruction key if is a valid instruction", () => {
+    const instruction = stringToInstruction("BRK");
+    expect(instruction).toBe("BRK");
+  });
+
+  test("should thrown an exception when transform string in to instruction key if is an invalid instruction", () => {
+    expect(() => {
+      stringToInstruction("BRK!!!");
+    }).toThrow("invalid instruction BRK!!!");
   });
 });
