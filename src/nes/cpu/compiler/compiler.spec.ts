@@ -1,4 +1,10 @@
-import { breakInstruction, compile, stringToInstruction } from "./compiler";
+import {
+  breakInstruction,
+  compile,
+  stringToAddr,
+  stringToInstruction,
+} from "./compiler";
+import { ADDR } from "./constants";
 
 const program = `
     LSR A
@@ -96,5 +102,38 @@ describe("compiler", () => {
     expect(() => {
       stringToInstruction("BRK!!!");
     }).toThrow("invalid instruction BRK!!!");
+  });
+
+  test("should get all the types of addr correctly", () => {
+    const addr = [
+      "A",
+      "#10",
+      "$00",
+      "$10,X",
+      "$10,Y",
+      "*+4",
+      "$1234",
+      "$3000,X",
+      "$4000,Y",
+      "($FFFC)",
+      "($40,X)",
+      "($40),Y",
+    ];
+    const result: ADDR[] = [
+      "ACC",
+      "IMM",
+      "ZERO_PAGE",
+      "ZERO_PAGE_X",
+      "ZERO_PAGE_Y",
+      "RELATIVE",
+      "ABS",
+      "ABSX",
+      "ABSY",
+      "INDIRECT",
+      "INDEXED_INDIRECT",
+      "INDIRECT_INDEXED",
+    ];
+
+    expect(addr.map(stringToAddr)).toBe(result);
   });
 });

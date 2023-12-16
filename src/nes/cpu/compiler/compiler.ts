@@ -1,5 +1,4 @@
 import { Dictionary } from "@/nes/helper/dictionary";
-import { instructionDictionary } from "../intructionDictionary/instructionDictionary";
 import {
   ADDR,
   INSTRUCTION,
@@ -30,12 +29,12 @@ export const stringToInstruction = (instruction: string): INSTRUCTION => {
   throw new Error(`invalid instruction ${instruction}`);
 };
 
-const stringToAddr = (instruction: string): ADDR => {
+const isACC = (addr: string) => addr === "A";
+const isIMM = (addr: string) => /#\d{1,3}/g.test(addr);
+
+export const stringToAddr = (instruction: string): ADDR => {
   throw new Error("not implemented");
 };
-
-const isACC = (addr: string) => addr === "A";
-const isIMM = (addr: string) => /#[]/;
 
 const breakInstruction = (program: string): string[] =>
   program.split(/\s+/).filter((v) => v);
