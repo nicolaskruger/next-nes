@@ -1,6 +1,7 @@
 import {
   breakInstruction,
   compile,
+  immediateToOpcode,
   stringToAddr,
   stringToInstruction,
 } from "./compiler";
@@ -136,4 +137,12 @@ describe("compiler", () => {
 
     expect(addr.map(stringToAddr)).toStrictEqual(result);
   });
+
+  test("immediate to opcode", () => {
+    const addr = "#10";
+
+    const [result] = immediateToOpcode(addr);
+
+    expect(result).toBe(10)
+  })
 });

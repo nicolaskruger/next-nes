@@ -80,6 +80,15 @@ const stringToAddrArray: StringAddrType[] = [
   }
 ]
 
+const findGroup = (regex: RegExp, value: string) => {
+  return value.matchAll(regex).next().value[1]
+}
+
+export const immediateToOpcode = (value: string): number[] => {
+  const group = findGroup(/^#(\d{1,3})$/g, value)
+  return [parseInt(group)]
+}
+
 const addrDataDictionary: Dictionary<
   ADDR,
   { data: (value: string) => number[] }
