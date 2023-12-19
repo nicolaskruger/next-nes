@@ -84,9 +84,18 @@ const findGroup = (regex: RegExp, value: string) => {
   return value.matchAll(regex).next().value[1]
 }
 
+const parseHex = (value: string) => {
+  return Number(`0x${value}`)
+}
+
 export const immediateToOpcode = (value: string): number[] => {
   const group = findGroup(/^#(\d{1,3})$/g, value)
   return [parseInt(group)]
+}
+
+export const zeroPageToOpcode = (value: string): number[] => {
+  const group = findGroup(/^\$([0-9A-F]{2})$/g, value)
+  return [parseHex(group)]
 }
 
 const addrDataDictionary: Dictionary<

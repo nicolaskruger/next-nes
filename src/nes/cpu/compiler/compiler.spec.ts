@@ -4,6 +4,7 @@ import {
   immediateToOpcode,
   stringToAddr,
   stringToInstruction,
+  zeroPageToOpcode,
 } from "./compiler";
 import { ADDR } from "./constants";
 
@@ -144,5 +145,13 @@ describe("compiler", () => {
     const [result] = immediateToOpcode(addr);
 
     expect(result).toBe(10)
+  })
+
+  test("zero page to opcode", () => {
+    const addr = "$EF";
+
+    const [result] = zeroPageToOpcode(addr);
+
+    expect(result).toBe(0xef)
   })
 });
