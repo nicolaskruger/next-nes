@@ -134,6 +134,6 @@ describe("compiler", () => {
       "INDIRECT_INDEXED",
     ];
 
-    expect(addr.map(stringToAddr)).toBe(result);
+    expect(addr.map(stringToAddr)).toStrictEqual(result);
   });
 });
