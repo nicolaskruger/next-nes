@@ -2,6 +2,7 @@ import {
   breakInstruction,
   compile,
   immediateToOpcode,
+  relativeToOpcode,
   stringToAddr,
   stringToInstruction,
   zeroPageToOpcode,
@@ -171,5 +172,21 @@ describe("compiler", () => {
     const [result] = zeroPageYToOpcode(addr)
 
     expect(result).toBe(0xff)
+  })
+
+  test("relative to opcode positive number", () => {
+    const addr = "*+4"
+
+    const [result] = relativeToOpcode(addr);
+
+    expect(result).toBe(4)
+  })
+
+  test("relative to opcode negative number", () => {
+    const addr = "*-4"
+
+    const [result] = relativeToOpcode(addr);
+
+    expect(result).toBe(0xfc)
   })
 });
