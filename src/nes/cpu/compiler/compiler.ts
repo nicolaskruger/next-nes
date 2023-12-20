@@ -81,27 +81,31 @@ const stringToAddrArray: StringAddrType[] = [
 ]
 
 const findGroup = (regex: RegExp, value: string) => {
-  return value.matchAll(regex).next().value[1]
+  return value.matchAll(regex).next().value[1] as string
 }
 
 const parseHex = (value: string) => {
   return Number(`0x${value}`)
 }
 
-export const immediateToOpcode = (value: string): number[] => {
-  const group = findGroup(/^#(\d{1,3})$/g, value)
-  return [parseInt(group)]
+const parseIntToArray = (value: string) => {
+  return [parseInt(value)]
 }
 
-export const zeroPageToOpcode = (value: string): number[] => {
-  const group = findGroup(/^\$([0-9A-F]{2})$/g, value)
-  return [parseHex(group)]
-}
+const parseHexToArray = (value: string) => [parseHex(value)]
 
-export const zeroPageXToOpcode = (value: string): number[] => {
-  const group = findGroup(/^\$([0-9A-F]{2}),X$/g, value)
-  return [parseHex(group)]
-}
+const toOpcode = (regex: RegExp, parse: (value: string) => number[]) =>
+  (value: string) => {
+    const group = findGroup(regex, value)
+    return parse(group)
+  }
+
+export const immediateToOpcode = toOpcode(/^#(\d{1,3})$/g, parseIntToArray)
+
+export const zeroPageToOpcode = toOpcode(/^\$([0-9A-F]{2})$/g, parseHexToArray)
+
+export const zeroPageXToOpcode = toOpcode(/^\$([0-9A-F]{2}),X$/g, parseHexToArray)
+
 
 const addrDataDictionary: Dictionary<
   ADDR,
