@@ -5,6 +5,7 @@ import {
   stringToAddr,
   stringToInstruction,
   zeroPageToOpcode,
+  zeroPageXToOpcode,
 } from "./compiler";
 import { ADDR } from "./constants";
 
@@ -153,5 +154,13 @@ describe("compiler", () => {
     const [result] = zeroPageToOpcode(addr);
 
     expect(result).toBe(0xef)
+  })
+
+  test("zero page x to opcode", () => {
+    const addr = "$DF,X"
+
+    const [result] = zeroPageXToOpcode(addr)
+
+    expect(result).toBe(0xdf)
   })
 });

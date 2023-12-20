@@ -98,6 +98,11 @@ export const zeroPageToOpcode = (value: string): number[] => {
   return [parseHex(group)]
 }
 
+export const zeroPageXToOpcode = (value: string): number[] => {
+  const group = findGroup(/^\$([0-9A-F]{2}),X$/g, value)
+  return [parseHex(group)]
+}
+
 const addrDataDictionary: Dictionary<
   ADDR,
   { data: (value: string) => number[] }
