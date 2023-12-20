@@ -132,7 +132,7 @@ export const indirectToOpcode = toOpcodeTwoBytes(/^\(\$([0-9A-F]{4})\)$/g)
 
 export const indexedIndirectToOpcode = toOpcodeOneByte(/^\(\$([0-9A-F]{2}),X\)$/g)
 
-export const indirectIndexedToOpcode = () => { throw new Error("not implemented") }
+export const indirectIndexedToOpcode = toOpcodeOneByte(/^\(\$([0-9A-F]{2})\),Y$/g)
 
 
 const addrDataDictionary: Dictionary<

@@ -6,6 +6,7 @@ import {
   compile,
   immediateToOpcode,
   indexedIndirectToOpcode,
+  indirectIndexedToOpcode,
   indirectToOpcode,
   relativeToOpcode,
   stringToAddr,
@@ -237,6 +238,15 @@ describe("compiler", () => {
 
     expect(result)
       .toBe(0xcf)
+  })
+
+  test("indirect indexed (idirect y) to opcode", () => {
+    const addr = "($40),Y"
+
+    const [result] = indirectIndexedToOpcode(addr)
+
+    expect(result)
+      .toBe(0x40)
   })
 
 });
