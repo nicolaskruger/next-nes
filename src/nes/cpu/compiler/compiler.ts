@@ -118,15 +118,15 @@ export const zeroPageYToOpcode = toOpcode(/^\$([0-9A-F]{2}),Y$/g, parseHexToArra
 export const relativeToOpcode = toOpcode(/^\*([+-]\d{1,3})$/g,
   (value) => [Number(value) & 0xff])
 
-const toOpcodeAbs = (regex: RegExp) => toOpcode(regex, parseHexTwoBytesToArray)
+const toOpcodeTwoBytes = (regex: RegExp) => toOpcode(regex, parseHexTwoBytesToArray)
 
-export const absoluteToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4})$/g)
+export const absoluteToOpcode = toOpcodeTwoBytes(/^\$([0-9A-F]{4})$/g)
 
-export const absoluteXToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4}),X$/g)
+export const absoluteXToOpcode = toOpcodeTwoBytes(/^\$([0-9A-F]{4}),X$/g)
 
-export const absoluteYToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4}),Y$/g)
+export const absoluteYToOpcode = toOpcodeTwoBytes(/^\$([0-9A-F]{4}),Y$/g)
 
-export const indirectToOpcode = () => { throw new Error("not implemented") }
+export const indirectToOpcode = toOpcodeTwoBytes(/^\(\$([0-9A-F]{4})\)$/g)
 
 export const indirectIndexedToOpcode = () => { throw new Error("not implemented") }
 

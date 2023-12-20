@@ -5,6 +5,7 @@ import {
   breakInstruction,
   compile,
   immediateToOpcode,
+  indirectToOpcode,
   relativeToOpcode,
   stringToAddr,
   stringToInstruction,
@@ -219,4 +220,13 @@ describe("compiler", () => {
     expect(low).toBe(0x34)
     expect(high).toBe(0x12)
   })
+  test("indirect to opcode", () => {
+    const addr = "($FFFC)"
+
+    const [low, high] = indirectToOpcode(addr);
+
+    expect(low).toBe(0xfc)
+    expect(high).toBe(0xff)
+  })
+
 });
