@@ -124,7 +124,7 @@ export const absoluteToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4})$/g)
 
 export const absoluteXToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4}),X$/g)
 
-export const absoluteYToOpcode = () => { throw new Error("not implemented") }
+export const absoluteYToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4}),Y$/g)
 
 export const indirectToOpcode = () => { throw new Error("not implemented") }
 
