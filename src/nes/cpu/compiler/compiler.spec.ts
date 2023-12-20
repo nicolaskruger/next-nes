@@ -5,6 +5,7 @@ import {
   breakInstruction,
   compile,
   immediateToOpcode,
+  indexedIndirectToOpcode,
   indirectToOpcode,
   relativeToOpcode,
   stringToAddr,
@@ -227,6 +228,15 @@ describe("compiler", () => {
 
     expect(low).toBe(0xfc)
     expect(high).toBe(0xff)
+  })
+
+  test("indexed indirect (indirect x) to opcode", () => {
+    const addr = "($CF,X)"
+
+    const [result] = indexedIndirectToOpcode(addr)
+
+    expect(result)
+      .toBe(0xcf)
   })
 
 });

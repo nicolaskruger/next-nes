@@ -109,11 +109,13 @@ const toOpcode = (regex: RegExp, parse: (value: string) => number[]) =>
 
 export const immediateToOpcode = toOpcode(/^#(\d{1,3})$/g, parseIntToArray)
 
-export const zeroPageToOpcode = toOpcode(/^\$([0-9A-F]{2})$/g, parseHexToArray)
+const toOpcodeOneByte = (regex: RegExp) => toOpcode(regex, parseHexToArray)
 
-export const zeroPageXToOpcode = toOpcode(/^\$([0-9A-F]{2}),X$/g, parseHexToArray)
+export const zeroPageToOpcode = toOpcodeOneByte(/^\$([0-9A-F]{2})$/g)
 
-export const zeroPageYToOpcode = toOpcode(/^\$([0-9A-F]{2}),Y$/g, parseHexToArray)
+export const zeroPageXToOpcode = toOpcodeOneByte(/^\$([0-9A-F]{2}),X$/g)
+
+export const zeroPageYToOpcode = toOpcodeOneByte(/^\$([0-9A-F]{2}),Y$/g)
 
 export const relativeToOpcode = toOpcode(/^\*([+-]\d{1,3})$/g,
   (value) => [Number(value) & 0xff])
@@ -128,9 +130,10 @@ export const absoluteYToOpcode = toOpcodeTwoBytes(/^\$([0-9A-F]{4}),Y$/g)
 
 export const indirectToOpcode = toOpcodeTwoBytes(/^\(\$([0-9A-F]{4})\)$/g)
 
+export const indexedIndirectToOpcode = toOpcodeOneByte(/^\(\$([0-9A-F]{2}),X\)$/g)
+
 export const indirectIndexedToOpcode = () => { throw new Error("not implemented") }
 
-export const indexedIndirectToOpcode = () => { throw new Error("not implemented") }
 
 const addrDataDictionary: Dictionary<
   ADDR,
