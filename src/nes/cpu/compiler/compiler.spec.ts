@@ -1,4 +1,5 @@
 import {
+  absoluteToOpcode,
   breakInstruction,
   compile,
   immediateToOpcode,
@@ -188,5 +189,14 @@ describe("compiler", () => {
     const [result] = relativeToOpcode(addr);
 
     expect(result).toBe(0xfc)
+  })
+
+  test("absolute to opcode", () => {
+    const addr = "$1234"
+
+    const [low, high] = absoluteToOpcode(addr);
+
+    expect(low).toBe(0x34)
+    expect(high).toBe(0x12)
   })
 });

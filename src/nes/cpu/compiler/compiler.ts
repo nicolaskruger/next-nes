@@ -94,6 +94,13 @@ const parseIntToArray = (value: string) => {
 
 const parseHexToArray = (value: string) => [parseHex(value)]
 
+const parseHexTwoBytesToArray = (value: string) => {
+  const hex = parseHex(value);
+  const low = hex & 0xff
+  const high = hex >> 8
+  return [low, high]
+}
+
 const toOpcode = (regex: RegExp, parse: (value: string) => number[]) =>
   (value: string) => {
     const group = findGroup(regex, value)
@@ -110,6 +117,8 @@ export const zeroPageYToOpcode = toOpcode(/^\$([0-9A-F]{2}),Y$/g, parseHexToArra
 
 export const relativeToOpcode = toOpcode(/^\*([+-]\d{1,3})$/g,
   (value) => [Number(value) & 0xff])
+
+export const absoluteToOpcode = toOpcode(/^\$([0-9A-F]{4})$/g, parseHexTwoBytesToArray)
 
 const addrDataDictionary: Dictionary<
   ADDR,
