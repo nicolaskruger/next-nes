@@ -118,7 +118,19 @@ export const zeroPageYToOpcode = toOpcode(/^\$([0-9A-F]{2}),Y$/g, parseHexToArra
 export const relativeToOpcode = toOpcode(/^\*([+-]\d{1,3})$/g,
   (value) => [Number(value) & 0xff])
 
-export const absoluteToOpcode = toOpcode(/^\$([0-9A-F]{4})$/g, parseHexTwoBytesToArray)
+const toOpcodeAbs = (regex: RegExp) => toOpcode(regex, parseHexTwoBytesToArray)
+
+export const absoluteToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4})$/g)
+
+export const absoluteXToOpcode = toOpcodeAbs(/^\$([0-9A-F]{4}),X$/g)
+
+export const absoluteYToOpcode = () => { throw new Error("not implemented") }
+
+export const indirectToOpcode = () => { throw new Error("not implemented") }
+
+export const indirectIndexedToOpcode = () => { throw new Error("not implemented") }
+
+export const indexedIndirectToOpcode = () => { throw new Error("not implemented") }
 
 const addrDataDictionary: Dictionary<
   ADDR,

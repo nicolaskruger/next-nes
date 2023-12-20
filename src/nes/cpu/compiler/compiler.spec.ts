@@ -1,5 +1,6 @@
 import {
   absoluteToOpcode,
+  absoluteXToOpcode,
   breakInstruction,
   compile,
   immediateToOpcode,
@@ -195,6 +196,15 @@ describe("compiler", () => {
     const addr = "$1234"
 
     const [low, high] = absoluteToOpcode(addr);
+
+    expect(low).toBe(0x34)
+    expect(high).toBe(0x12)
+  })
+
+  test("absolute x to opcode", () => {
+    const addr = "$1234,X"
+
+    const [low, high] = absoluteXToOpcode(addr);
 
     expect(low).toBe(0x34)
     expect(high).toBe(0x12)
