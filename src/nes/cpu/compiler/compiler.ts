@@ -134,17 +134,27 @@ export const indexedIndirectToOpcode = toOpcodeOneByte(/^\(\$([0-9A-F]{2}),X\)$/
 
 export const indirectIndexedToOpcode = toOpcodeOneByte(/^\(\$([0-9A-F]{2})\),Y$/g)
 
+const defaultToOpcode = (value: string) => []
 
 const addrDataDictionary: Dictionary<
-  ADDR,
-  { data: (value: string) => number[] }
+  ADDR, (value: string) => number[]
 > = {
-  IMM: {
-    data: (value) => [],
-  },
+  IMM: immediateToOpcode,
+  ABS: absoluteToOpcode,
+  ABSX: absoluteXToOpcode,
+  ABSY: absoluteYToOpcode,
+  ACC: defaultToOpcode,
+  IMP: defaultToOpcode,
+  INDEXED_INDIRECT: indexedIndirectToOpcode,
+  INDIRECT: indirectToOpcode,
+  RELATIVE: relativeToOpcode,
+  INDIRECT_INDEXED: indirectIndexedToOpcode,
+  ZERO_PAGE: zeroPageToOpcode,
+  ZERO_PAGE_X: zeroPageXToOpcode,
+  ZERO_PAGE_Y: zeroPageYToOpcode
 };
 const isImpliedInstruction = (instruction: INSTRUCTION): boolean => {
-  throw new Error("not implemented");
+  return Boolean(instructionDictionaryOpcode[instruction].IMP)
 };
 
 export const stringToInstruction = (instruction: string): INSTRUCTION => {
@@ -156,7 +166,7 @@ export const stringToInstruction = (instruction: string): INSTRUCTION => {
 export const stringToAddr = (instruction: string): ADDR => {
   const addr = stringToAddrArray.find(addr => addr.verify(instruction))
   if (addr) return addr.addr;
-  throw new Error("this is not a valid addr");
+  throw new Error(`addr ${instruction} is invalid`);
 };
 
 const breakInstruction = (program: string): string[] =>
@@ -189,7 +199,7 @@ const opcodeFlow = (acc: Required<Compiler>, curr: string): Compiler => {
   const { instruction } = acc;
   const addr = stringToAddr(curr);
   const opcode = fetchOpcode(instruction, addr);
-  const data = addrDataDictionary[addr].data(curr);
+  const data = addrDataDictionary[addr](curr);
 
   return {
     ...acc,
@@ -201,7 +211,7 @@ const opcodeFlow = (acc: Required<Compiler>, curr: string): Compiler => {
 const compile = (program: string): number[] => {
   const instruction = breakInstruction(program);
 
-  instruction.reduce(
+  const { comp } = instruction.reduce(
     (acc, curr) => {
       const { instruction } = acc;
       if (instruction == undefined) return instructionFlow(acc, curr);
@@ -210,7 +220,7 @@ const compile = (program: string): number[] => {
     { comp: [] } as Compiler
   );
 
-  return [];
+  return comp;
 };
 
 export { breakInstruction, compile };

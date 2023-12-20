@@ -48,7 +48,7 @@ const errorInstructionNotFoundProgram = `
 `;
 
 const errorAddrNotExistsProgram = `
-    LSA NOT
+    LDA NOT
 `;
 
 describe("compiler", () => {
@@ -58,7 +58,7 @@ describe("compiler", () => {
     expect(instruction).toStrictEqual(["LSR", "A", "ROR", "A", "LDA", "#10"]);
   });
 
-  test.skip("compile", () => {
+  test("compile", () => {
     const comp = compile(allAddrProgram);
 
     const CLC = [0x18];
@@ -92,13 +92,13 @@ describe("compiler", () => {
     ]);
   });
 
-  test.skip("instruction not found", () => {
+  test("instruction not found", () => {
     expect(() => compile(errorInstructionNotFoundProgram)).toThrow(
-      "instruction DEL not exists"
+      "invalid instruction DEL"
     );
   });
 
-  test.skip("addr not found", () => {
+  test("addr not found", () => {
     expect(() => compile(errorAddrNotExistsProgram)).toThrow(
       "addr NOT is invalid"
     );
