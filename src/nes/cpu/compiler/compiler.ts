@@ -106,6 +106,7 @@ export const zeroPageToOpcode = toOpcode(/^\$([0-9A-F]{2})$/g, parseHexToArray)
 
 export const zeroPageXToOpcode = toOpcode(/^\$([0-9A-F]{2}),X$/g, parseHexToArray)
 
+export const zeroPageYToOpcode = toOpcode(/^\$([0-9A-F]{2}),Y$/g, parseHexToArray)
 
 const addrDataDictionary: Dictionary<
   ADDR,
