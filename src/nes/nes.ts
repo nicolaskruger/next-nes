@@ -102,6 +102,12 @@ const Y = (nes: Nes) => (Y: number) => {
   return nesBuilder(_nes);
 };
 
+const allBus = (nes: Nes) => (bus: Bus) => {
+  const _nes: Nes = { ...nes, bus }
+
+  return nesBuilder(_nes)
+}
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -119,6 +125,7 @@ function nesBuilder(nes: Nes) {
     Y: Y(nes),
     X: X(nes),
     build: () => nes,
+    allBus: allBus(nes)
   };
 }
 
