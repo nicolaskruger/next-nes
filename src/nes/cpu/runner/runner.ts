@@ -43,7 +43,7 @@ const run = async (program: string): Promise<Nes> => {
     let nes = initNesRunner();
     nes = compileNes(comp, nes)
 
-    while (getPC(nes) <= (0x8000 + comp.length)) {
+    while (getPC(nes) < (0x8000 + comp.length)) {
         const PC = getPC(nes)
         const fetch = readBus(PC, nes)
         const { addr, instruction, baseCycles, offsetCycles } = instructionDictionary[fetch]

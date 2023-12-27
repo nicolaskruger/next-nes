@@ -1456,7 +1456,7 @@ describe("instruction test", () => {
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(3).toSTK(0xfe).toBuss(0x01ff, 0x12);
+    expectNes(_nes).toCycles(3).toSTK(0xfe).toBuss(0x01ff, 0x12).toBuss(0x01fe, 0);
   });
 
   test("PHP, Push Processor Status", () => {
