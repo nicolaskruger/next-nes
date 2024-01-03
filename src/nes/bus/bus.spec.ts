@@ -1,6 +1,13 @@
 import { Cpu } from "../cpu/cpu";
 import { Nes } from "../nes";
-import { Bus, readBus, simpleRead, simpleWrite, writeBus } from "./bus";
+import {
+  Bus,
+  mirrorWrite,
+  readBus,
+  simpleRead,
+  simpleWrite,
+  writeBus,
+} from "./bus";
 
 const initBus = (): Bus => [
   {
@@ -10,6 +17,16 @@ const initBus = (): Bus => [
   },
 ];
 
+const initBusMirror = (): Bus =>
+  "_"
+    .repeat(3)
+    .split("")
+    .map((v) => ({
+      data: 1,
+      read: simpleRead,
+      write: mirrorWrite(0, 1, 2),
+    }));
+
 const initCpu = (): Cpu => ({
   ACC: 0,
   PC: 0,
@@ -17,6 +34,7 @@ const initCpu = (): Cpu => ({
   STK: 0,
   X: 0,
   Y: 0,
+  cycles: 0,
 });
 
 const initNes = (): Nes => ({
@@ -64,5 +82,18 @@ describe("BUS", () => {
     const newNes = writeBus(0, 2, nes);
 
     expect(newNes.bus[0].data).toBe(2);
+  });
+
+  test("should write mirror write value", () => {
+    const nes = initNes();
+    nes.bus = initBusMirror();
+
+    expect(nes.bus[0].data).toBe(0x1);
+
+    const _nes = writeBus(0x0000, 2, nes);
+
+    _nes.bus.forEach((b) => {
+      expect(b.data).toBe(2);
+    });
   });
 });

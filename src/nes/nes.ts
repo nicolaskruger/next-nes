@@ -102,11 +102,21 @@ const Y = (nes: Nes) => (Y: number) => {
   return nesBuilder(_nes);
 };
 
-const allBus = (nes: Nes) => (bus: Bus) => {
-  const _nes: Nes = { ...nes, bus }
+const directWriteBus = (nes: Nes) => (addr: number, value: number) => {
+  const bus: Bus = nes.bus.map((b, i) => {
+    if (addr === i) return { ...b, data: value };
+    return b;
+  });
+  const _nes: Nes = { ...nes, bus };
 
-  return nesBuilder(_nes)
-}
+  return nesBuilder(_nes);
+};
+
+const allBus = (nes: Nes) => (bus: Bus) => {
+  const _nes: Nes = { ...nes, bus };
+
+  return nesBuilder(_nes);
+};
 
 function nesBuilder(nes: Nes) {
   return {
@@ -125,7 +135,8 @@ function nesBuilder(nes: Nes) {
     Y: Y(nes),
     X: X(nes),
     build: () => nes,
-    allBus: allBus(nes)
+    allBus: allBus(nes),
+    directWrite: directWriteBus(nes),
   };
 }
 
