@@ -180,7 +180,18 @@ function flagBuilder(result: FlagResult, nes: Nes) {
   };
 }
 
+const initCpu = (): Cpu => ({
+  ACC: 0,
+  PC: 0,
+  STATUS: 0,
+  STK: 0xff,
+  X: 0,
+  Y: 0,
+  cycles: 0,
+});
+
 export {
+  initCpu,
   getCarryFlag,
   getZeroFlag,
   getInterruptDisable,
