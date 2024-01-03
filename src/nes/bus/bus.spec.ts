@@ -2,11 +2,15 @@ import { Cpu } from "../cpu/cpu";
 import { Nes } from "../nes";
 import {
   Bus,
+  mirrorBuilder,
   mirrorWrite,
   readBus,
   simpleRead,
   simpleWrite,
   writeBus,
+  initBus as initB,
+  buildMirrorArray8bytes,
+  mirror8BytesWrite,
 } from "./bus";
 
 const initBus = (): Bus => [
@@ -16,6 +20,16 @@ const initBus = (): Bus => [
     write: simpleWrite,
   },
 ];
+
+const initBusSimple = (): Bus =>
+  "_"
+    .repeat(0x10000)
+    .split("")
+    .map((v) => ({
+      data: 1,
+      read: simpleRead,
+      write: simpleWrite,
+    }));
 
 const initBusMirror = (): Bus =>
   "_"
@@ -95,5 +109,60 @@ describe("BUS", () => {
     _nes.bus.forEach((b) => {
       expect(b.data).toBe(2);
     });
+  });
+
+  test("mirror builder", () => {
+    const nes = initNes();
+    nes.bus = "_"
+      .repeat(5)
+      .split("")
+      .map((_) => initBus()[0]);
+
+    let _nes = mirrorBuilder(nes, 0, 4);
+
+    _nes = writeBus(0, 2, _nes);
+
+    expect(_nes.bus.map((b) => b.data)).toStrictEqual([2, 1, 1, 1, 2]);
+  });
+
+  test("build mirror array every 8 bytes", () => {
+    const [a, b, c, ...arr] = buildMirrorArray8bytes(0x2000);
+    const last = arr.slice(-1)[0];
+    expect(a).toBe(0x2000);
+    expect(b).toBe(0x2008);
+    expect(c).toBe(0x2010);
+    expect(last).toBe(0x3ff8);
+  });
+
+  test("mirror 8 byte write", () => {
+    let nes = initNes();
+    nes.bus = initBusSimple();
+
+    nes = mirror8BytesWrite(0x2000, nes);
+    nes = writeBus(0x2000, 2, nes);
+
+    expect(readBus(0x2000, nes)).toBe(2);
+    expect(readBus(0x2008, nes)).toBe(2);
+    expect(readBus(0x2010, nes)).toBe(2);
+    expect(readBus(0x3ff8, nes)).toBe(2);
+  });
+  test("init buss", () => {
+    let nes = initB({} as Nes);
+
+    expect(nes.bus.length).toBe(0x10000);
+
+    nes = writeBus(0, 3, nes);
+
+    expect(readBus(0, nes)).toBe(3);
+    expect(readBus(0x0800, nes)).toBe(3);
+    expect(readBus(0x1000, nes)).toBe(3);
+    expect(readBus(0x1800, nes)).toBe(3);
+
+    nes = writeBus(0x2000, 4, nes);
+
+    expect(readBus(0x2000, nes)).toBe(4);
+    expect(readBus(0x2008, nes)).toBe(4);
+    expect(readBus(0x2010, nes)).toBe(4);
+    expect(readBus(0x3ff8, nes)).toBe(4);
   });
 });
