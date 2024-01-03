@@ -1,6 +1,7 @@
-import { Bus, writeBus } from "./bus/bus";
+import { Bus, initBus, writeBus } from "./bus/bus";
 import {
   Cpu,
+  initCpu,
   setACC,
   setCarryFlag,
   setCycles,
@@ -17,7 +18,7 @@ import {
   calculateCycles,
   pushToStack,
 } from "./cpu/instruction/instruction";
-import { Ppu } from "./ppu/ppu";
+import { Ppu, initPpu } from "./ppu/ppu";
 
 type Nes = {
   cpu: Cpu;
@@ -140,6 +141,12 @@ function nesBuilder(nes: Nes) {
   };
 }
 
-export { nesBuilder };
+const initNes = (): Nes => ({
+  bus: initBus(),
+  cpu: initCpu(),
+  ppu: initPpu(),
+});
+
+export { nesBuilder, initNes };
 
 export type { Nes };
