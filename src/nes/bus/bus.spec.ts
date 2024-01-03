@@ -112,17 +112,17 @@ describe("BUS", () => {
   });
 
   test("mirror builder", () => {
-    const nes = initNes();
+    let nes = initNes();
     nes.bus = "_"
       .repeat(5)
       .split("")
       .map((_) => initBus()[0]);
 
-    let _nes = mirrorBuilder(nes, 0, 4);
+    nes.bus = mirrorBuilder(nes.bus, 0, 4);
 
-    _nes = writeBus(0, 2, _nes);
+    nes = writeBus(0, 2, nes);
 
-    expect(_nes.bus.map((b) => b.data)).toStrictEqual([2, 1, 1, 1, 2]);
+    expect(nes.bus.map((b) => b.data)).toStrictEqual([2, 1, 1, 1, 2]);
   });
 
   test("build mirror array every 8 bytes", () => {
@@ -138,7 +138,7 @@ describe("BUS", () => {
     let nes = initNes();
     nes.bus = initBusSimple();
 
-    nes = mirror8BytesWrite(0x2000, nes);
+    nes.bus = mirror8BytesWrite(0x2000, nes.bus);
     nes = writeBus(0x2000, 2, nes);
 
     expect(readBus(0x2000, nes)).toBe(2);
@@ -147,7 +147,8 @@ describe("BUS", () => {
     expect(readBus(0x3ff8, nes)).toBe(2);
   });
   test("init buss", () => {
-    let nes = initB({} as Nes);
+    let nes = initNes();
+    nes.bus = initB();
 
     expect(nes.bus.length).toBe(0x10000);
 
