@@ -39,10 +39,6 @@ const allAddrProgram = `
     LDA ($40),Y
 `;
 
-const invalidOpcodeProgram = `
-    LSR $1234
-`;
-
 const errorInstructionNotFoundProgram = `
     DEL
 `;
@@ -153,100 +149,97 @@ describe("compiler", () => {
 
     const [result] = immediateToOpcode(addr);
 
-    expect(result).toBe(10)
-  })
+    expect(result).toBe(10);
+  });
 
   test("zero page to opcode", () => {
     const addr = "$EF";
 
     const [result] = zeroPageToOpcode(addr);
 
-    expect(result).toBe(0xef)
-  })
+    expect(result).toBe(0xef);
+  });
 
   test("zero page x to opcode", () => {
-    const addr = "$DF,X"
+    const addr = "$DF,X";
 
-    const [result] = zeroPageXToOpcode(addr)
+    const [result] = zeroPageXToOpcode(addr);
 
-    expect(result).toBe(0xdf)
-  })
+    expect(result).toBe(0xdf);
+  });
 
   test("zero page y to opcode", () => {
-    const addr = "$FF,Y"
+    const addr = "$FF,Y";
 
-    const [result] = zeroPageYToOpcode(addr)
+    const [result] = zeroPageYToOpcode(addr);
 
-    expect(result).toBe(0xff)
-  })
+    expect(result).toBe(0xff);
+  });
 
   test("relative to opcode positive number", () => {
-    const addr = "*+4"
+    const addr = "*+4";
 
     const [result] = relativeToOpcode(addr);
 
-    expect(result).toBe(4)
-  })
+    expect(result).toBe(4);
+  });
 
   test("relative to opcode negative number", () => {
-    const addr = "*-4"
+    const addr = "*-4";
 
     const [result] = relativeToOpcode(addr);
 
-    expect(result).toBe(0xfc)
-  })
+    expect(result).toBe(0xfc);
+  });
 
   test("absolute to opcode", () => {
-    const addr = "$1234"
+    const addr = "$1234";
 
     const [low, high] = absoluteToOpcode(addr);
 
-    expect(low).toBe(0x34)
-    expect(high).toBe(0x12)
-  })
+    expect(low).toBe(0x34);
+    expect(high).toBe(0x12);
+  });
 
   test("absolute x to opcode", () => {
-    const addr = "$1234,X"
+    const addr = "$1234,X";
 
     const [low, high] = absoluteXToOpcode(addr);
 
-    expect(low).toBe(0x34)
-    expect(high).toBe(0x12)
-  })
+    expect(low).toBe(0x34);
+    expect(high).toBe(0x12);
+  });
 
   test("absolute y to opcode", () => {
-    const addr = "$1234,Y"
+    const addr = "$1234,Y";
 
     const [low, high] = absoluteYToOpcode(addr);
 
-    expect(low).toBe(0x34)
-    expect(high).toBe(0x12)
-  })
+    expect(low).toBe(0x34);
+    expect(high).toBe(0x12);
+  });
   test("indirect to opcode", () => {
-    const addr = "($FFFC)"
+    const addr = "($FFFC)";
 
     const [low, high] = indirectToOpcode(addr);
 
-    expect(low).toBe(0xfc)
-    expect(high).toBe(0xff)
-  })
+    expect(low).toBe(0xfc);
+    expect(high).toBe(0xff);
+  });
 
   test("indexed indirect (indirect x) to opcode", () => {
-    const addr = "($CF,X)"
+    const addr = "($CF,X)";
 
-    const [result] = indexedIndirectToOpcode(addr)
+    const [result] = indexedIndirectToOpcode(addr);
 
-    expect(result)
-      .toBe(0xcf)
-  })
+    expect(result).toBe(0xcf);
+  });
 
   test("indirect indexed (idirect y) to opcode", () => {
-    const addr = "($40),Y"
+    const addr = "($40),Y";
 
-    const [result] = indirectIndexedToOpcode(addr)
+    const [result] = indirectIndexedToOpcode(addr);
 
-    expect(result)
-      .toBe(0x40)
-  })
-
+    expect(result).toBe(0x40);
+  });
 });
