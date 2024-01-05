@@ -26,7 +26,7 @@ const NesView = ({ nes }: NesViewProps) => {
       </ul>
       <h2>Bus</h2>
       <ul>
-        {bus.map(({ data }, index) => (
+        {bus.slice(0, 0x00ff).map(({ data }, index) => (
           <li key={`bus-${index}`}>
             <h3>{index}</h3>
             <p data-testid={`bus-${index}`}>{data}</p>

@@ -26,6 +26,7 @@ const Compiler = () => {
     try {
       setInfo("loading");
       const newNes = await run(program);
+      setNes(newNes);
       setInfo("invisible");
     } catch (e) {
       if (e instanceof Error) setError(e.message);
