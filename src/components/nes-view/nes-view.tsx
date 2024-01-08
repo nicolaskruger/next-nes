@@ -25,6 +25,16 @@ const NesView = ({ nes }: NesViewProps) => {
         ))}
       </ul>
       <h2>Bus</h2>
+      <div>
+        <button data-testid="bus-button-prev">prev</button>
+        <p>
+          0x0000 - 0x00ff page{" "}
+          <input type="text" data-testid="input-page" value={0} /> of 0xff{" "}
+          <button data-testid="button-change">change</button>
+        </p>
+        <p data-error="invisible">invalid number of page</p>
+        <button data-testid="bus-button-next">next</button>
+      </div>
       <ul>
         {bus.slice(0, 0x00ff).map(({ data }, index) => (
           <li key={`bus-${index}`}>
