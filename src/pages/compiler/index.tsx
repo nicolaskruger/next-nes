@@ -1,3 +1,5 @@
+import { Compiler } from "@/components/compiler/compiler";
+
 export default function Page() {
-    return <h1 className="text-black">hello word</h1>
+  return <Compiler />;
 }

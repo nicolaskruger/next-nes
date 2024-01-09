@@ -2,6 +2,7 @@ import { NesView } from "../nes-view/nes-view";
 import { FormEvent, useState } from "react";
 import { initNesRunner, run } from "@/nes/cpu/runner/runner";
 import { Dictionary } from "@/nes/helper/dictionary";
+import { Container } from "../aux/container/container";
 
 type InfoStates = "invisible" | "error" | "loading";
 
@@ -35,21 +36,23 @@ const Compiler = () => {
   };
   return (
     <main>
-      <h1>Compiler</h1>
-      <form action="submit" onSubmit={onHandleSubmit}>
-        <textarea
-          data-testid="text-area-compiler"
-          name="program"
-          id="program"
-          value={program}
-          onChange={(e) => setProgram(e.target.value)}
-        ></textarea>
-        <button data-testid="button-compiler">run</button>
-      </form>
-      <p data-info={info} data-testid="compile-info" className="invisible">
-        {renderInfo()}
-      </p>
-      <NesView nes={nes} />
+      <Container>
+        <h1>Compiler</h1>
+        <form action="submit" onSubmit={onHandleSubmit}>
+          <textarea
+            data-testid="text-area-compiler"
+            name="program"
+            id="program"
+            value={program}
+            onChange={(e) => setProgram(e.target.value)}
+          ></textarea>
+          <button data-testid="button-compiler">run</button>
+        </form>
+        <p data-info={info} data-testid="compile-info" className="invisible">
+          {renderInfo()}
+        </p>
+        <NesView nes={nes} />
+      </Container>
     </main>
   );
 };
