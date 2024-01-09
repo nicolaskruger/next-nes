@@ -5,7 +5,7 @@ import user from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 describe("<NesView/>", () => {
-  const queryBus = async (busId: string) => {
+  const queryBus = (busId: string) => {
     return screen.queryByTestId<HTMLLIElement>(`bus-${busId}`);
   };
 
@@ -17,11 +17,14 @@ describe("<NesView/>", () => {
 
     const changeButton = screen.getByTestId<HTMLButtonElement>("button-change");
 
+    const errorP = screen.getByTestId<HTMLParagraphElement>("error-nes-view");
+
     return {
       prevButton,
       nextButton,
       input,
       changeButton,
+      errorP,
     };
   };
 
@@ -49,12 +52,13 @@ describe("<NesView/>", () => {
   test("should change page when click on next page", async () => {
     const { nextButton, input } = fetchAllButtonAndInput();
 
-    expect(input.value).toBe(0);
+    expect(input.value).toBe("00");
     const buss0 = queryBus("0000");
+    screen.debug();
     expect(buss0).toBeInTheDocument();
     await user.click(nextButton);
 
-    expect(input.value).toBe(1);
+    expect(input.value).toBe("01");
     const bus0100 = queryBus("0100");
     expect(bus0100).toBeInTheDocument();
     expect(queryBus("0000")).not.toBeInTheDocument();
@@ -82,5 +86,15 @@ describe("<NesView/>", () => {
     expect(input.value).toBe("01");
 
     expect(queryBus("0100")).toBeInTheDocument();
+  });
+
+  test("should not change the page when type a invalid number", async () => {
+    const { input, changeButton, errorP } = fetchAllButtonAndInput();
+
+    await user.type(input, "xx");
+
+    await user.click(changeButton);
+
+    expect(errorP.dataset.error).toBe("true");
   });
 });

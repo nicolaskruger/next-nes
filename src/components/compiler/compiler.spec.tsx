@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Compiler } from "./compiler";
+import { dexToHexFourDigitsNoPrefix } from "@/nes/helper/converter";
 
 const user = userEvent.setup();
 describe("<Compiler/>", () => {
@@ -20,7 +21,9 @@ describe("<Compiler/>", () => {
   };
 
   const fetchBusData = (index: number) =>
-    screen.findByTestId(`bus-${index}`).then((v) => Number(v.textContent));
+    screen
+      .findByTestId(`bus-${dexToHexFourDigitsNoPrefix(index)}`)
+      .then((v) => Number(v.textContent));
 
   const fetchACC = () =>
     screen.findByTestId("register-ACC").then((v) => Number(v.textContent));
