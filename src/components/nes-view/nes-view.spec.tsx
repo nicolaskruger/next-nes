@@ -54,7 +54,6 @@ describe("<NesView/>", () => {
 
     expect(input.value).toBe("00");
     const buss0 = queryBus("0000");
-    screen.debug();
     expect(buss0).toBeInTheDocument();
     await user.click(nextButton);
 
