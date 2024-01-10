@@ -35,20 +35,30 @@ const Compiler = () => {
     }
   };
   return (
-    <main>
+    <main className="bg-black text-slate-300">
       <Container>
-        <h1>Compiler</h1>
+        <h1 className="text-slate-50 text-3xl mb-5 pt-5">Compiler</h1>
         <form action="submit" onSubmit={onHandleSubmit}>
           <textarea
+            className="w-full h-96 resize-none bg-slate-700 text-slate-50 p-3 rounded-xl mb-1"
             data-testid="text-area-compiler"
             name="program"
             id="program"
             value={program}
             onChange={(e) => setProgram(e.target.value)}
           ></textarea>
-          <button data-testid="button-compiler">run</button>
+          <button
+            className="bg-green-600 text-xl px-6 py-1 text-slate-50 rounded-full  active:bg-green-800 items-center"
+            data-testid="button-compiler"
+          >
+            run
+          </button>
         </form>
-        <p data-info={info} data-testid="compile-info" className="invisible">
+        <p
+          data-info={info}
+          data-testid="compile-info"
+          className="data-[info=error]:text-red-500 data-[info=invisible]:invisible data-[info=loading]:text-slate-300"
+        >
           {renderInfo()}
         </p>
         <NesView nes={nes} />
