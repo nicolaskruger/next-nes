@@ -182,7 +182,7 @@ function flagBuilder(result: FlagResult, nes: Nes) {
 
 const initCpu = (): Cpu => ({
   ACC: 0,
-  PC: 0,
+  PC: 0x8000,
   STATUS: 0,
   STK: 0xff,
   X: 0,

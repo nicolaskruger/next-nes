@@ -119,6 +119,27 @@ const allBus = (nes: Nes) => (bus: Bus) => {
   return nesBuilder(_nes);
 };
 
+export const getPpu = (nes: Nes) => nes.ppu;
+
+export const getBussPpu = (nes: Nes) => nes.ppu.bus;
+
+const buildNesPpu = (nes: Nes, addr: number, value: number) => {
+  return {
+    ...nes,
+    ppu: {
+      ...getPpu(nes),
+      bus: getBussPpu(nes).map((b, bAddr) => {
+        if (addr === bAddr) return { ...b, data: value };
+        return b;
+      }),
+    },
+  };
+};
+
+const bussPpu = (nes: Nes) => (addr: number, value: number) => {
+  return nesBuilder(buildNesPpu(nes, addr, value));
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -138,6 +159,7 @@ function nesBuilder(nes: Nes) {
     build: () => nes,
     allBus: allBus(nes),
     directWrite: directWriteBus(nes),
+    bussPpu: bussPpu(nes),
   };
 }
 
