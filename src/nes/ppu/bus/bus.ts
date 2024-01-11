@@ -1,4 +1,5 @@
-import { Bus } from "@/nes/bus/bus";
+import { Bus, mirrorBuilder } from "@/nes/bus/bus";
+import { pa, paOfPa } from "@/nes/helper/pa";
 import { Nes, getBussPpu, getPpu, nesBuilder } from "@/nes/nes";
 
 const simpleReadPpu = (addr: number, nes: Nes) => {
@@ -30,6 +31,18 @@ const initPpuBus = (): Bus => {
       write: simpleWritePpu,
     }));
 
+  for (let addr = 0x0000; addr <= 0x3fff; addr++) {
+    if (addr >= 0x2000 && addr <= 0x2eff) {
+      bus = mirrorBuilder(
+        bus,
+        simpleWritePpu,
+        ...paOfPa([addr, addr + 0x1000], 0x4000, 4)
+      );
+    } else if (addr >= 0x3000 && addr <= 0x3eff) {
+    } else {
+      bus = mirrorBuilder(bus, simpleWritePpu, ...pa(addr, 0x4000, 4));
+    }
+  }
   return bus;
 };
 
