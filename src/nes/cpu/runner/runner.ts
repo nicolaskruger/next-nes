@@ -1,6 +1,6 @@
 import { Nes, nesBuilder } from "@/nes/nes";
 import { compile } from "../compiler/compiler";
-import { Bus, readBus, simpleRead, simpleWrite } from "@/nes/bus/bus";
+import { Bus, readBusNes, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Cpu, getPC } from "../cpu";
 import { instructionDictionary } from "../intructionDictionary/instructionDictionary";
 
@@ -47,7 +47,7 @@ const run = async (program: string): Promise<Nes> => {
 
   while (getPC(nes) < 0x8000 + comp.length) {
     const PC = getPC(nes);
-    const fetch = readBus(PC, nes);
+    const fetch = readBusNes(PC, nes);
     const { addr, instruction, baseCycles, offsetCycles } =
       instructionDictionary[fetch];
     const addrResult = addr(nes);

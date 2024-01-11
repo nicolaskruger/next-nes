@@ -32,12 +32,12 @@ export const mirrorBuilder = (bus: Bus, ...mirror: number[]): Bus => {
   });
 };
 
-const readBus = (addr: number, nes: Nes) => {
+const readBusNes = (addr: number, nes: Nes) => {
   if (addr >= 0 && addr <= 0xffff) return nes.bus[addr].read(addr, nes);
   throw new Error("cross the border off buss on read");
 };
 
-const writeBus = (addr: number, value: number, nes: Nes): Nes => {
+const writeBusNes = (addr: number, value: number, nes: Nes): Nes => {
   if (addr >= 0 && addr <= 0xffff)
     return {
       ...nes.bus[addr].write(addr, value, nes),
@@ -69,6 +69,6 @@ export const initBus = (): Bus => {
   return bus;
 };
 
-export { simpleRead, simpleWrite, readBus, writeBus };
+export { simpleRead, simpleWrite, readBusNes, writeBusNes };
 
 export type { Bus };

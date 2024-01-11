@@ -21,7 +21,7 @@ import {
   setZeroFlag,
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
-import { readBus, writeBus } from "@/nes/bus/bus";
+import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 
 type Instruction = {
   nes: Nes;
@@ -202,7 +202,7 @@ const BPL = (instruction: Instruction): Nes => {
 export const pushToStack = (nes: Nes, data: number): Nes => {
   let STK = nes.cpu.STK;
   if (STK < 0) throw new Error("stack overflow");
-  const newNes = writeBus(0x0100 | STK, data, nes);
+  const newNes = writeBusNes(0x0100 | STK, data, nes);
   STK--;
   return setSTK(STK, newNes);
 };
@@ -211,7 +211,7 @@ const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
   let STK = getSTK(nes);
   STK++;
   if (STK > 0xff) throw new Error("stack overflow");
-  const value = readBus(0x0100 | STK, nes);
+  const value = readBusNes(0x0100 | STK, nes);
   return [value, setSTK(STK, nes)];
 };
 
@@ -284,7 +284,7 @@ const DEC = (instruction: Instruction): Nes => {
 
   if (addr === undefined) throw new Error("instruction DEC needs addr");
 
-  const result = (readBus(addr, nes) - 1) & MASK_8;
+  const result = (readBusNes(addr, nes) - 1) & MASK_8;
 
   return flagBuilder({ result }, nes)
     .zero()
@@ -349,7 +349,7 @@ const INC = (instruction: Instruction): Nes => {
 
   if (addr === undefined) throw new Error("instruction INC must have addr");
 
-  const result = (readBus(addr, nes) + 1) & MASK_8;
+  const result = (readBusNes(addr, nes) + 1) & MASK_8;
 
   return flagBuilder({ result }, nes)
     .zero()

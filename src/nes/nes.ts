@@ -1,4 +1,4 @@
-import { Bus, initBus, writeBus } from "./bus/bus";
+import { Bus, initBus, writeBusNes } from "./bus/bus";
 import {
   Cpu,
   initCpu,
@@ -39,7 +39,7 @@ const cycles = (nes: Nes) => (cycles: number) => {
 };
 
 const buss = (nes: Nes) => (addr: number, value: number) => {
-  const _nes = writeBus(addr, value, nes);
+  const _nes = writeBusNes(addr, value, nes);
 
   return nesBuilder(_nes);
 };

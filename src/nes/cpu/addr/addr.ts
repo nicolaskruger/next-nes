@@ -1,4 +1,4 @@
-import { readBus } from "@/nes/bus/bus";
+import { readBusNes } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { setPC } from "../cpu";
 
@@ -27,7 +27,7 @@ const IMM = (nes: Nes): Addr => {
   const { cpu } = nes;
   let PC = cpu.PC + 1;
   const addr = PC;
-  const data = readBus(addr, nes);
+  const data = readBusNes(addr, nes);
   PC++;
   return {
     nes: setPC(PC, nes),
@@ -41,9 +41,9 @@ const ZERO_PAGE = (nes: Nes): Addr => {
   const { cpu } = nes;
   let PC = cpu.PC + 1;
 
-  const zeroPageAddr = readBus(PC, nes);
+  const zeroPageAddr = readBusNes(PC, nes);
 
-  const data = readBus(zeroPageAddr, nes);
+  const data = readBusNes(zeroPageAddr, nes);
 
   PC++;
   return {
@@ -60,14 +60,14 @@ const ZERO_PAGE_X = (nes: Nes): Addr => {
   let PC = cpu.PC + 1;
 
   let cross = false;
-  let addr = readBus(PC, nes) + cpu.X;
+  let addr = readBusNes(PC, nes) + cpu.X;
 
   if (addr > 0xff) {
     addr = 0xff & addr;
     cross = true;
   }
 
-  const data = readBus(addr, nes);
+  const data = readBusNes(addr, nes);
 
   PC++;
 
@@ -85,14 +85,14 @@ const ZERO_PAGE_Y = (nes: Nes): Addr => {
   let PC = cpu.PC + 1;
 
   let cross = false;
-  let addr = readBus(PC, nes) + cpu.Y;
+  let addr = readBusNes(PC, nes) + cpu.Y;
 
   if (addr > 0xff) {
     addr = 0xff & addr;
     cross = true;
   }
 
-  const data = readBus(addr, nes);
+  const data = readBusNes(addr, nes);
 
   PC++;
 
@@ -111,7 +111,7 @@ const RELATIVE = (nes: Nes): Addr => {
 
   const addr = PC;
 
-  let data = readBus(addr, nes);
+  let data = readBusNes(addr, nes);
 
   if (((data >> 7) & 1) == 1) data = (-1 << 8) | data;
 
@@ -130,12 +130,12 @@ const ABS = (nes: Nes): Addr => {
 
   let PC = cpu.PC + 1;
 
-  const low = readBus(PC++, nes);
-  const high = readBus(PC, nes);
+  const low = readBusNes(PC++, nes);
+  const high = readBusNes(PC, nes);
 
   const addr = (high << 8) | low;
 
-  const data = readBus(addr, nes);
+  const data = readBusNes(addr, nes);
 
   PC++;
 
@@ -152,12 +152,12 @@ const ABSX = (nes: Nes): Addr => {
 
   let PC = cpu.PC + 1;
 
-  const low = readBus(PC++, nes);
-  const high = readBus(PC, nes);
+  const low = readBusNes(PC++, nes);
+  const high = readBusNes(PC, nes);
 
   const addr = ((high << 8) | low) + cpu.X;
 
-  const data = readBus(addr, nes);
+  const data = readBusNes(addr, nes);
 
   const cross = low + cpu.X > 0xff;
 
@@ -176,12 +176,12 @@ const ABSY = (nes: Nes): Addr => {
 
   let PC = cpu.PC + 1;
 
-  const low = readBus(PC++, nes);
-  const high = readBus(PC, nes);
+  const low = readBusNes(PC++, nes);
+  const high = readBusNes(PC, nes);
 
   const addr = ((high << 8) | low) + cpu.Y;
 
-  const data = readBus(addr, nes);
+  const data = readBusNes(addr, nes);
 
   const cross = low + cpu.Y > 0xff;
 
@@ -200,16 +200,16 @@ const INDIRECT = (nes: Nes): Addr => {
 
   let PC = cpu.PC;
   let cross = false;
-  const lowAddr = readBus(++PC, nes);
-  const highAddr = readBus(++PC, nes);
+  const lowAddr = readBusNes(++PC, nes);
+  const highAddr = readBusNes(++PC, nes);
 
   if (lowAddr >= 0xff) cross = true;
 
   const low = (highAddr << 8) | lowAddr;
   const high = (highAddr << 8) | (lowAddr + 1) % 256;
 
-  const lowValue = readBus(low, nes);
-  const highValue = readBus(high, nes);
+  const lowValue = readBusNes(low, nes);
+  const highValue = readBusNes(high, nes);
 
   const data = (highValue << 8) | lowValue;
 
@@ -226,11 +226,11 @@ const INDEXED_INDIRECT = (nes: Nes): Addr => {
   const { cpu } = nes;
   let PC = cpu.PC;
   const X = cpu.X;
-  const addr = readBus(++PC, nes);
+  const addr = readBusNes(++PC, nes);
   const cross = X + addr + 1 > 0xff;
-  const low = readBus((addr + X) % 256, nes);
-  const high = readBus((addr + X + 1) % 256, nes);
-  const data = readBus((high << 8) | low, nes);
+  const low = readBusNes((addr + X) % 256, nes);
+  const high = readBusNes((addr + X + 1) % 256, nes);
+  const data = readBusNes((high << 8) | low, nes);
 
   PC++;
 
@@ -245,12 +245,12 @@ const INDIRECT_INDEXED = (nes: Nes): Addr => {
   const { cpu } = nes;
   let PC = cpu.PC;
   const Y = cpu.Y;
-  const addr = readBus(++PC, nes);
+  const addr = readBusNes(++PC, nes);
   let cross = addr + 1 > 0xff;
-  const low = readBus(addr % 256, nes);
-  const high = readBus((addr + 1) % 256, nes);
+  const low = readBusNes(addr % 256, nes);
+  const high = readBusNes((addr + 1) % 256, nes);
   cross ||= low + Y > 0xff;
-  const data = readBus((high << 8) | (low + Y) % 256, nes);
+  const data = readBusNes((high << 8) | (low + Y) % 256, nes);
 
   PC++;
 
