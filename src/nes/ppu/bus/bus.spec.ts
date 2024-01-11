@@ -13,7 +13,7 @@ describe("ppu bus", () => {
     expect(readPpu(0xc000, nes)).toBe(2);
   });
 
-  test("should throw an exception when cross the board of VRAM", () => {
+  test("should throw an exception when cross the board of VRAM when reading", () => {
     let nes = initNes();
 
     expect(() => {
@@ -29,5 +29,25 @@ describe("ppu bus", () => {
     let nes = initNes();
 
     expect(readPpu(0, nes)).toBe(0);
+  });
+
+  test("should throw an exception when cross the board of VRAM when writing", () => {
+    let nes = initNes();
+
+    expect(() => {
+      writePpu(-1, 1, nes);
+    }).toThrow("PPU VRAM out of range");
+
+    expect(() => {
+      writePpu(0x10000, 1, nes);
+    }).toThrow("PPU VRAM out of range");
+  });
+
+  test("should write VRAM correctly", () => {
+    let nes = initNes();
+
+    nes = writePpu(0, 1, nes);
+
+    expect(readPpu(0, nes)).toBe(1);
   });
 });

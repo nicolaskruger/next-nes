@@ -15,11 +15,16 @@ const readPpu = (addr: number, nes: Nes): Number => {
 };
 
 const writePpu = (addr: number, value: number, nes: Nes): Nes => {
-  return getBussPpu(nes)[addr].write(addr, value, nes);
+  if (addr >= 0 && addr <= 0xffff)
+    return getBussPpu(nes)[addr].write(addr, value, nes);
+  throw new Error("PPU VRAM out of range");
 };
 
 const initPpuBus = (): Bus => {
-  return "_"
+
+
+
+  let bus = "_"
     .repeat(0x10000)
     .split("")
     .map((_) => ({
@@ -27,6 +32,12 @@ const initPpuBus = (): Bus => {
       read: simpleReadPpu,
       write: simpleWritePpu,
     }));
+
+  for(let addr = 0x0000; addr <= 0xffff; addr++){
+    bus = 
+  }
+
+  return bus
 };
 
 export { initPpuBus, readPpu, writePpu };
