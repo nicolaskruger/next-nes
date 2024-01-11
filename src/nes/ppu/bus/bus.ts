@@ -38,7 +38,16 @@ const initPpuBus = (): Bus => {
         simpleWritePpu,
         ...paOfPa([addr, addr + 0x1000], 0x4000, 4)
       );
-    } else if (addr >= 0x3000 && addr <= 0x3eff) {
+    } else if (addr >= 0x3f00 && addr <= 0x3f20) {
+      bus = mirrorBuilder(
+        bus,
+        simpleWritePpu,
+        ...paOfPa(pa(addr, 0x0020, 7), 0x4000, 4)
+      );
+    } else if (
+      (addr >= 0x3000 && addr <= 0x3eff) ||
+      (addr >= 0x3f00 && addr <= 0x3f20)
+    ) {
     } else {
       bus = mirrorBuilder(bus, simpleWritePpu, ...pa(addr, 0x4000, 4));
     }

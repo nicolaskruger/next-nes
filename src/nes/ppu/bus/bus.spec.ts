@@ -22,6 +22,43 @@ describe("ppu bus", () => {
     expect(readPpu(0x7000, nes)).toBe(3);
     expect(readPpu(0xb000, nes)).toBe(3);
     expect(readPpu(0xf000, nes)).toBe(3);
+
+    nes = writePpu(0x3f00, 4, nes);
+
+    expect(readPpu(0x3f00, nes)).toBe(4);
+    expect(readPpu(0x7f00, nes)).toBe(4);
+    expect(readPpu(0xbf00, nes)).toBe(4);
+    expect(readPpu(0xff00, nes)).toBe(4);
+
+    expect(readPpu(0x3f20, nes)).toBe(4);
+    expect(readPpu(0x7f20, nes)).toBe(4);
+    expect(readPpu(0xbf20, nes)).toBe(4);
+    expect(readPpu(0xff20, nes)).toBe(4);
+
+    expect(readPpu(0x3f40, nes)).toBe(4);
+    expect(readPpu(0x7f40, nes)).toBe(4);
+    expect(readPpu(0xbf40, nes)).toBe(4);
+    expect(readPpu(0xff40, nes)).toBe(4);
+
+    expect(readPpu(0x3f60, nes)).toBe(4);
+    expect(readPpu(0x7f60, nes)).toBe(4);
+    expect(readPpu(0xbf60, nes)).toBe(4);
+    expect(readPpu(0xff60, nes)).toBe(4);
+
+    expect(readPpu(0x3f80, nes)).toBe(4);
+    expect(readPpu(0x7f80, nes)).toBe(4);
+    expect(readPpu(0xbf80, nes)).toBe(4);
+    expect(readPpu(0xff80, nes)).toBe(4);
+
+    expect(readPpu(0x3fa0, nes)).toBe(4);
+    expect(readPpu(0x7fa0, nes)).toBe(4);
+    expect(readPpu(0xbfa0, nes)).toBe(4);
+    expect(readPpu(0xffa0, nes)).toBe(4);
+
+    expect(readPpu(0x3fc0, nes)).toBe(4);
+    expect(readPpu(0x7fc0, nes)).toBe(4);
+    expect(readPpu(0xbfc0, nes)).toBe(4);
+    expect(readPpu(0xffc0, nes)).toBe(4);
   });
 
   test("should throw an exception when cross the board of VRAM when reading", () => {
@@ -64,6 +101,10 @@ describe("ppu bus", () => {
 
   test("hex calc", () => {
     const result = 0x3f20 - 0x3f00;
+
+    const a = 0x4000 - 0x3f20;
+
+    console.log({ result, a, b: a / result });
 
     expect(result).toBe(0);
   });
