@@ -9,25 +9,29 @@ type OperatorBus = {
 
 type Bus = OperatorBus[];
 
+type Write = (addr: number, value: number, nes: Nes) => Nes;
+
 const simpleRead = (addr: number, nes: Nes) => nes.bus[addr].data;
 
-const simpleWrite = (addr: number, value: number, nes: Nes): Nes => ({
+const simpleWrite: Write = (addr, value, nes) => ({
   ...nes,
   bus: nes.bus.map((v, i) => (i === addr ? { ...v, data: value } : { ...v })),
 });
 
 export const mirrorWrite =
-  (...mirror: number[]) =>
+  (write: Write, ...mirror: number[]) =>
   (addr: number, value: number, nes: Nes): Nes => {
-    return mirror.reduce(
-      (curr, acc) => nesBuilder(curr).directWrite(acc, value).build(),
-      nes
-    );
+    return mirror.reduce((acc, curr) => write(curr, value, acc), nes);
   };
 
-export const mirrorBuilder = (bus: Bus, ...mirror: number[]): Bus => {
+export const mirrorBuilder = (
+  bus: Bus,
+  write: Write,
+  ...mirror: number[]
+): Bus => {
   return bus.map((b, i) => {
-    if (mirror.includes(i)) return { ...b, write: mirrorWrite(...mirror) };
+    if (mirror.includes(i))
+      return { ...b, write: mirrorWrite(write, ...mirror) };
     return b;
   });
 };
@@ -55,7 +59,7 @@ export const buildMirrorArray8bytes = (startAddr: number) => {
 };
 
 export const mirror8BytesWrite = (startAddr: number, bus: Bus) =>
-  mirrorBuilder(bus, ...buildMirrorArray8bytes(startAddr));
+  mirrorBuilder(bus, simpleWrite, ...buildMirrorArray8bytes(startAddr));
 
 export const initBus = (): Bus => {
   let bus = "_"
@@ -63,7 +67,14 @@ export const initBus = (): Bus => {
     .split("")
     .map(() => ({ data: 0, read: simpleRead, write: simpleWrite }));
   for (let addr = 0x0000; addr <= 0x07ff; addr++)
-    bus = mirrorBuilder(bus, addr, addr + 0x0800, addr + 0x1000, addr + 0x1800);
+    bus = mirrorBuilder(
+      bus,
+      simpleWrite,
+      addr,
+      addr + 0x0800,
+      addr + 0x1000,
+      addr + 0x1800
+    );
   for (let addr = 0x2000; addr <= 0x2007; addr++)
     bus = mirror8BytesWrite(addr, bus);
   return bus;

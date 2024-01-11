@@ -21,9 +21,6 @@ const writePpu = (addr: number, value: number, nes: Nes): Nes => {
 };
 
 const initPpuBus = (): Bus => {
-
-
-
   let bus = "_"
     .repeat(0x10000)
     .split("")
@@ -33,11 +30,7 @@ const initPpuBus = (): Bus => {
       write: simpleWritePpu,
     }));
 
-  for(let addr = 0x0000; addr <= 0xffff; addr++){
-    bus = 
-  }
-
-  return bus
+  return bus;
 };
 
 export { initPpuBus, readPpu, writePpu };

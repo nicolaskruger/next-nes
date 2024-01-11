@@ -38,7 +38,7 @@ const initBusMirror = (): Bus =>
     .map((v) => ({
       data: 1,
       read: simpleRead,
-      write: mirrorWrite(0, 1, 2),
+      write: mirrorWrite(simpleWrite, 0, 1, 2),
     }));
 
 const initCpu = (): Cpu => ({
@@ -118,7 +118,7 @@ describe("BUS", () => {
       .split("")
       .map((_) => initBus()[0]);
 
-    nes.bus = mirrorBuilder(nes.bus, 0, 4);
+    nes.bus = mirrorBuilder(nes.bus, simpleWrite, 0, 4);
 
     nes = writeBusNes(0, 2, nes);
 
