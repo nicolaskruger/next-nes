@@ -1,9 +1,9 @@
 import { writeBusNes } from "@/nes/bus/bus";
 import { initNes } from "@/nes/nes";
-import { getNameTable } from "./registers";
+import { getAmountIncrement, getNameTable } from "./registers";
 
 describe("PPU registers", () => {
-  test("0x2000", () => {
+  test("0x2000 bit 0-1 name table", () => {
     let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
@@ -17,5 +17,15 @@ describe("PPU registers", () => {
 
     nes = writeBusNes(0x2000, 3, nes);
     expect(getNameTable(nes)).toBe(0x2c00);
+  });
+  test("0x2001 bit 2 amount", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2000, 0, nes);
+    expect(getAmountIncrement(nes)).toBe(1);
+
+    nes = writeBusNes(0x2000, 1 << 2, nes);
+
+    expect(getAmountIncrement(nes)).toBe(32);
   });
 });

@@ -5,3 +5,9 @@ export const getNameTable = (nes: Nes): number => {
   const data = readBusNes(0x2000, nes) & (1 | (1 << 1));
   return [0x2000, 0x2400, 0x2800, 0x2c00][data];
 };
+
+export const getAmountIncrement = (nes: Nes): number => {
+  const data = (readBusNes(0x2000, nes) >> 2) & 1;
+
+  return [1, 32][data];
+};
