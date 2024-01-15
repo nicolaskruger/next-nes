@@ -12,7 +12,16 @@ export const getAmountIncrement = (nes: Nes): number => {
   return [1, 32][data];
 };
 
-export const getPatternTable = (nes: Nes): number => {
+export const getPatternTableSprite = (nes: Nes): number => {
   const data = (readBusNes(0x2000, nes) >> 3) & 1;
   return [0x0000, 0x1000][data];
+};
+
+export const getPatterTableBackground = (nes: Nes): number => {
+  const data = (readBusNes(0x2000, nes) >> 4) & 1;
+  return [0x0000, 0x1000][data];
+};
+
+export const getSizeOfSprite = (nes: Nes): "8x8" | "8x16" => {
+  throw new Error("not implemented");
 };

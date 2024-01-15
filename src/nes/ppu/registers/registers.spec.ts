@@ -1,6 +1,11 @@
 import { writeBusNes } from "@/nes/bus/bus";
 import { initNes } from "@/nes/nes";
-import { getAmountIncrement, getNameTable, getPatternTable } from "./registers";
+import {
+  getAmountIncrement,
+  getNameTable,
+  getPatterTableBackground,
+  getPatternTableSprite,
+} from "./registers";
 
 describe("PPU registers", () => {
   test("0x2000 bit 0-1 name table", () => {
@@ -29,15 +34,27 @@ describe("PPU registers", () => {
     expect(getAmountIncrement(nes)).toBe(32);
   });
 
-  test("0x2000 bit 3 pattern table", () => {
+  test("0x2000 bit 3 pattern table sprite", () => {
     let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
 
-    expect(getPatternTable(nes)).toBe(0);
+    expect(getPatternTableSprite(nes)).toBe(0);
 
     nes = writeBusNes(0x2000, 1 << 3, nes);
 
-    expect(getPatternTable(nes)).toBe(0x1000);
+    expect(getPatternTableSprite(nes)).toBe(0x1000);
+  });
+
+  test("0x2000 bit 4 pattern table background", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x200, 0, nes);
+
+    expect(getPatterTableBackground(nes)).toBe(0);
+
+    nes = writeBusNes(0x2000, 1 << 4, nes);
+
+    expect(getPatterTableBackground(nes)).toBe(0x1000);
   });
 });
