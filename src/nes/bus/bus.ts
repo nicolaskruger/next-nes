@@ -18,22 +18,29 @@ const simpleWrite: Write = (addr, value, nes) => ({
   bus: nes.bus.map((v, i) => (i === addr ? { ...v, data: value } : { ...v })),
 });
 
+/**
+ *
+ * @param bus mutate the bus
+ * @param write
+ * @param read
+ * @param mirror
+ * @returns
+ */
 export const mirrorBuilder = (
   bus: Bus,
   write: Write,
   read: Read,
   ...mirror: number[]
 ): Bus => {
-  return bus.map((b, i) => {
-    const [addr] = mirror;
-    if (mirror.includes(i))
-      return {
-        ...b,
-        write: (_, value, nes) => write(addr, value, nes),
-        read: (_, nes) => read(addr, nes),
-      };
-    return b;
+  const [addr] = mirror;
+  mirror.forEach((m) => {
+    bus[m] = {
+      ...bus[m],
+      write: (_, value, nes) => write(addr, value, nes),
+      read: (_, nes) => read(addr, nes),
+    };
   });
+  return bus;
 };
 
 const readBusNes = (addr: number, nes: Nes) => {
