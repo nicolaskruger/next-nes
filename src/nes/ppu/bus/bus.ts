@@ -21,6 +21,45 @@ const writePpu = (addr: number, value: number, nes: Nes): Nes => {
   throw new Error("PPU VRAM out of range");
 };
 
+const isInRange = (addr: number, start: number, finish: number) =>
+  addr >= start && addr <= finish;
+
+type MirrorBuilderPpu = {
+  isInRange: (addr: number) => boolean;
+  bussBuilder: (addr: number, bus: Bus) => Bus;
+};
+
+const mirrorBuilderPpu: MirrorBuilderPpu[] = [
+  {
+    isInRange: (addr) => isInRange(addr, 0x2000, 0x2eff),
+    bussBuilder: (addr, bus) =>
+      mirrorBuilder(
+        bus,
+        simpleWritePpu,
+        ...paOfPa([addr, addr + 0x1000], 0x4000, 4)
+      ),
+  },
+  {
+    isInRange: (addr) => isInRange(addr, 0x3f00, 0x3f20),
+    bussBuilder: (addr, bus) =>
+      mirrorBuilder(
+        bus,
+        simpleWritePpu,
+        ...paOfPa(pa(addr, 0x0020, 7), 0x4000, 4)
+      ),
+  },
+  {
+    isInRange: (addr) =>
+      isInRange(addr, 0x3000, 0x3eff) || isInRange(addr, 0x3f00, 0x3f20),
+    bussBuilder: (addr, bus) => bus,
+  },
+  {
+    isInRange: (addr) => true,
+    bussBuilder: (addr, bus) =>
+      mirrorBuilder(bus, simpleWritePpu, ...pa(addr, 0x4000, 4)),
+  },
+];
+
 const initPpuBus = (): Bus => {
   let bus = "_"
     .repeat(0x10000)
@@ -32,25 +71,9 @@ const initPpuBus = (): Bus => {
     }));
 
   for (let addr = 0x0000; addr <= 0x3fff; addr++) {
-    if (addr >= 0x2000 && addr <= 0x2eff) {
-      bus = mirrorBuilder(
-        bus,
-        simpleWritePpu,
-        ...paOfPa([addr, addr + 0x1000], 0x4000, 4)
-      );
-    } else if (addr >= 0x3f00 && addr <= 0x3f20) {
-      bus = mirrorBuilder(
-        bus,
-        simpleWritePpu,
-        ...paOfPa(pa(addr, 0x0020, 7), 0x4000, 4)
-      );
-    } else if (
-      (addr >= 0x3000 && addr <= 0x3eff) ||
-      (addr >= 0x3f00 && addr <= 0x3f20)
-    ) {
-    } else {
-      bus = mirrorBuilder(bus, simpleWritePpu, ...pa(addr, 0x4000, 4));
-    }
+    bus = mirrorBuilderPpu
+      .find(({ isInRange }) => isInRange(addr))
+      ?.bussBuilder(addr, bus) as Bus;
   }
   return bus;
 };

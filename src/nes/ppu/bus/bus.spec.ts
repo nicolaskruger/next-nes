@@ -98,14 +98,4 @@ describe("ppu bus", () => {
 
     expect(readPpu(0, nes)).toBe(1);
   });
-
-  test("hex calc", () => {
-    const result = 0x3f20 - 0x3f00;
-
-    const a = 0x4000 - 0x3f20;
-
-    console.log({ result, a, b: a / result });
-
-    expect(result).toBe(0);
-  });
 });
