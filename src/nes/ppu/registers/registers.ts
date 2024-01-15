@@ -11,3 +11,8 @@ export const getAmountIncrement = (nes: Nes): number => {
 
   return [1, 32][data];
 };
+
+export const getPatternTable = (nes: Nes): number => {
+  const data = (readBusNes(0x2000, nes) >> 3) & 1;
+  return [0x0000, 0x1000][data];
+};
