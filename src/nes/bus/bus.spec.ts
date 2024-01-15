@@ -3,7 +3,6 @@ import { Nes } from "../nes";
 import {
   Bus,
   mirrorBuilder,
-  mirrorWrite,
   readBusNes,
   simpleRead,
   simpleWrite,
@@ -31,15 +30,18 @@ const initBusSimple = (): Bus =>
       write: simpleWrite,
     }));
 
-const initBusMirror = (): Bus =>
-  "_"
+const initBusMirror = (): Bus => {
+  const bus = "_"
     .repeat(3)
     .split("")
     .map((v) => ({
       data: 1,
       read: simpleRead,
-      write: mirrorWrite(simpleWrite, 0, 1, 2),
+      write: simpleWrite,
     }));
+
+  return mirrorBuilder(bus, simpleWrite, simpleRead, 0, 1, 2);
+};
 
 const initCpu = (): Cpu => ({
   ACC: 0,
@@ -106,8 +108,8 @@ describe("BUS", () => {
 
     const _nes = writeBusNes(0x0000, 2, nes);
 
-    _nes.bus.forEach((b) => {
-      expect(b.data).toBe(2);
+    _nes.bus.forEach((b, addr) => {
+      expect(readBusNes(addr, _nes)).toBe(2);
     });
   });
 
@@ -118,11 +120,13 @@ describe("BUS", () => {
       .split("")
       .map((_) => initBus()[0]);
 
-    nes.bus = mirrorBuilder(nes.bus, simpleWrite, 0, 4);
+    nes.bus = mirrorBuilder(nes.bus, simpleWrite, simpleRead, 0, 4);
 
     nes = writeBusNes(0, 2, nes);
 
-    expect(nes.bus.map((b) => b.data)).toStrictEqual([2, 1, 1, 1, 2]);
+    expect(nes.bus.map((b, addr) => readBusNes(addr, nes))).toStrictEqual([
+      2, 1, 1, 1, 2,
+    ]);
   });
 
   test("build mirror array every 8 bytes", () => {

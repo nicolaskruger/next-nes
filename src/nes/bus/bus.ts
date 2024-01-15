@@ -1,5 +1,4 @@
-import { Dictionary } from "../helper/dictionary";
-import { Nes, nesBuilder } from "../nes";
+import { Nes } from "../nes";
 
 type OperatorBus = {
   read: (addr: number, nes: Nes) => number;
@@ -10,6 +9,7 @@ type OperatorBus = {
 type Bus = OperatorBus[];
 
 type Write = (addr: number, value: number, nes: Nes) => Nes;
+type Read = (addr: number, nes: Nes) => number;
 
 const simpleRead = (addr: number, nes: Nes) => nes.bus[addr].data;
 
@@ -18,20 +18,20 @@ const simpleWrite: Write = (addr, value, nes) => ({
   bus: nes.bus.map((v, i) => (i === addr ? { ...v, data: value } : { ...v })),
 });
 
-export const mirrorWrite =
-  (write: Write, ...mirror: number[]) =>
-  (addr: number, value: number, nes: Nes): Nes => {
-    return mirror.reduce((acc, curr) => write(curr, value, acc), nes);
-  };
-
 export const mirrorBuilder = (
   bus: Bus,
   write: Write,
+  read: Read,
   ...mirror: number[]
 ): Bus => {
   return bus.map((b, i) => {
+    const [addr] = mirror;
     if (mirror.includes(i))
-      return { ...b, write: mirrorWrite(write, ...mirror) };
+      return {
+        ...b,
+        write: (_, value, nes) => write(addr, value, nes),
+        read: (_, nes) => read(addr, nes),
+      };
     return b;
   });
 };
@@ -59,7 +59,12 @@ export const buildMirrorArray8bytes = (startAddr: number) => {
 };
 
 export const mirror8BytesWrite = (startAddr: number, bus: Bus) =>
-  mirrorBuilder(bus, simpleWrite, ...buildMirrorArray8bytes(startAddr));
+  mirrorBuilder(
+    bus,
+    simpleWrite,
+    simpleRead,
+    ...buildMirrorArray8bytes(startAddr)
+  );
 
 export const initBus = (): Bus => {
   let bus = "_"
@@ -70,6 +75,7 @@ export const initBus = (): Bus => {
     bus = mirrorBuilder(
       bus,
       simpleWrite,
+      simpleRead,
       addr,
       addr + 0x0800,
       addr + 0x1000,

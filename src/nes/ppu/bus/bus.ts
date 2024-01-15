@@ -1,6 +1,6 @@
 import { Bus, mirrorBuilder } from "@/nes/bus/bus";
 import { pa, paOfPa } from "@/nes/helper/pa";
-import { Nes, getBussPpu, getPpu, nesBuilder } from "@/nes/nes";
+import { Nes, getBussPpu, nesBuilder } from "@/nes/nes";
 
 const simpleReadPpu = (addr: number, nes: Nes) => {
   return getBussPpu(nes)[addr].data;
@@ -36,27 +36,29 @@ const mirrorBuilderPpu: MirrorBuilderPpu[] = [
       mirrorBuilder(
         bus,
         simpleWritePpu,
+        simpleReadPpu,
         ...paOfPa([addr, addr + 0x1000], 0x4000, 4)
       ),
   },
   {
-    isInRange: (addr) => isInRange(addr, 0x3f00, 0x3f20),
+    isInRange: (addr) => isInRange(addr, 0x3f00, 0x3f1f),
     bussBuilder: (addr, bus) =>
       mirrorBuilder(
         bus,
         simpleWritePpu,
+        simpleReadPpu,
         ...paOfPa(pa(addr, 0x0020, 7), 0x4000, 4)
       ),
   },
   {
     isInRange: (addr) =>
-      isInRange(addr, 0x3000, 0x3eff) || isInRange(addr, 0x3f00, 0x3f20),
+      isInRange(addr, 0x3000, 0x3eff) || isInRange(addr, 0x3f20, 0x3fff),
     bussBuilder: (addr, bus) => bus,
   },
   {
     isInRange: (addr) => true,
     bussBuilder: (addr, bus) =>
-      mirrorBuilder(bus, simpleWritePpu, ...pa(addr, 0x4000, 4)),
+      mirrorBuilder(bus, simpleWritePpu, simpleReadPpu, ...pa(addr, 0x4000, 4)),
   },
 ];
 
