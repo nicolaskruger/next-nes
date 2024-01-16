@@ -12,6 +12,7 @@ import {
   isDisableSpr,
   isMNIOccur,
   isSprLeftMost8Pix,
+  shouldIgnoreWritesToVRAM,
 } from "./registers";
 
 describe("PPU registers", () => {
@@ -147,5 +148,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2001, 1 << 4, nes);
 
     expect(isDisableSpr(nes)).toBe(true);
+  });
+
+  test("0x2002 bit 4 is should ignore write to VRAM", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2002, 0, nes);
+
+    expect(shouldIgnoreWritesToVRAM(nes)).toBe(false);
+
+    nes = writeBusNes(0x2002, 1 << 4, nes);
+
+    expect(shouldIgnoreWritesToVRAM(nes)).toBe(true);
   });
 });

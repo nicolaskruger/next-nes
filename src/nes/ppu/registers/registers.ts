@@ -54,3 +54,6 @@ export const isDisableBg = (nes: Nes): boolean =>
 
 export const isDisableSpr = (nes: Nes): boolean =>
   !!((readBusNes(0x2001, nes) >> 4) & 1);
+
+export const shouldIgnoreWritesToVRAM = (nes: Nes): boolean =>
+  !!((readBusNes(0x2002, nes) >> 4) & 1);
