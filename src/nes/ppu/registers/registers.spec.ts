@@ -14,6 +14,7 @@ import {
   isSprLeftMost8Pix,
   isMoreThan8SpritesOnScanLine,
   shouldIgnoreWritesToVRAM,
+  isZeroHitFlag,
 } from "./registers";
 
 describe("PPU registers", () => {
@@ -173,5 +174,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2002, 1 << 5, nes);
 
     expect(isMoreThan8SpritesOnScanLine(nes)).toBe(true);
+  });
+
+  test("0x2002 bit 6 zero hit flag", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2002, 0, nes);
+
+    expect(isZeroHitFlag(nes)).toBe(false);
+
+    nes = writeBusNes(0x2002, 1 << 6, nes);
+
+    expect(isZeroHitFlag(nes)).toBe(true);
   });
 });

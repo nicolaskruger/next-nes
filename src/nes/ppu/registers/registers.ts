@@ -60,3 +60,6 @@ export const shouldIgnoreWritesToVRAM = (nes: Nes): boolean =>
 
 export const isMoreThan8SpritesOnScanLine = (nes: Nes): boolean =>
   !!((readBusNes(0x2002, nes) >> 5) & 1);
+
+export const isZeroHitFlag = (nes: Nes): boolean =>
+  !!((readBusNes(0x2002, nes) >> 6) & 1);
