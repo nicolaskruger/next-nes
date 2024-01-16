@@ -9,6 +9,7 @@ import {
   getSizeOfSprite,
   isBgLeftMost8Pix,
   isDisableBg,
+  isDisableSpr,
   isMNIOccur,
   isSprLeftMost8Pix,
 } from "./registers";
@@ -134,5 +135,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2001, 1 << 3, nes);
 
     expect(isDisableBg(nes)).toBe(true);
+  });
+
+  test("0x2001 bit 4 is disable sprite", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2001, 0, nes);
+
+    expect(isDisableSpr(nes)).toBe(false);
+
+    nes = writeBusNes(0x2001, 1 << 4, nes);
+
+    expect(isDisableSpr(nes)).toBe(true);
   });
 });

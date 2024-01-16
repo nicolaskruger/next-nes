@@ -51,3 +51,6 @@ export const isSprLeftMost8Pix = (nes: Nes): boolean => {
 
 export const isDisableBg = (nes: Nes): boolean =>
   !!((readBusNes(0x2001, nes) >> 3) & 1);
+
+export const isDisableSpr = (nes: Nes): boolean =>
+  !!((readBusNes(0x2001, nes) >> 4) & 1);
