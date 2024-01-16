@@ -1,23 +1,23 @@
 import { Bus, mirrorBuilder } from "@/nes/bus/bus";
 import { pa, paOfPa } from "@/nes/helper/pa";
-import { Nes, getBussPpu, nesBuilder } from "@/nes/nes";
+import { Nes, getVRam, nesBuilder } from "@/nes/nes";
 
 const simpleReadVRam = (addr: number, nes: Nes) => {
-  return getBussPpu(nes)[addr].data;
+  return getVRam(nes)[addr].data;
 };
 
 const simpleWriteVRam = (addr: number, value: number, nes: Nes): Nes => {
-  return nesBuilder(nes).bussPpu(addr, value).build();
+  return nesBuilder(nes).vram(addr, value).build();
 };
 
 const readVRam = (addr: number, nes: Nes): Number => {
-  if (addr >= 0 && addr <= 0xffff) return getBussPpu(nes)[addr].read(addr, nes);
+  if (addr >= 0 && addr <= 0xffff) return getVRam(nes)[addr].read(addr, nes);
   throw new Error("PPU VRAM out of range");
 };
 
 const writeVRam = (addr: number, value: number, nes: Nes): Nes => {
   if (addr >= 0 && addr <= 0xffff)
-    return getBussPpu(nes)[addr].write(addr, value, nes);
+    return getVRam(nes)[addr].write(addr, value, nes);
   throw new Error("PPU VRAM out of range");
 };
 
