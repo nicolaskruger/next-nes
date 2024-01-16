@@ -1,11 +1,11 @@
 import { Bus } from "../bus/bus";
-import { initPpuBus } from "./bus/bus";
+import { initPpuBus } from "./vram/vram";
 
 type Ppu = {
-  bus: Bus;
+  vram: Bus;
 };
 
-const initPpu = (): Ppu => ({ bus: initPpuBus() });
+const initPpu = (): Ppu => ({ vram: initPpuBus() });
 
 export { initPpu };
 export type { Ppu };

@@ -56,7 +56,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { bus: [] },
+  ppu: { vram: [] },
 });
 
 describe("BUS", () => {

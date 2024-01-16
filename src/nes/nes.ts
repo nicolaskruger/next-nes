@@ -121,14 +121,14 @@ const allBus = (nes: Nes) => (bus: Bus) => {
 
 export const getPpu = (nes: Nes) => nes.ppu;
 
-export const getBussPpu = (nes: Nes) => nes.ppu.bus;
+export const getBussPpu = (nes: Nes) => nes.ppu.vram;
 
 const buildNesPpu = (nes: Nes, addr: number, value: number) => {
   return {
     ...nes,
     ppu: {
       ...getPpu(nes),
-      bus: getBussPpu(nes).map((b, bAddr) => {
+      vram: getBussPpu(nes).map((b, bAddr) => {
         if (addr === bAddr) return { ...b, data: value };
         return b;
       }),

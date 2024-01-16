@@ -26,7 +26,7 @@ const initCpuRunner = (): Cpu => ({
 export const initNesRunner = (): Nes => ({
   cpu: initCpuRunner(),
   bus: initBusRunner(),
-  ppu: { bus: [] },
+  ppu: { vram: [] },
 });
 
 const compileNes = (program: number[], nes: Nes): Nes => {

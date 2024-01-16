@@ -1,6 +1,5 @@
 import { initNes } from "@/nes/nes";
-import { readPpu, writePpu } from "./bus";
-import { dexToHexFourDigitsPrefix } from "@/nes/helper/converter";
+import { readPpu, writePpu } from "./vram";
 
 describe("ppu bus", () => {
   test("init ppu bus", () => {
