@@ -63,3 +63,6 @@ export const isMoreThan8SpritesOnScanLine = (nes: Nes): boolean =>
 
 export const isZeroHitFlag = (nes: Nes): boolean =>
   !!((readBusNes(0x2002, nes) >> 6) & 1);
+
+export const isVBlankOccurring = (nes: Nes): boolean =>
+  !!((readBusNes(0x2002, nes) >> 7) & 1);

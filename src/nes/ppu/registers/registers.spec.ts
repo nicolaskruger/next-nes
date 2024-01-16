@@ -1,5 +1,5 @@
 import { writeBusNes } from "@/nes/bus/bus";
-import { initNes } from "@/nes/nes";
+import { Nes, initNes } from "@/nes/nes";
 import {
   getAmountIncrement,
   getColorMode,
@@ -15,7 +15,20 @@ import {
   isMoreThan8SpritesOnScanLine,
   shouldIgnoreWritesToVRAM,
   isZeroHitFlag,
+  isVBlankOccurring,
 } from "./registers";
+
+const testFlag = (
+  register: number,
+  setValue: number,
+  isFlag: (nes: Nes) => boolean
+) => {
+  let nes = initNes();
+  nes = writeBusNes(register, 0, nes);
+  expect(isFlag(nes)).toBe(false);
+  nes = writeBusNes(register, setValue, nes);
+  expect(isFlag(nes)).toBe(true);
+};
 
 describe("PPU registers", () => {
   test("0x2000 bit 0-1 name table", () => {
@@ -81,15 +94,7 @@ describe("PPU registers", () => {
   });
 
   test("0x2000 bit 7", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2000, 0, nes);
-
-    expect(isMNIOccur(nes)).toBe(false);
-
-    nes = writeBusNes(0x2000, 1 << 7, nes);
-
-    expect(isMNIOccur(nes)).toBe(true);
+    testFlag(0x2000, 1 << 7, isMNIOccur);
   });
 
   test("0x2001 bit 0 color mode", () => {
@@ -105,86 +110,34 @@ describe("PPU registers", () => {
   });
 
   test("0x2001 bit 1 8bit bg", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2001, 0, nes);
-
-    expect(isBgLeftMost8Pix(nes)).toBe(false);
-
-    nes = writeBusNes(0x2001, 1 << 1, nes);
-
-    expect(isBgLeftMost8Pix(nes)).toBe(true);
+    testFlag(0x2001, 1 << 1, isBgLeftMost8Pix);
   });
 
   test("0x2001 bit 2 8bit spr", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2001, 0, nes);
-
-    expect(isSprLeftMost8Pix(nes)).toBe(false);
-
-    nes = writeBusNes(0x2001, 1 << 2, nes);
-
-    expect(isSprLeftMost8Pix(nes)).toBe(true);
+    testFlag(0x2001, 1 << 2, isSprLeftMost8Pix);
   });
 
   test("0x2001 bit 3 is disable background", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2001, 0, nes);
-
-    expect(isDisableBg(nes)).toBe(false);
-
-    nes = writeBusNes(0x2001, 1 << 3, nes);
-
-    expect(isDisableBg(nes)).toBe(true);
+    testFlag(0x2001, 1 << 3, isDisableBg);
   });
 
   test("0x2001 bit 4 is disable sprite", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2001, 0, nes);
-
-    expect(isDisableSpr(nes)).toBe(false);
-
-    nes = writeBusNes(0x2001, 1 << 4, nes);
-
-    expect(isDisableSpr(nes)).toBe(true);
+    testFlag(0x2001, 1 << 4, isDisableSpr);
   });
 
   test("0x2002 bit 4 is should ignore write to VRAM", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2002, 0, nes);
-
-    expect(shouldIgnoreWritesToVRAM(nes)).toBe(false);
-
-    nes = writeBusNes(0x2002, 1 << 4, nes);
-
-    expect(shouldIgnoreWritesToVRAM(nes)).toBe(true);
+    testFlag(0x2002, 1 << 4, shouldIgnoreWritesToVRAM);
   });
 
   test("0x2002 bit 5 more than 8 sprites in the same scan line", () => {
-    let nes = initNes();
-
-    nes = writeBusNes(0x2002, 0, nes);
-
-    expect(isMoreThan8SpritesOnScanLine(nes)).toBe(false);
-
-    nes = writeBusNes(0x2002, 1 << 5, nes);
-
-    expect(isMoreThan8SpritesOnScanLine(nes)).toBe(true);
+    testFlag(0x2002, 1 << 5, isMoreThan8SpritesOnScanLine);
   });
 
   test("0x2002 bit 6 zero hit flag", () => {
-    let nes = initNes();
+    testFlag(0x2002, 1 << 6, isZeroHitFlag);
+  });
 
-    nes = writeBusNes(0x2002, 0, nes);
-
-    expect(isZeroHitFlag(nes)).toBe(false);
-
-    nes = writeBusNes(0x2002, 1 << 6, nes);
-
-    expect(isZeroHitFlag(nes)).toBe(true);
+  test("0x2002 bit 7 is vblank accurring", () => {
+    testFlag(0x2002, 1 << 7, isVBlankOccurring);
   });
 });
