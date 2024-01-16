@@ -2,20 +2,20 @@ import { Bus, mirrorBuilder } from "@/nes/bus/bus";
 import { pa, paOfPa } from "@/nes/helper/pa";
 import { Nes, getBussPpu, nesBuilder } from "@/nes/nes";
 
-const simpleReadPpu = (addr: number, nes: Nes) => {
+const simpleReadVRam = (addr: number, nes: Nes) => {
   return getBussPpu(nes)[addr].data;
 };
 
-const simpleWritePpu = (addr: number, value: number, nes: Nes): Nes => {
+const simpleWriteVRam = (addr: number, value: number, nes: Nes): Nes => {
   return nesBuilder(nes).bussPpu(addr, value).build();
 };
 
-const readPpu = (addr: number, nes: Nes): Number => {
+const readVRam = (addr: number, nes: Nes): Number => {
   if (addr >= 0 && addr <= 0xffff) return getBussPpu(nes)[addr].read(addr, nes);
   throw new Error("PPU VRAM out of range");
 };
 
-const writePpu = (addr: number, value: number, nes: Nes): Nes => {
+const writeVRam = (addr: number, value: number, nes: Nes): Nes => {
   if (addr >= 0 && addr <= 0xffff)
     return getBussPpu(nes)[addr].write(addr, value, nes);
   throw new Error("PPU VRAM out of range");
@@ -29,14 +29,14 @@ type MirrorBuilderPpu = {
   bussBuilder: (addr: number, bus: Bus) => Bus;
 };
 
-const mirrorBuilderPpu: MirrorBuilderPpu[] = [
+const mirrorBuilderVram: MirrorBuilderPpu[] = [
   {
     isInRange: (addr) => isInRange(addr, 0x2000, 0x2eff),
     bussBuilder: (addr, bus) =>
       mirrorBuilder(
         bus,
-        simpleWritePpu,
-        simpleReadPpu,
+        simpleWriteVRam,
+        simpleReadVRam,
         ...paOfPa([addr, addr + 0x1000], 0x4000, 4)
       ),
   },
@@ -45,8 +45,8 @@ const mirrorBuilderPpu: MirrorBuilderPpu[] = [
     bussBuilder: (addr, bus) =>
       mirrorBuilder(
         bus,
-        simpleWritePpu,
-        simpleReadPpu,
+        simpleWriteVRam,
+        simpleReadVRam,
         ...paOfPa(pa(addr, 0x0020, 7), 0x4000, 4)
       ),
   },
@@ -58,26 +58,31 @@ const mirrorBuilderPpu: MirrorBuilderPpu[] = [
   {
     isInRange: (addr) => true,
     bussBuilder: (addr, bus) =>
-      mirrorBuilder(bus, simpleWritePpu, simpleReadPpu, ...pa(addr, 0x4000, 4)),
+      mirrorBuilder(
+        bus,
+        simpleWriteVRam,
+        simpleReadVRam,
+        ...pa(addr, 0x4000, 4)
+      ),
   },
 ];
 
-const initPpuBus = (): Bus => {
+const initPpuVRam = (): Bus => {
   let bus = "_"
     .repeat(0x10000)
     .split("")
     .map((_) => ({
       data: 0,
-      read: simpleReadPpu,
-      write: simpleWritePpu,
+      read: simpleReadVRam,
+      write: simpleWriteVRam,
     }));
 
   for (let addr = 0x0000; addr <= 0x3fff; addr++) {
-    bus = mirrorBuilderPpu
+    bus = mirrorBuilderVram
       .find(({ isInRange }) => isInRange(addr))
       ?.bussBuilder(addr, bus) as Bus;
   }
   return bus;
 };
 
-export { initPpuBus, readPpu, writePpu };
+export { initPpuVRam, readVRam, writeVRam };
