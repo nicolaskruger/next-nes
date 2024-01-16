@@ -7,6 +7,7 @@ import {
   getPatterTableBackground,
   getPatternTableSprite,
   getSizeOfSprite,
+  isBgLeftMost8Pix,
   isMNIOccur,
 } from "./registers";
 
@@ -95,5 +96,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2001, 1, nes);
 
     expect(getColorMode(nes)).toBe("mono");
+  });
+
+  test("0x2001 bit 1 8bit bg", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2001, 0, nes);
+
+    expect(isBgLeftMost8Pix(nes)).toBe(false);
+
+    nes = writeBusNes(0x2001, 1 << 1, nes);
+
+    expect(isBgLeftMost8Pix(nes)).toBe(true);
   });
 });

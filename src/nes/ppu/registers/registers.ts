@@ -40,3 +40,7 @@ export const getColorMode = (nes: Nes): ColorMode => {
   const ret: ColorMode[] = ["color", "mono"];
   return ret[data];
 };
+
+export const isBgLeftMost8Pix = (nes: Nes): boolean => {
+  return !!((readBusNes(0x2001, nes) >> 1) & 1);
+};
