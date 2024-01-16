@@ -2,6 +2,7 @@ import { writeBusNes } from "@/nes/bus/bus";
 import { initNes } from "@/nes/nes";
 import {
   getAmountIncrement,
+  getColorMode,
   getNameTable,
   getPatterTableBackground,
   getPatternTableSprite,
@@ -82,5 +83,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2000, 1 << 7, nes);
 
     expect(isMNIOccur(nes)).toBe(true);
+  });
+
+  test("0x2001 bit 0 color mode", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2001, 0, nes);
+
+    expect(getColorMode(nes)).toBe("color");
+
+    nes = writeBusNes(0x2001, 1, nes);
+
+    expect(getColorMode(nes)).toBe("mono");
   });
 });

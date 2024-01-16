@@ -32,3 +32,11 @@ export const getSizeOfSprite = (nes: Nes): SizeOfSprite => {
 
 export const isMNIOccur = (nes: Nes): boolean =>
   !!((readBusNes(0x2000, nes) >> 7) & 1);
+
+type ColorMode = "mono" | "color";
+
+export const getColorMode = (nes: Nes): ColorMode => {
+  const data = readBusNes(0x2001, nes) & 1;
+  const ret: ColorMode[] = ["color", "mono"];
+  return ret[data];
+};
