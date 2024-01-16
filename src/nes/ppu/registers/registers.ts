@@ -22,6 +22,12 @@ export const getPatterTableBackground = (nes: Nes): number => {
   return [0x0000, 0x1000][data];
 };
 
-export const getSizeOfSprite = (nes: Nes): "8x8" | "8x16" => {
-  throw new Error("not implemented");
+type SizeOfSprite = "8x8" | "8x16";
+
+export const getSizeOfSprite = (nes: Nes): SizeOfSprite => {
+  const data = (readBusNes(0x2000, nes) >> 5) & 1;
+
+  const ret: SizeOfSprite[] = ["8x8", "8x16"];
+
+  return ret[data];
 };

@@ -5,6 +5,7 @@ import {
   getNameTable,
   getPatterTableBackground,
   getPatternTableSprite,
+  getSizeOfSprite,
 } from "./registers";
 
 describe("PPU registers", () => {
@@ -56,5 +57,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2000, 1 << 4, nes);
 
     expect(getPatterTableBackground(nes)).toBe(0x1000);
+  });
+
+  test("0x2000 bit 5", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2000, 0, nes);
+
+    expect(getSizeOfSprite(nes)).toBe("8x8");
+
+    nes = writeBusNes(0x2000, 1 << 5, nes);
+
+    expect(getSizeOfSprite(nes)).toBe("8x16");
   });
 });
