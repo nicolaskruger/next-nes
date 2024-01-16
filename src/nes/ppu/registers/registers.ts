@@ -26,8 +26,9 @@ type SizeOfSprite = "8x8" | "8x16";
 
 export const getSizeOfSprite = (nes: Nes): SizeOfSprite => {
   const data = (readBusNes(0x2000, nes) >> 5) & 1;
-
   const ret: SizeOfSprite[] = ["8x8", "8x16"];
-
   return ret[data];
 };
+
+export const isMNIOccur = (nes: Nes): boolean =>
+  !!((readBusNes(0x2000, nes) >> 7) & 1);

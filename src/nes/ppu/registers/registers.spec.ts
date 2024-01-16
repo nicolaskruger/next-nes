@@ -6,6 +6,7 @@ import {
   getPatterTableBackground,
   getPatternTableSprite,
   getSizeOfSprite,
+  isMNIOccur,
 } from "./registers";
 
 describe("PPU registers", () => {
@@ -69,5 +70,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2000, 1 << 5, nes);
 
     expect(getSizeOfSprite(nes)).toBe("8x16");
+  });
+
+  test("0x2000 bit 7", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2000, 0, nes);
+
+    expect(isMNIOccur(nes)).toBe(false);
+
+    nes = writeBusNes(0x2000, 1 << 7, nes);
+
+    expect(isMNIOccur(nes)).toBe(true);
   });
 });
