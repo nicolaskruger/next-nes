@@ -57,3 +57,6 @@ export const isDisableSpr = (nes: Nes): boolean =>
 
 export const shouldIgnoreWritesToVRAM = (nes: Nes): boolean =>
   !!((readBusNes(0x2002, nes) >> 4) & 1);
+
+export const isMoreThan8SpritesOnScanLine = (nes: Nes): boolean =>
+  !!((readBusNes(0x2002, nes) >> 5) & 1);

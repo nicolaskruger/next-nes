@@ -12,6 +12,7 @@ import {
   isDisableSpr,
   isMNIOccur,
   isSprLeftMost8Pix,
+  isMoreThan8SpritesOnScanLine,
   shouldIgnoreWritesToVRAM,
 } from "./registers";
 
@@ -160,5 +161,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2002, 1 << 4, nes);
 
     expect(shouldIgnoreWritesToVRAM(nes)).toBe(true);
+  });
+
+  test("0x2002 bit 5 more than 8 sprites in the same scan line", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2002, 0, nes);
+
+    expect(isMoreThan8SpritesOnScanLine(nes)).toBe(false);
+
+    nes = writeBusNes(0x2002, 1 << 5, nes);
+
+    expect(isMoreThan8SpritesOnScanLine(nes)).toBe(true);
   });
 });
