@@ -9,6 +9,7 @@ import {
   getSizeOfSprite,
   isBgLeftMost8Pix,
   isMNIOccur,
+  isSprLeftMost8Pix,
 } from "./registers";
 
 describe("PPU registers", () => {
@@ -108,5 +109,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2001, 1 << 1, nes);
 
     expect(isBgLeftMost8Pix(nes)).toBe(true);
+  });
+
+  test("0x2001 bit 1 8bit spr", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2001, 0, nes);
+
+    expect(isSprLeftMost8Pix(nes)).toBe(false);
+
+    nes = writeBusNes(0x2001, 1 << 2, nes);
+
+    expect(isSprLeftMost8Pix(nes)).toBe(true);
   });
 });
