@@ -8,6 +8,7 @@ import {
   getPatternTableSprite,
   getSizeOfSprite,
   isBgLeftMost8Pix,
+  isDisableBg,
   isMNIOccur,
   isSprLeftMost8Pix,
 } from "./registers";
@@ -111,7 +112,7 @@ describe("PPU registers", () => {
     expect(isBgLeftMost8Pix(nes)).toBe(true);
   });
 
-  test("0x2001 bit 1 8bit spr", () => {
+  test("0x2001 bit 2 8bit spr", () => {
     let nes = initNes();
 
     nes = writeBusNes(0x2001, 0, nes);
@@ -121,5 +122,17 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2001, 1 << 2, nes);
 
     expect(isSprLeftMost8Pix(nes)).toBe(true);
+  });
+
+  test("0x2001 bit 3 is disable background", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2001, 0, nes);
+
+    expect(isDisableBg(nes)).toBe(false);
+
+    nes = writeBusNes(0x2001, 1 << 3, nes);
+
+    expect(isDisableBg(nes)).toBe(true);
   });
 });
