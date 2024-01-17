@@ -16,6 +16,7 @@ import {
   shouldIgnoreWritesToVRAM,
   isZeroHitFlag,
   isVBlankOccurring,
+  readSprAddr,
 } from "./registers";
 
 const testFlag = (
@@ -139,5 +140,13 @@ describe("PPU registers", () => {
 
   test("0x2002 bit 7 is vblank accurring", () => {
     testFlag(0x2002, 1 << 7, isVBlankOccurring);
+  });
+
+  test("read, spr addr", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2003, 4, nes);
+
+    expect(readSprAddr(nes)).toBe(4);
   });
 });

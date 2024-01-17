@@ -66,3 +66,5 @@ export const isZeroHitFlag = (nes: Nes): boolean =>
 
 export const isVBlankOccurring = (nes: Nes): boolean =>
   !!((readBusNes(0x2002, nes) >> 7) & 1);
+
+export const readSprAddr = (nes: Nes) => readBusNes(0x2003, nes);
