@@ -17,6 +17,9 @@ import {
   isZeroHitFlag,
   isVBlankOccurring,
   readSprAddr,
+  writePpuRegister,
+  getPpuRegister,
+  getPpuRegisterStatus,
 } from "./registers";
 import { readSprRam } from "../spr-ram/spr-ram";
 
@@ -158,5 +161,18 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2004, 0x0e, nes);
 
     expect(readSprRam(0x0f, nes)).toBe(0x0e);
+  });
+
+  test("write register", () => {
+    let nes = initNes();
+
+    nes = writePpuRegister(0x12, nes);
+
+    expect(getPpuRegisterStatus(nes)).toBe("low");
+
+    nes = writePpuRegister(0x34, nes);
+
+    expect(getPpuRegister(nes)).toBe(0x1234);
+    expect(getPpuRegisterStatus(nes)).toBe("hight");
   });
 });

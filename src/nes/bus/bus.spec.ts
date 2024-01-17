@@ -56,7 +56,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [], sprRam: [] },
+  ppu: { vram: [], sprRam: [], register: 0x0000, registerStatus: "hight" },
 });
 
 describe("BUS", () => {

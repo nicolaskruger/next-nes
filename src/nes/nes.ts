@@ -18,7 +18,7 @@ import {
   calculateCycles,
   pushToStack,
 } from "./cpu/instruction/instruction";
-import { Ppu, initPpu } from "./ppu/ppu";
+import { Ppu, PpuStatusRegister, initPpu } from "./ppu/ppu";
 
 type Nes = {
   cpu: Cpu;
@@ -140,6 +140,14 @@ const bussPpu = (nes: Nes) => (addr: number, value: number) => {
   return nesBuilder(buildNesPpu(nes, addr, value));
 };
 
+const ppuRegister = (nes: Nes) => (value: number) => {
+  return nesBuilder({ ...nes, ppu: { ...nes.ppu, register: value } });
+};
+
+const ppuStatusRegister = (nes: Nes) => (status: PpuStatusRegister) => {
+  return nesBuilder({ ...nes, ppu: { ...nes.ppu, registerStatus: status } });
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -160,6 +168,8 @@ function nesBuilder(nes: Nes) {
     allBus: allBus(nes),
     directWrite: directWriteBus(nes),
     vram: bussPpu(nes),
+    ppuRegister: ppuRegister(nes),
+    ppuStatusRegister: ppuStatusRegister(nes),
   };
 }
 

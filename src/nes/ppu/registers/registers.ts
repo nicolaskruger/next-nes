@@ -1,6 +1,8 @@
 import { readBusNes, writeBusNes } from "@/nes/bus/bus";
-import { Nes } from "@/nes/nes";
+import { Nes, nesBuilder } from "@/nes/nes";
 import { writeSprRam } from "../spr-ram/spr-ram";
+import { Dictionary } from "@/nes/helper/dictionary";
+import { PpuStatusRegister } from "../ppu";
 
 export const getNameTable = (nes: Nes): number => {
   const data = readBusNes(0x2000, nes) & (1 | (1 << 1));
@@ -69,6 +71,30 @@ export const isVBlankOccurring = (nes: Nes): boolean =>
   !!((readBusNes(0x2002, nes) >> 7) & 1);
 
 export const readSprAddr = (nes: Nes) => readBusNes(0x2003, nes);
+
+const writeStatusRegister: Dictionary<
+  PpuStatusRegister,
+  (value: number, nes: Nes) => Nes
+> = {
+  hight: (value, nes) =>
+    nesBuilder(nes)
+      .ppuRegister(value << 8)
+      .ppuStatusRegister("low")
+      .build(),
+  low: (value, nes) =>
+    nesBuilder(nes)
+      .ppuRegister(value | getPpuRegister(nes))
+      .ppuStatusRegister("hight")
+      .build(),
+};
+
+export const writePpuRegister = (value: number, nes: Nes): Nes => {
+  return writeStatusRegister[getPpuRegisterStatus(nes)](value, nes);
+};
+
+export const getPpuRegister = (nes: Nes) => nes.ppu.register;
+
+export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.registerStatus;
 
 export const writeSprRamRegister = (
   addr: number,
