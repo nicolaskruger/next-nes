@@ -1,4 +1,5 @@
 import { Nes } from "../nes";
+import { writeSprRamRegister } from "../ppu/registers/registers";
 
 type OperatorBus = {
   read: (addr: number, nes: Nes) => number;
@@ -65,13 +66,13 @@ export const buildMirrorArray8bytes = (startAddr: number) => {
   return arr;
 };
 
-export const mirror8BytesWrite = (startAddr: number, bus: Bus) =>
-  mirrorBuilder(
-    bus,
-    simpleWrite,
-    simpleRead,
-    ...buildMirrorArray8bytes(startAddr)
-  );
+export const mirror8BytesWrite = (write: Write, startAddr: number, bus: Bus) =>
+  mirrorBuilder(bus, write, simpleRead, ...buildMirrorArray8bytes(startAddr));
+
+const selectWrite = (addr: number) => {
+  if (addr === 0x2004) return writeSprRamRegister;
+  return simpleWrite;
+};
 
 export const initBus = (): Bus => {
   let bus = "_"
@@ -88,8 +89,9 @@ export const initBus = (): Bus => {
       addr + 0x1000,
       addr + 0x1800
     );
-  for (let addr = 0x2000; addr <= 0x2007; addr++)
-    bus = mirror8BytesWrite(addr, bus);
+  for (let addr = 0x2000; addr <= 0x2007; addr++) {
+    bus = mirror8BytesWrite(selectWrite(addr), addr, bus);
+  }
   return bus;
 };
 

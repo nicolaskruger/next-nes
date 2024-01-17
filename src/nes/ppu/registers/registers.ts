@@ -1,5 +1,6 @@
-import { readBusNes } from "@/nes/bus/bus";
+import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
+import { writeSprRam } from "../spr-ram/spr-ram";
 
 export const getNameTable = (nes: Nes): number => {
   const data = readBusNes(0x2000, nes) & (1 | (1 << 1));
@@ -68,3 +69,13 @@ export const isVBlankOccurring = (nes: Nes): boolean =>
   !!((readBusNes(0x2002, nes) >> 7) & 1);
 
 export const readSprAddr = (nes: Nes) => readBusNes(0x2003, nes);
+
+export const writeSprRamRegister = (
+  addr: number,
+  value: number,
+  nes: Nes
+): Nes => {
+  let _nes = writeSprRam(readSprAddr(nes), value, nes);
+  _nes.bus[addr].data = value;
+  return _nes;
+};

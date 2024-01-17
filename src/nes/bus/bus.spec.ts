@@ -56,7 +56,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [] },
+  ppu: { vram: [], sprRam: [] },
 });
 
 describe("BUS", () => {
@@ -142,7 +142,7 @@ describe("BUS", () => {
     let nes = initNes();
     nes.bus = initBusSimple();
 
-    nes.bus = mirror8BytesWrite(0x2000, nes.bus);
+    nes.bus = mirror8BytesWrite(simpleWrite, 0x2000, nes.bus);
     nes = writeBusNes(0x2000, 2, nes);
 
     expect(readBusNes(0x2000, nes)).toBe(2);

@@ -18,6 +18,7 @@ import {
   isVBlankOccurring,
   readSprAddr,
 } from "./registers";
+import { readSprRam } from "../spr-ram/spr-ram";
 
 const testFlag = (
   register: number,
@@ -148,5 +149,14 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2003, 4, nes);
 
     expect(readSprAddr(nes)).toBe(4);
+  });
+
+  test("write spr register", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2003, 0x0f, nes);
+    nes = writeBusNes(0x2004, 0x0e, nes);
+
+    expect(readSprRam(0x0f, nes)).toBe(0x0e);
   });
 });
