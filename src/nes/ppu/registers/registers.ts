@@ -2,7 +2,8 @@ import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
-import { PpuStatusRegister } from "../ppu";
+import { AddrVRamStatus } from "../ppu";
+import { writeVRam } from "../vram/vram";
 
 export const getNameTable = (nes: Nes): number => {
   const data = readBusNes(0x2000, nes) & (1 | (1 << 1));
@@ -73,7 +74,7 @@ export const isVBlankOccurring = (nes: Nes): boolean =>
 export const readSprAddr = (nes: Nes) => readBusNes(0x2003, nes);
 
 const writeStatusRegister: Dictionary<
-  PpuStatusRegister,
+  AddrVRamStatus,
   (value: number, nes: Nes) => Nes
 > = {
   hight: (value, nes) =>
@@ -83,18 +84,31 @@ const writeStatusRegister: Dictionary<
       .build(),
   low: (value, nes) =>
     nesBuilder(nes)
-      .ppuRegister(value | getPpuRegister(nes))
+      .ppuRegister(value | getAddrVRam(nes))
       .ppuStatusRegister("hight")
       .build(),
 };
 
-export const writePpuRegister = (value: number, nes: Nes): Nes => {
+export const writePpuAddrVRamRegister = (value: number, nes: Nes): Nes => {
   return writeStatusRegister[getPpuRegisterStatus(nes)](value, nes);
 };
 
-export const getPpuRegister = (nes: Nes) => nes.ppu.register;
+export const readPpuDataVRam = (addr: number, nes: Nes): number => {
+  throw new Error("not implemented");
+};
 
-export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.registerStatus;
+const calcNewAddrVRam = (nes: Nes) =>
+  getAddrVRam(nes) + getAmountIncrement(nes);
+
+export const writePpuDataVRam = (addr: number, data: number, nes: Nes): Nes => {
+  let _nes = writeVRam(getAddrVRam(nes), data, nes);
+
+  return nesBuilder(_nes).addrVram(calcNewAddrVRam(_nes)).build();
+};
+
+export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;
+
+export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.addrVramStatus;
 
 export const writeSprRamRegister = (
   addr: number,

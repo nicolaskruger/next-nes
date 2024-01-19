@@ -1,4 +1,4 @@
-import { writeBusNes } from "@/nes/bus/bus";
+import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, initNes } from "@/nes/nes";
 import {
   getAmountIncrement,
@@ -17,11 +17,12 @@ import {
   isZeroHitFlag,
   isVBlankOccurring,
   readSprAddr,
-  writePpuRegister,
-  getPpuRegister,
+  writePpuAddrVRamRegister,
+  getAddrVRam as getPpuAddrVRam,
   getPpuRegisterStatus,
 } from "./registers";
 import { readSprRam } from "../spr-ram/spr-ram";
+import { readVRam } from "../vram/vram";
 
 const testFlag = (
   register: number,
@@ -166,13 +167,25 @@ describe("PPU registers", () => {
   test("write register", () => {
     let nes = initNes();
 
-    nes = writePpuRegister(0x12, nes);
+    nes = writePpuAddrVRamRegister(0x12, nes);
 
     expect(getPpuRegisterStatus(nes)).toBe("low");
 
-    nes = writePpuRegister(0x34, nes);
+    nes = writePpuAddrVRamRegister(0x34, nes);
 
-    expect(getPpuRegister(nes)).toBe(0x1234);
+    expect(getPpuAddrVRam(nes)).toBe(0x1234);
     expect(getPpuRegisterStatus(nes)).toBe("hight");
+  });
+
+  test("should write to ppu VRAM", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2006, 0x12, nes);
+    nes = writeBusNes(0x2006, 0x34, nes);
+    nes = writeBusNes(0x2000, 1 << 2, nes);
+    nes = writeBusNes(0x2007, 0xff, nes);
+
+    expect(getPpuAddrVRam(nes)).toBe(0x1254);
+    expect(readVRam(0x1234, nes)).toBe(0xff);
   });
 });
