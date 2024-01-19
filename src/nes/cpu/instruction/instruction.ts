@@ -211,8 +211,8 @@ const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
   let STK = getSTK(nes);
   STK++;
   if (STK > 0xff) throw new Error("stack overflow");
-  const value = readBusNes(0x0100 | STK, nes);
-  return [value, setSTK(STK, nes)];
+  const [value, _nes] = readBusNes(0x0100 | STK, nes);
+  return [value, setSTK(STK, _nes)];
 };
 
 const BRK = ({ nes, baseCycles }: Instruction): Nes => {
@@ -284,9 +284,11 @@ const DEC = (instruction: Instruction): Nes => {
 
   if (addr === undefined) throw new Error("instruction DEC needs addr");
 
-  const result = (readBusNes(addr, nes) - 1) & MASK_8;
+  const [data, _nes] = readBusNes(addr, nes);
 
-  return flagBuilder({ result }, nes)
+  const result = (data - 1) & MASK_8;
+
+  return flagBuilder({ result }, _nes)
     .zero()
     .negative()
     .nesBuilder()
@@ -349,9 +351,11 @@ const INC = (instruction: Instruction): Nes => {
 
   if (addr === undefined) throw new Error("instruction INC must have addr");
 
-  const result = (readBusNes(addr, nes) + 1) & MASK_8;
+  const [data, _nes] = readBusNes(addr, nes);
 
-  return flagBuilder({ result }, nes)
+  const result = (data + 1) & MASK_8;
+
+  return flagBuilder({ result }, _nes)
     .zero()
     .negative()
     .nesBuilder()

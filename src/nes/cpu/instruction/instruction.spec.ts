@@ -84,7 +84,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [] },
+  ppu: { vram: [], addrVRam: 0xff, addrVramStatus: "hight", sprRam: [] },
 });
 
 const toCycles = (nes: Nes) => (cycles: number) => {
