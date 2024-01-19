@@ -1,8 +1,9 @@
+import { repeat } from "../helper/reapeat";
 import { Nes } from "../nes";
 import {
-  writePpuAddrVRamRegister,
-  writePpuDataVRam,
-  writeSprRamRegister,
+  write2006AddrVRam,
+  write2007DataVRam,
+  write2004SprRam,
 } from "../ppu/registers/registers";
 
 type OperatorBus = {
@@ -73,19 +74,24 @@ export const buildMirrorArray8bytes = (startAddr: number) => {
 export const mirror8BytesWrite = (write: Write, startAddr: number, bus: Bus) =>
   mirrorBuilder(bus, write, simpleRead, ...buildMirrorArray8bytes(startAddr));
 
+const wrapperNoAddr =
+  (write: (data: number, nes: Nes) => Nes): Write =>
+  (addr, data, nes) =>
+    write(data, nes);
+
 const selectWrite = (addr: number): Write => {
-  if (addr === 0x2004) return writeSprRamRegister;
-  if (addr === 0x2006)
-    return (addr, data, nes) => writePpuAddrVRamRegister(data, nes);
-  if (addr === 0x2007) return writePpuDataVRam;
+  if (addr === 0x2004) return write2004SprRam;
+  if (addr === 0x2006) return wrapperNoAddr(write2006AddrVRam);
+  if (addr === 0x2007) return wrapperNoAddr(write2007DataVRam);
   return simpleWrite;
 };
 
 export const initBus = (): Bus => {
-  let bus = "_"
-    .repeat(0x10000)
-    .split("")
-    .map(() => ({ data: 0, read: simpleRead, write: simpleWrite }));
+  let bus = repeat(0x10000).map(() => ({
+    data: 0,
+    read: simpleRead,
+    write: simpleWrite,
+  }));
   for (let addr = 0x0000; addr <= 0x07ff; addr++)
     bus = mirrorBuilder(
       bus,

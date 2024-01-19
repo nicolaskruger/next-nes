@@ -17,7 +17,7 @@ import {
   isZeroHitFlag,
   isVBlankOccurring,
   readSprAddr,
-  writePpuAddrVRamRegister,
+  write2006AddrVRam,
   getAddrVRam as getPpuAddrVRam,
   getPpuRegisterStatus,
 } from "./registers";
@@ -167,11 +167,11 @@ describe("PPU registers", () => {
   test("write register", () => {
     let nes = initNes();
 
-    nes = writePpuAddrVRamRegister(0x12, nes);
+    nes = write2006AddrVRam(0x12, nes);
 
     expect(getPpuRegisterStatus(nes)).toBe("low");
 
-    nes = writePpuAddrVRamRegister(0x34, nes);
+    nes = write2006AddrVRam(0x34, nes);
 
     expect(getPpuAddrVRam(nes)).toBe(0x1234);
     expect(getPpuRegisterStatus(nes)).toBe("hight");

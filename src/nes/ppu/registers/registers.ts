@@ -89,7 +89,7 @@ const writeStatusRegister: Dictionary<
       .build(),
 };
 
-export const writePpuAddrVRamRegister = (value: number, nes: Nes): Nes => {
+export const write2006AddrVRam = (value: number, nes: Nes): Nes => {
   return writeStatusRegister[getPpuRegisterStatus(nes)](value, nes);
 };
 
@@ -100,7 +100,7 @@ export const readPpuDataVRam = (addr: number, nes: Nes): number => {
 const calcNewAddrVRam = (nes: Nes) =>
   getAddrVRam(nes) + getAmountIncrement(nes);
 
-export const writePpuDataVRam = (addr: number, data: number, nes: Nes): Nes => {
+export const write2007DataVRam = (data: number, nes: Nes): Nes => {
   let _nes = writeVRam(getAddrVRam(nes), data, nes);
 
   return nesBuilder(_nes).addrVram(calcNewAddrVRam(_nes)).build();
@@ -110,11 +110,7 @@ export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;
 
 export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.addrVramStatus;
 
-export const writeSprRamRegister = (
-  addr: number,
-  value: number,
-  nes: Nes
-): Nes => {
+export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
   let _nes = writeSprRam(readSprAddr(nes), value, nes);
   _nes.bus[addr].data = value;
   return _nes;
