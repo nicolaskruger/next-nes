@@ -49,7 +49,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [] },
+  ppu: { vram: [], addrVRam: 0xff, sprRam: [], addrVramStatus: "hight" },
 });
 
 const initNesAllRam = (): Nes => {

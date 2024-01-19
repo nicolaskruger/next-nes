@@ -6,18 +6,21 @@ import {
   write2004SprRam,
 } from "../ppu/registers/registers";
 
-type OperatorBus = {
-  read: (addr: number, nes: Nes) => number;
-  write: (addr: number, value: number, nes: Nes) => Nes;
-  data: number;
-};
+export type ReadData = [number, Nes];
 
 type Bus = OperatorBus[];
 
 type Write = (addr: number, value: number, nes: Nes) => Nes;
-type Read = (addr: number, nes: Nes) => number;
 
-const simpleRead = (addr: number, nes: Nes) => nes.bus[addr].data;
+type Read = (addr: number, nes: Nes) => ReadData;
+
+type OperatorBus = {
+  read: Read;
+  write: Write;
+  data: number;
+};
+
+const simpleRead: Read = (addr, nes) => [nes.bus[addr].data, nes];
 
 const simpleWrite: Write = (addr, value, nes) => ({
   ...nes,
@@ -49,7 +52,7 @@ export const mirrorBuilder = (
   return bus;
 };
 
-const readBusNes = (addr: number, nes: Nes) => {
+const readBusNes = (addr: number, nes: Nes): ReadData => {
   if (addr >= 0 && addr <= 0xffff) return nes.bus[addr].read(addr, nes);
   throw new Error("cross the border off buss on read");
 };
