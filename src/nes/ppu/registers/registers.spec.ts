@@ -90,15 +90,17 @@ describe("PPU registers", () => {
   });
 
   test("0x2000 bit 4 pattern table background", () => {
+    const mutableGetPatternTableBackground = (nes: Nes) =>
+      mutableGet(nes, getPatternTableBackground);
     let nes = initNes();
 
     nes = writeBusNes(0x200, 0, nes);
 
-    expect(getPatternTableBackground(nes)).toBe(0);
+    expect(mutableGetPatternTableBackground(nes)).toBe(0);
 
     nes = writeBusNes(0x2000, 1 << 4, nes);
 
-    expect(getPatternTableBackground(nes)).toBe(0x1000);
+    expect(mutableGetPatternTableBackground(nes)).toBe(0x1000);
   });
 
   test("0x2000 bit 5", () => {
