@@ -47,10 +47,11 @@ export const isMNIOccur = (nes: Nes): [boolean, Nes] => {
 };
 type ColorMode = "mono" | "color";
 
-export const getColorMode = (nes: Nes): ColorMode => {
-  const data = readBusNes(0x2001, nes) & 1;
+export const getColorMode = (nes: Nes): [ColorMode, Nes] => {
+  const [reg2001, nesReg2001] = readBusNes(0x2001, nes);
+  const data = reg2001 & 1;
   const ret: ColorMode[] = ["color", "mono"];
-  return ret[data];
+  return [ret[data], nesReg2001];
 };
 
 export const isBgLeftMost8Pix = (nes: Nes): boolean => {

@@ -124,15 +124,17 @@ describe("PPU registers", () => {
   });
 
   test("0x2001 bit 0 color mode", () => {
+    const mutateGetColorMode = (nes: Nes) => mutableGet(nes, getColorMode);
+
     let nes = initNes();
 
     nes = writeBusNes(0x2001, 0, nes);
 
-    expect(getColorMode(nes)).toBe("color");
+    expect(mutateGetColorMode(nes)).toBe("color");
 
     nes = writeBusNes(0x2001, 1, nes);
 
-    expect(getColorMode(nes)).toBe("mono");
+    expect(mutateGetColorMode(nes)).toBe("mono");
   });
 
   test("0x2001 bit 1 8bit bg", () => {
