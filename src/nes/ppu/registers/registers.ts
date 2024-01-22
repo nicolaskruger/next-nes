@@ -41,9 +41,10 @@ export const getSizeOfSprite = (nes: Nes): [SizeOfSprite, Nes] => {
   return [ret[data], nesReg2000];
 };
 
-export const isMNIOccur = (nes: Nes): boolean =>
-  !!((readBusNes(0x2000, nes) >> 7) & 1);
-
+export const isMNIOccur = (nes: Nes): [boolean, Nes] => {
+  const [reg20000, nesReg2000] = readBusNes(0x2000, nes);
+  return [!!((reg20000 >> 7) & 1), nesReg2000];
+};
 type ColorMode = "mono" | "color";
 
 export const getColorMode = (nes: Nes): ColorMode => {

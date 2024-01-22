@@ -24,22 +24,23 @@ import {
 import { readSprRam } from "../spr-ram/spr-ram";
 import { readVRam } from "../vram/vram";
 
-const testFlag = (
-  register: number,
-  setValue: number,
-  isFlag: (nes: Nes) => boolean
-) => {
-  let nes = initNes();
-  nes = writeBusNes(register, 0, nes);
-  expect(isFlag(nes)).toBe(false);
-  nes = writeBusNes(register, setValue, nes);
-  expect(isFlag(nes)).toBe(true);
-};
-
 const mutableGet = <T>(nes: Nes, get: (nes: Nes) => [T, Nes]): T => {
   const [data, _nes] = get(nes);
   nes = _nes;
   return data;
+};
+
+const testFlag = (
+  register: number,
+  setValue: number,
+  isFlag: (nes: Nes) => [boolean, Nes]
+) => {
+  const isMutable = (nes: Nes) => mutableGet(nes, isFlag);
+  let nes = initNes();
+  nes = writeBusNes(register, 0, nes);
+  expect(isMutable(nes)).toBe(false);
+  nes = writeBusNes(register, setValue, nes);
+  expect(isMutable(nes)).toBe(true);
 };
 
 describe("PPU registers", () => {
