@@ -1,6 +1,11 @@
-import { initNes } from "@/nes/nes";
+import { Nes, initNes } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "./spr-ram";
 
+const readSprMutate = (addr: number, nes: Nes) => {
+  const [_data, _nes] = readSprRam(addr, nes);
+  nes = _nes;
+  return _data;
+};
 describe("spr-ram", () => {
   test("should not read memory less than 0x00 nether mote 0xff", () => {
     let nes = initNes();
@@ -14,7 +19,7 @@ describe("spr-ram", () => {
 
     nes.ppu.sprRam[0].data = 4;
 
-    expect(readSprRam(0, nes)).toBe(4);
+    expect(readSprMutate(0, nes)).toBe(4);
   });
 
   test("should not write memory less than 0x00 nether mote 0xff", () => {
@@ -31,6 +36,6 @@ describe("spr-ram", () => {
 
     nes = writeSprRam(0x00, 4, nes);
 
-    expect(readSprRam(0, nes)).toBe(4);
+    expect(readSprMutate(0, nes)).toBe(4);
   });
 });

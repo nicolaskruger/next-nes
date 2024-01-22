@@ -183,7 +183,7 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2003, 0x0f, nes);
     nes = writeBusNes(0x2004, 0x0e, nes);
 
-    expect(readSprRam(0x0f, nes)).toBe(0x0e);
+    expect(readSprRam(0x0f, nes)[0]).toBe(0x0e);
   });
 
   test("write register", () => {

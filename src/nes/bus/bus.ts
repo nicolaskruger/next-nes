@@ -1,4 +1,4 @@
-import { repeat } from "../helper/reapeat";
+import { repeat } from "../helper/repeat";
 import { Nes } from "../nes";
 import {
   write2006AddrVRam,
@@ -10,9 +10,9 @@ export type ReadData = [number, Nes];
 
 type Bus = OperatorBus[];
 
-type Write = (addr: number, value: number, nes: Nes) => Nes;
+export type Write = (addr: number, value: number, nes: Nes) => Nes;
 
-type Read = (addr: number, nes: Nes) => ReadData;
+export type Read = (addr: number, nes: Nes) => ReadData;
 
 type OperatorBus = {
   read: Read;
