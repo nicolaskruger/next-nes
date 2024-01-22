@@ -41,10 +41,18 @@ export const getSizeOfSprite = (nes: Nes): [SizeOfSprite, Nes] => {
   return [ret[data], nesReg2000];
 };
 
-export const isMNIOccur = (nes: Nes): [boolean, Nes] => {
-  const [reg20000, nesReg2000] = readBusNes(0x2000, nes);
-  return [!!((reg20000 >> 7) & 1), nesReg2000];
+const isRegister = (
+  nes: Nes,
+  register: number,
+  bit: number
+): [boolean, Nes] => {
+  const [reg, nesReg] = readBusNes(register, nes);
+  return [!!((reg >> bit) & 1), nesReg];
 };
+
+export const isMNIOccur = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2000, 7);
+
 type ColorMode = "mono" | "color";
 
 export const getColorMode = (nes: Nes): [ColorMode, Nes] => {
@@ -54,31 +62,29 @@ export const getColorMode = (nes: Nes): [ColorMode, Nes] => {
   return [ret[data], nesReg2001];
 };
 
-export const isBgLeftMost8Pix = (nes: Nes): boolean => {
-  return !!((readBusNes(0x2001, nes) >> 1) & 1);
-};
+export const isBgLeftMost8Pix = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2001, 1);
 
-export const isSprLeftMost8Pix = (nes: Nes): boolean => {
-  return !!((readBusNes(0x2001, nes) >> 2) & 1);
-};
+export const isSprLeftMost8Pix = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2001, 2);
 
-export const isDisableBg = (nes: Nes): boolean =>
-  !!((readBusNes(0x2001, nes) >> 3) & 1);
+export const isDisableBg = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2001, 3);
 
-export const isDisableSpr = (nes: Nes): boolean =>
-  !!((readBusNes(0x2001, nes) >> 4) & 1);
+export const isDisableSpr = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2001, 4);
 
-export const shouldIgnoreWritesToVRAM = (nes: Nes): boolean =>
-  !!((readBusNes(0x2002, nes) >> 4) & 1);
+export const shouldIgnoreWritesToVRAM = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2002, 4);
 
-export const isMoreThan8SpritesOnScanLine = (nes: Nes): boolean =>
-  !!((readBusNes(0x2002, nes) >> 5) & 1);
+export const isMoreThan8SpritesOnScanLine = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2002, 5);
 
-export const isZeroHitFlag = (nes: Nes): boolean =>
-  !!((readBusNes(0x2002, nes) >> 6) & 1);
+export const isZeroHitFlag = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2002, 6);
 
-export const isVBlankOccurring = (nes: Nes): boolean =>
-  !!((readBusNes(0x2002, nes) >> 7) & 1);
+export const isVBlankOccurring = (nes: Nes): [boolean, Nes] =>
+  isRegister(nes, 0x2002, 7);
 
 export const readSprAddr = (nes: Nes) => readBusNes(0x2003, nes);
 
