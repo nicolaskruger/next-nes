@@ -26,7 +26,7 @@ const initCpuRunner = (): Cpu => ({
 export const initNesRunner = (): Nes => ({
   cpu: initCpuRunner(),
   bus: initBusRunner(),
-  ppu: { vram: [] },
+  ppu: { vram: [], addrVRam: 0x00, addrVramStatus: "hight", sprRam: [] },
 });
 
 const compileNes = (program: number[], nes: Nes): Nes => {
@@ -47,7 +47,8 @@ const run = async (program: string): Promise<Nes> => {
 
   while (getPC(nes) < 0x8000 + comp.length) {
     const PC = getPC(nes);
-    const fetch = readBusNes(PC, nes);
+    const [fetch, nesFetch] = readBusNes(PC, nes);
+    nes = nesFetch;
     const { addr, instruction, baseCycles, offsetCycles } =
       instructionDictionary[fetch];
     const addrResult = addr(nes);

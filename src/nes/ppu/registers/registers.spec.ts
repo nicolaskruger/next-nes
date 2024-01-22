@@ -38,19 +38,27 @@ const testFlag = (
 
 describe("PPU registers", () => {
   test("0x2000 bit 0-1 name table", () => {
+    const mutateGetNameTable = (nes: Nes, data: number) => {
+      const [_data, _nes] = getNameTable(nes);
+      data = _data;
+      nes = _nes;
+      return data;
+    };
+
     let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
-    expect(getNameTable(nes)).toBe(0x2000);
+    let data = 0;
+    expect(mutateGetNameTable(nes, data)).toBe(0x2000);
 
     nes = writeBusNes(0x2000, 1, nes);
-    expect(getNameTable(nes)).toBe(0x2400);
+    expect(mutateGetNameTable(nes, data)).toBe(0x2400);
 
     nes = writeBusNes(0x2000, 2, nes);
-    expect(getNameTable(nes)).toBe(0x2800);
+    expect(mutateGetNameTable(nes, data)).toBe(0x2800);
 
     nes = writeBusNes(0x2000, 3, nes);
-    expect(getNameTable(nes)).toBe(0x2c00);
+    expect(mutateGetNameTable(nes, data)).toBe(0x2c00);
   });
   test("0x2000 bit 2 amount", () => {
     let nes = initNes();

@@ -1,13 +1,14 @@
-import { readBusNes, writeBusNes } from "@/nes/bus/bus";
+import { ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
 import { AddrVRamStatus } from "../ppu";
 import { writeVRam } from "../vram/vram";
 
-export const getNameTable = (nes: Nes): number => {
-  const data = readBusNes(0x2000, nes) & (1 | (1 << 1));
-  return [0x2000, 0x2400, 0x2800, 0x2c00][data];
+export const getNameTable = (nes: Nes): ReadData => {
+  const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
+  const data = reg2000 & (1 | (1 << 1));
+  return [[0x2000, 0x2400, 0x2800, 0x2c00][data], nesReg2000];
 };
 
 export const getAmountIncrement = (nes: Nes): number => {
