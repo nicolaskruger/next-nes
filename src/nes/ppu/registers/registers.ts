@@ -18,12 +18,13 @@ export const getAmountIncrement = (nes: Nes): ReadData => {
   return [[1, 32][data], nesReg2000];
 };
 
-export const getPatternTableSprite = (nes: Nes): number => {
-  const data = (readBusNes(0x2000, nes) >> 3) & 1;
-  return [0x0000, 0x1000][data];
+export const getPatternTableSprite = (nes: Nes): ReadData => {
+  const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
+  const data = (reg2000 >> 3) & 1;
+  return [[0x0000, 0x1000][data], nesReg2000];
 };
 
-export const getPatterTableBackground = (nes: Nes): number => {
+export const getPatternTableBackground = (nes: Nes): number => {
   const data = (readBusNes(0x2000, nes) >> 4) & 1;
   return [0x0000, 0x1000][data];
 };

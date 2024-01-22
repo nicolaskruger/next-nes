@@ -4,7 +4,7 @@ import {
   getAmountIncrement,
   getColorMode,
   getNameTable,
-  getPatterTableBackground,
+  getPatternTableBackground,
   getPatternTableSprite,
   getSizeOfSprite,
   isBgLeftMost8Pix,
@@ -67,7 +67,6 @@ describe("PPU registers", () => {
       mutableGet(nes, getAmountIncrement);
 
     nes = writeBusNes(0x2000, 0, nes);
-    let data = 0;
     expect(mutableGetAmountIncrement(nes)).toBe(1);
 
     nes = writeBusNes(0x2000, 1 << 2, nes);
@@ -76,15 +75,18 @@ describe("PPU registers", () => {
   });
 
   test("0x2000 bit 3 pattern table sprite", () => {
+    const mutableGetPatternTableSprite = (nes: Nes) =>
+      mutableGet(nes, getPatternTableSprite);
+
     let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
 
-    expect(getPatternTableSprite(nes)).toBe(0);
+    expect(mutableGetPatternTableSprite(nes)).toBe(0);
 
     nes = writeBusNes(0x2000, 1 << 3, nes);
 
-    expect(getPatternTableSprite(nes)).toBe(0x1000);
+    expect(mutableGetPatternTableSprite(nes)).toBe(0x1000);
   });
 
   test("0x2000 bit 4 pattern table background", () => {
@@ -92,11 +94,11 @@ describe("PPU registers", () => {
 
     nes = writeBusNes(0x200, 0, nes);
 
-    expect(getPatterTableBackground(nes)).toBe(0);
+    expect(getPatternTableBackground(nes)).toBe(0);
 
     nes = writeBusNes(0x2000, 1 << 4, nes);
 
-    expect(getPatterTableBackground(nes)).toBe(0x1000);
+    expect(getPatternTableBackground(nes)).toBe(0x1000);
   });
 
   test("0x2000 bit 5", () => {
