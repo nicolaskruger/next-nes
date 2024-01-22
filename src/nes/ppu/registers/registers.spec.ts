@@ -174,7 +174,7 @@ describe("PPU registers", () => {
 
     nes = writeBusNes(0x2003, 4, nes);
 
-    expect(readSprAddr(nes)).toBe(4);
+    expect(readSprAddr(nes)[0]).toBe(4);
   });
 
   test("write spr register", () => {

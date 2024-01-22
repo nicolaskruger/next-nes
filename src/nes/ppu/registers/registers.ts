@@ -112,13 +112,18 @@ export const readPpuDataVRam = (addr: number, nes: Nes): number => {
   throw new Error("not implemented");
 };
 
-const calcNewAddrVRam = (nes: Nes) =>
-  getAddrVRam(nes) + getAmountIncrement(nes);
+const calcNewAddrVRam = (nes: Nes): ReadData => {
+  const [amountIncrement, nesAmountIncrement] = getAmountIncrement(nes);
+  const nextAddr = getAddrVRam(nes) + amountIncrement;
+  return [nextAddr, nesAmountIncrement];
+};
 
 export const write2007DataVRam = (data: number, nes: Nes): Nes => {
   let _nes = writeVRam(getAddrVRam(nes), data, nes);
 
-  return nesBuilder(_nes).addrVram(calcNewAddrVRam(_nes)).build();
+  const [nextAddr, nesNextAddr] = calcNewAddrVRam(_nes);
+
+  return nesBuilder(nesNextAddr).addrVram(nextAddr).build();
 };
 
 export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;
@@ -126,7 +131,9 @@ export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;
 export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.addrVramStatus;
 
 export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
-  let _nes = writeSprRam(readSprAddr(nes), value, nes);
+  const [sprAddr, nesAddr] = readSprAddr(nes);
+
+  let _nes = writeSprRam(sprAddr, value, nesAddr);
   _nes.bus[addr].data = value;
   return _nes;
 };
