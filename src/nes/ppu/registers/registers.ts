@@ -11,10 +11,11 @@ export const getNameTable = (nes: Nes): ReadData => {
   return [[0x2000, 0x2400, 0x2800, 0x2c00][data], nesReg2000];
 };
 
-export const getAmountIncrement = (nes: Nes): number => {
-  const data = (readBusNes(0x2000, nes) >> 2) & 1;
+export const getAmountIncrement = (nes: Nes): ReadData => {
+  const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
+  const data = (reg2000 >> 2) & 1;
 
-  return [1, 32][data];
+  return [[1, 32][data], nesReg2000];
 };
 
 export const getPatternTableSprite = (nes: Nes): number => {

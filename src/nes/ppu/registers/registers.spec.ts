@@ -1,4 +1,4 @@
-import { readBusNes, writeBusNes } from "@/nes/bus/bus";
+import { ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, initNes } from "@/nes/nes";
 import {
   getAmountIncrement,
@@ -36,39 +36,43 @@ const testFlag = (
   expect(isFlag(nes)).toBe(true);
 };
 
+const mutableGet = (nes: Nes, get: (nes: Nes) => ReadData): number => {
+  const [data, _nes] = get(nes);
+  nes = _nes;
+  return data;
+};
+
 describe("PPU registers", () => {
   test("0x2000 bit 0-1 name table", () => {
-    const mutateGetNameTable = (nes: Nes, data: number) => {
-      const [_data, _nes] = getNameTable(nes);
-      data = _data;
-      nes = _nes;
-      return data;
-    };
+    const mutableGetNameTable = (nes: Nes) => mutableGet(nes, getNameTable);
 
     let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
-    let data = 0;
-    expect(mutateGetNameTable(nes, data)).toBe(0x2000);
+    expect(mutableGetNameTable(nes)).toBe(0x2000);
 
     nes = writeBusNes(0x2000, 1, nes);
-    expect(mutateGetNameTable(nes, data)).toBe(0x2400);
+    expect(mutableGetNameTable(nes)).toBe(0x2400);
 
     nes = writeBusNes(0x2000, 2, nes);
-    expect(mutateGetNameTable(nes, data)).toBe(0x2800);
+    expect(mutableGetNameTable(nes)).toBe(0x2800);
 
     nes = writeBusNes(0x2000, 3, nes);
-    expect(mutateGetNameTable(nes, data)).toBe(0x2c00);
+    expect(mutableGetNameTable(nes)).toBe(0x2c00);
   });
   test("0x2000 bit 2 amount", () => {
     let nes = initNes();
 
+    const mutableGetAmountIncrement = (nes: Nes) =>
+      mutableGet(nes, getAmountIncrement);
+
     nes = writeBusNes(0x2000, 0, nes);
-    expect(getAmountIncrement(nes)).toBe(1);
+    let data = 0;
+    expect(mutableGetAmountIncrement(nes)).toBe(1);
 
     nes = writeBusNes(0x2000, 1 << 2, nes);
 
-    expect(getAmountIncrement(nes)).toBe(32);
+    expect(mutableGetAmountIncrement(nes)).toBe(32);
   });
 
   test("0x2000 bit 3 pattern table sprite", () => {
