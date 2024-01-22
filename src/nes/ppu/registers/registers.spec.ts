@@ -36,7 +36,7 @@ const testFlag = (
   expect(isFlag(nes)).toBe(true);
 };
 
-const mutableGet = (nes: Nes, get: (nes: Nes) => ReadData): number => {
+const mutableGet = <T>(nes: Nes, get: (nes: Nes) => [T, Nes]): T => {
   const [data, _nes] = get(nes);
   nes = _nes;
   return data;
@@ -104,15 +104,18 @@ describe("PPU registers", () => {
   });
 
   test("0x2000 bit 5", () => {
+    const mutableGetSizeOfSprite = (nes: Nes) =>
+      mutableGet(nes, getSizeOfSprite);
+
     let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
 
-    expect(getSizeOfSprite(nes)).toBe("8x8");
+    expect(mutableGetSizeOfSprite(nes)).toBe("8x8");
 
     nes = writeBusNes(0x2000, 1 << 5, nes);
 
-    expect(getSizeOfSprite(nes)).toBe("8x16");
+    expect(mutableGetSizeOfSprite(nes)).toBe("8x16");
   });
 
   test("0x2000 bit 7", () => {

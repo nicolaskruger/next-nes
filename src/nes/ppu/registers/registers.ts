@@ -33,10 +33,12 @@ export const getPatternTableBackground = (nes: Nes): ReadData => {
 
 type SizeOfSprite = "8x8" | "8x16";
 
-export const getSizeOfSprite = (nes: Nes): SizeOfSprite => {
-  const data = (readBusNes(0x2000, nes) >> 5) & 1;
+export const getSizeOfSprite = (nes: Nes): [SizeOfSprite, Nes] => {
+  const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
+
+  const data = (reg2000 >> 5) & 1;
   const ret: SizeOfSprite[] = ["8x8", "8x16"];
-  return ret[data];
+  return [ret[data], nesReg2000];
 };
 
 export const isMNIOccur = (nes: Nes): boolean =>
