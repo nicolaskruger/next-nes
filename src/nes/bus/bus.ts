@@ -4,6 +4,7 @@ import {
   write2006AddrVRam,
   write2007DataVRam,
   write2004SprRam,
+  read2004SprRam,
 } from "../ppu/registers/registers";
 
 export type ReadData = [number, Nes];
@@ -74,13 +75,22 @@ export const buildMirrorArray8bytes = (startAddr: number) => {
   return arr;
 };
 
-export const mirror8BytesWrite = (write: Write, startAddr: number, bus: Bus) =>
-  mirrorBuilder(bus, write, simpleRead, ...buildMirrorArray8bytes(startAddr));
+export const mirror8BytesWrite = (
+  write: Write,
+  read: Read,
+  startAddr: number,
+  bus: Bus
+) => mirrorBuilder(bus, write, read, ...buildMirrorArray8bytes(startAddr));
 
 const wrapperNoAddr =
   (write: (data: number, nes: Nes) => Nes): Write =>
   (addr, data, nes) =>
     write(data, nes);
+
+const selectRead = (addr: number): Read => {
+  if (addr === 0x2004) return read2004SprRam;
+  return simpleRead;
+};
 
 const selectWrite = (addr: number): Write => {
   if (addr === 0x2004) return write2004SprRam;
@@ -106,7 +116,7 @@ export const initBus = (): Bus => {
       addr + 0x1800
     );
   for (let addr = 0x2000; addr <= 0x2007; addr++) {
-    bus = mirror8BytesWrite(selectWrite(addr), addr, bus);
+    bus = mirror8BytesWrite(selectWrite(addr), selectRead(addr), addr, bus);
   }
   return bus;
 };

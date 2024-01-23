@@ -1,6 +1,6 @@
-import { ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
+import { Read, ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
-import { writeSprRam } from "../spr-ram/spr-ram";
+import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
 import { AddrVRamStatus } from "../ppu";
 import { writeVRam } from "../vram/vram";
@@ -86,7 +86,7 @@ export const isZeroHitFlag = (nes: Nes): [boolean, Nes] =>
 export const isVBlankOccurring = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2002, 7);
 
-export const readSprAddr = (nes: Nes) => readBusNes(0x2003, nes);
+export const read2003SprAddr = (nes: Nes) => readBusNes(0x2003, nes);
 
 const writeStatusRegister: Dictionary<
   AddrVRamStatus,
@@ -131,9 +131,14 @@ export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;
 export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.addrVramStatus;
 
 export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
-  const [sprAddr, nesAddr] = readSprAddr(nes);
+  const [sprAddr, nesAddr] = read2003SprAddr(nes);
 
   let _nes = writeSprRam(sprAddr, value, nesAddr);
   _nes.bus[addr].data = value;
   return _nes;
+};
+
+export const read2004SprRam: Read = (addr, nes) => {
+  const [reg2003, nesReg2003] = read2003SprAddr(nes);
+  return readSprRam(reg2003, nesReg2003);
 };

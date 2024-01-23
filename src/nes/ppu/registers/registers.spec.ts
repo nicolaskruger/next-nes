@@ -16,12 +16,12 @@ import {
   shouldIgnoreWritesToVRAM,
   isZeroHitFlag,
   isVBlankOccurring,
-  readSprAddr,
+  read2003SprAddr,
   write2006AddrVRam,
   getAddrVRam as getPpuAddrVRam,
   getPpuRegisterStatus,
 } from "./registers";
-import { readSprRam } from "../spr-ram/spr-ram";
+import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { readVRam } from "../vram/vram";
 
 const mutableGet = <T>(nes: Nes, get: (nes: Nes) => [T, Nes]): T => {
@@ -174,7 +174,7 @@ describe("PPU registers", () => {
 
     nes = writeBusNes(0x2003, 4, nes);
 
-    expect(readSprAddr(nes)[0]).toBe(4);
+    expect(read2003SprAddr(nes)[0]).toBe(4);
   });
 
   test("write spr register", () => {
@@ -209,5 +209,16 @@ describe("PPU registers", () => {
 
     expect(getPpuAddrVRam(nes)).toBe(0x1254);
     expect(readVRam(0x1234, nes)[0]).toBe(0xff);
+  });
+
+  test("read 2004 spr ram", () => {
+    let nes = initNes();
+
+    nes = writeBusNes(0x2003, 0x12, nes);
+    nes = writeSprRam(0x12, 0x34, nes);
+
+    const [data] = readBusNes(0x2004, nes);
+
+    expect(data).toBe(0x34);
   });
 });
