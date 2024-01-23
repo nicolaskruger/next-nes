@@ -23,6 +23,8 @@ import {
 } from "./registers";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { readVRam } from "../vram/vram";
+import { write } from "fs";
+import { getFirstRead, getVRamAddr } from "../ppu";
 
 const mutableGet = <T>(nes: Nes, get: (nes: Nes) => [T, Nes]): T => {
   const [data, _nes] = get(nes);
@@ -220,5 +222,27 @@ describe("PPU registers", () => {
     const [data] = readBusNes(0x2004, nes);
 
     expect(data).toBe(0x34);
+  });
+
+  test("read 2007 vram", () => {
+    let nes = initNes();
+
+    nes = writeSprRam(0xff, 0x12, nes);
+    nes = writeBusNes(0x2006, 0x00, nes);
+    nes = writeBusNes(0x2006, 0xff, nes);
+
+    expect(getFirstRead(nes)).toBe(true);
+
+    const [data, _nes] = readBusNes(0x2007, nes);
+
+    expect(data).toBe(0x0);
+    expect(getVRamAddr(_nes)).toBe(0xff);
+    expect(getFirstRead(_nes)).toBe(false);
+
+    const [result, nesResult] = readBusNes(0x2007, _nes);
+
+    expect(result).toBe(0x12);
+    expect(getVRamAddr(nesResult)).toBe(0x100);
+    expect(getFirstRead(nesResult)).toBe(true);
   });
 });

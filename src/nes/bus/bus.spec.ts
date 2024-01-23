@@ -63,6 +63,7 @@ const initNes = (): Nes => ({
     addrVRam: 0x0000,
     addrVramStatus: "hight",
     scroll: initScroll(),
+    firstRead: true,
   },
 });
 

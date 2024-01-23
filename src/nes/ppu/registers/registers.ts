@@ -2,7 +2,7 @@ import { Read, ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
-import { AddrVRamStatus } from "../ppu";
+import { AddrVRamStatus, getFirstRead } from "../ppu";
 import { writeVRam } from "../vram/vram";
 
 export const getNameTable = (nes: Nes): ReadData => {
@@ -124,6 +124,19 @@ export const write2007DataVRam = (data: number, nes: Nes): Nes => {
   const [nextAddr, nesNextAddr] = calcNewAddrVRam(_nes);
 
   return nesBuilder(nesNextAddr).addrVram(nextAddr).build();
+};
+
+export const read2007DataVRam = (nes: Nes): [data: number, nes: Nes] => {
+  if (getFirstRead(nes)) {
+    return [0, nesBuilder(nes).firstReadPpu(false).build()];
+  } else {
+    const [nextAddr, nesNextAddr] = calcNewAddrVRam(nes);
+    const [result, nesResult] = readSprRam(getAddrVRam(nes), nesNextAddr);
+    return [
+      result,
+      nesBuilder(nesResult).addrVram(nextAddr).firstReadPpu(true).build(),
+    ];
+  }
 };
 
 export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;

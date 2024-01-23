@@ -5,6 +5,7 @@ import {
   write2007DataVRam,
   write2004SprRam,
   read2004SprRam,
+  read2007DataVRam,
 } from "../ppu/registers/registers";
 import { write2005scroll } from "../ppu/scroll/scroll";
 
@@ -83,21 +84,26 @@ export const mirror8BytesWrite = (
   bus: Bus
 ) => mirrorBuilder(bus, write, read, ...buildMirrorArray8bytes(startAddr));
 
-const wrapperNoAddr =
+const wrapperNoAddrWrite =
   (write: (data: number, nes: Nes) => Nes): Write =>
   (addr, data, nes) =>
     write(data, nes);
+const wrapperNoAddrRead =
+  (read: (nes: Nes) => [number, Nes]): Read =>
+  (addr, nes) =>
+    read(nes);
 
 const selectRead = (addr: number): Read => {
   if (addr === 0x2004) return read2004SprRam;
+  if (addr === 0x2007) return wrapperNoAddrRead(read2007DataVRam);
   return simpleRead;
 };
 
 const selectWrite = (addr: number): Write => {
   if (addr === 0x2004) return write2004SprRam;
-  if (addr === 0x2005) return wrapperNoAddr(write2005scroll);
-  if (addr === 0x2006) return wrapperNoAddr(write2006AddrVRam);
-  if (addr === 0x2007) return wrapperNoAddr(write2007DataVRam);
+  if (addr === 0x2005) return wrapperNoAddrWrite(write2005scroll);
+  if (addr === 0x2006) return wrapperNoAddrWrite(write2006AddrVRam);
+  if (addr === 0x2007) return wrapperNoAddrWrite(write2007DataVRam);
   return simpleWrite;
 };
 

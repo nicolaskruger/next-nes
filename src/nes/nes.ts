@@ -181,6 +181,10 @@ const scrollStatus = (nes: Nes) => (status: ScrollStatus) => {
   return nesBuilder(nes).scroll({ ...getScroll(nes), status });
 };
 
+const firstReadPpu = (nes: Nes) => (firstRead: boolean) => {
+  return nesBuilder(nes).ppu({ firstRead } as Ppu);
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -209,6 +213,7 @@ function nesBuilder(nes: Nes) {
     scrollX: scrollX(nes),
     scrollStatus: scrollStatus(nes),
     scrollY: scrollY(nes),
+    firstReadPpu: firstReadPpu(nes),
   };
 }
 
