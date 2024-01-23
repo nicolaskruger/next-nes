@@ -151,7 +151,7 @@ export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
   return _nes;
 };
 
-export const read2004SprRam: Read = (addr, nes) => {
+export const read2004SprRam = (nes: Nes): [number, Nes] => {
   const [reg2003, nesReg2003] = read2003SprAddr(nes);
   return readSprRam(reg2003, nesReg2003);
 };

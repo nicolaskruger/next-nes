@@ -94,7 +94,7 @@ const wrapperNoAddrRead =
     read(nes);
 
 const selectRead = (addr: number): Read => {
-  if (addr === 0x2004) return read2004SprRam;
+  if (addr === 0x2004) return wrapperNoAddrRead(read2004SprRam);
   if (addr === 0x2007) return wrapperNoAddrRead(read2007DataVRam);
   return simpleRead;
 };
