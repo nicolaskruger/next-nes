@@ -1,4 +1,4 @@
-import { ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
+import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, initNes } from "@/nes/nes";
 import {
   getAmountIncrement,
@@ -22,9 +22,7 @@ import {
   getPpuRegisterStatus,
 } from "./registers";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
-import { readVRam } from "../vram/vram";
-import { write } from "fs";
-import { getFirstRead, getVRamAddr } from "../ppu";
+import { getFirstRead, getVRamAddr, readVRam } from "../vram/vram";
 
 const mutableGet = <T>(nes: Nes, get: (nes: Nes) => [T, Nes]): T => {
   const [data, _nes] = get(nes);

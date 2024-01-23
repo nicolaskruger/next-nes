@@ -2,8 +2,7 @@ import { Read, ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
-import { AddrVRamStatus, getFirstRead } from "../ppu";
-import { writeVRam } from "../vram/vram";
+import { AddrVRamStatus, getFirstRead, writeVRam } from "../vram/vram";
 
 export const getNameTable = (nes: Nes): ReadData => {
   const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
@@ -139,9 +138,9 @@ export const read2007DataVRam = (nes: Nes): [data: number, nes: Nes] => {
   }
 };
 
-export const getAddrVRam = (nes: Nes) => nes.ppu.addrVRam;
+export const getAddrVRam = (nes: Nes) => nes.ppu.vram.addr;
 
-export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.addrVramStatus;
+export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.vram.addrStatus;
 
 export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
   const [sprAddr, nesAddr] = read2003SprAddr(nes);

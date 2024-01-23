@@ -1,6 +1,7 @@
 import { Cpu } from "../cpu/cpu";
 import { Nes } from "../nes";
 import { initScroll } from "../ppu/scroll/scroll";
+import { initVram } from "../ppu/vram/vram";
 import {
   Bus,
   mirrorBuilder,
@@ -58,12 +59,9 @@ const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
   ppu: {
-    vram: [],
+    vram: initVram(),
     sprRam: [],
-    addrVRam: 0x0000,
-    addrVramStatus: "hight",
     scroll: initScroll(),
-    firstRead: true,
   },
 });
 

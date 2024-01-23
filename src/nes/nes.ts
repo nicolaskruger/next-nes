@@ -18,8 +18,9 @@ import {
   calculateCycles,
   pushToStack,
 } from "./cpu/instruction/instruction";
-import { Ppu, AddrVRamStatus, initPpu } from "./ppu/ppu";
+import { Ppu, initPpu } from "./ppu/ppu";
 import { Scroll, ScrollStatus, getScroll } from "./ppu/scroll/scroll";
+import { AddrVRamStatus, VRam } from "./ppu/vram/vram";
 
 type Nes = {
   cpu: Cpu;
@@ -124,39 +125,30 @@ export const getPpu = (nes: Nes) => nes.ppu;
 
 export const getVRam = (nes: Nes) => nes.ppu.vram;
 
+export const getVRamBus = (nes: Nes) => nes.ppu.vram.bus;
+
 const buildNesPpu = (nes: Nes, addr: number, value: number) => {
-  return {
-    ...nes,
-    ppu: {
-      ...getPpu(nes),
-      vram: getVRam(nes).map((b, bAddr) => {
-        if (addr === bAddr) return { ...b, data: value };
-        return b;
-      }),
-    },
+  getVRamBus(nes)[addr] = {
+    ...getVRamBus(nes)[addr],
+    data: value,
   };
+  return nes;
 };
 
 const bussPpu = (nes: Nes) => (addr: number, value: number) => {
   return nesBuilder(buildNesPpu(nes, addr, value));
 };
 
-const ppuRegister = (nes: Nes) => (value: number) => {
-  return nesBuilder({ ...nes, ppu: { ...nes.ppu, addrVRam: value } });
+const vram = (nes: Nes) => (vram: VRam) => {
+  return nesBuilder(nes).ppu({ vram: { ...getVRam(nes), ...vram } } as Ppu);
 };
 
-const ppuStatusRegister = (nes: Nes) => (status: AddrVRamStatus) => {
-  return nesBuilder({ ...nes, ppu: { ...nes.ppu, addrVramStatus: status } });
+const addrVram = (nes: Nes) => (value: number) => {
+  return nesBuilder(nes).vram({ addr: value } as VRam);
 };
 
-const addrVram = (nes: Nes) => (data: number) => {
-  return nesBuilder({
-    ...nes,
-    ppu: {
-      ...nes.ppu,
-      addrVRam: data,
-    },
-  });
+const addrStatusVRam = (nes: Nes) => (status: AddrVRamStatus) => {
+  return nesBuilder(nes).vram({ addrStatus: status } as VRam);
 };
 
 const ppu = (nes: Nes) => (ppu: Ppu) => {
@@ -182,7 +174,7 @@ const scrollStatus = (nes: Nes) => (status: ScrollStatus) => {
 };
 
 const firstReadPpu = (nes: Nes) => (firstRead: boolean) => {
-  return nesBuilder(nes).ppu({ firstRead } as Ppu);
+  return nesBuilder(nes).vram({ firstRead } as VRam);
 };
 
 function nesBuilder(nes: Nes) {
@@ -204,9 +196,9 @@ function nesBuilder(nes: Nes) {
     build: () => nes,
     allBus: allBus(nes),
     directWrite: directWriteBus(nes),
-    vram: bussPpu(nes),
-    ppuRegister: ppuRegister(nes),
-    ppuStatusRegister: ppuStatusRegister(nes),
+    vramBus: bussPpu(nes),
+    ppuRegister: addrVram(nes),
+    ppuStatusRegister: addrStatusVRam(nes),
     addrVram: addrVram(nes),
     ppu: ppu(nes),
     scroll: scroll(nes),
@@ -214,6 +206,7 @@ function nesBuilder(nes: Nes) {
     scrollStatus: scrollStatus(nes),
     scrollY: scrollY(nes),
     firstReadPpu: firstReadPpu(nes),
+    vram: vram(nes),
   };
 }
 
