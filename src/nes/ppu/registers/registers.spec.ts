@@ -208,6 +208,6 @@ describe("PPU registers", () => {
     nes = writeBusNes(0x2007, 0xff, nes);
 
     expect(getPpuAddrVRam(nes)).toBe(0x1254);
-    expect(readVRam(0x1234, nes)).toBe(0xff);
+    expect(readVRam(0x1234, nes)[0]).toBe(0xff);
   });
 });
