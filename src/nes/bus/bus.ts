@@ -6,6 +6,7 @@ import {
   write2004SprRam,
   read2004SprRam,
 } from "../ppu/registers/registers";
+import { write2005scroll } from "../ppu/scroll/scroll";
 
 export type ReadData = [number, Nes];
 
@@ -94,6 +95,7 @@ const selectRead = (addr: number): Read => {
 
 const selectWrite = (addr: number): Write => {
   if (addr === 0x2004) return write2004SprRam;
+  if (addr === 0x2005) return wrapperNoAddr(write2005scroll);
   if (addr === 0x2006) return wrapperNoAddr(write2006AddrVRam);
   if (addr === 0x2007) return wrapperNoAddr(write2007DataVRam);
   return simpleWrite;

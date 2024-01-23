@@ -1,4 +1,5 @@
 import { Bus } from "../bus/bus";
+import { Scroll, initScroll } from "./scroll/scroll";
 import { initSprRam } from "./spr-ram/spr-ram";
 import { initPpuVRam } from "./vram/vram";
 
@@ -9,6 +10,7 @@ type Ppu = {
   sprRam: Bus;
   addrVramStatus: AddrVRamStatus;
   addrVRam: number;
+  scroll: Scroll;
 };
 
 const initPpu = (): Ppu => ({
@@ -16,6 +18,7 @@ const initPpu = (): Ppu => ({
   sprRam: initSprRam(),
   addrVramStatus: "hight",
   addrVRam: 0x0000,
+  scroll: initScroll(),
 });
 
 export { initPpu };

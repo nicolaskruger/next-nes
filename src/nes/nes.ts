@@ -19,6 +19,7 @@ import {
   pushToStack,
 } from "./cpu/instruction/instruction";
 import { Ppu, AddrVRamStatus, initPpu } from "./ppu/ppu";
+import { Scroll, ScrollStatus, getScroll } from "./ppu/scroll/scroll";
 
 type Nes = {
   cpu: Cpu;
@@ -158,6 +159,28 @@ const addrVram = (nes: Nes) => (data: number) => {
   });
 };
 
+const ppu = (nes: Nes) => (ppu: Ppu) => {
+  return nesBuilder({ ...nes, ppu: { ...nes.ppu, ...ppu } });
+};
+
+const scroll = (nes: Nes) => (scroll: Scroll) => {
+  return nesBuilder(nes).ppu({
+    scroll: { ...getScroll(nes), ...scroll },
+  } as Ppu);
+};
+
+const scrollX = (nes: Nes) => (data: number) => {
+  return nesBuilder(nes).scroll({ ...getScroll(nes), x: data });
+};
+
+const scrollY = (nes: Nes) => (data: number) => {
+  return nesBuilder(nes).scroll({ ...getScroll(nes), y: data });
+};
+
+const scrollStatus = (nes: Nes) => (status: ScrollStatus) => {
+  return nesBuilder(nes).scroll({ ...getScroll(nes), status });
+};
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -181,6 +204,11 @@ function nesBuilder(nes: Nes) {
     ppuRegister: ppuRegister(nes),
     ppuStatusRegister: ppuStatusRegister(nes),
     addrVram: addrVram(nes),
+    ppu: ppu(nes),
+    scroll: scroll(nes),
+    scrollX: scrollX(nes),
+    scrollStatus: scrollStatus(nes),
+    scrollY: scrollY(nes),
   };
 }
 

@@ -1,5 +1,6 @@
 import { Cpu } from "../cpu/cpu";
 import { Nes } from "../nes";
+import { initScroll } from "../ppu/scroll/scroll";
 import {
   Bus,
   mirrorBuilder,
@@ -56,7 +57,13 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [], sprRam: [], addrVRam: 0x0000, addrVramStatus: "hight" },
+  ppu: {
+    vram: [],
+    sprRam: [],
+    addrVRam: 0x0000,
+    addrVramStatus: "hight",
+    scroll: initScroll(),
+  },
 });
 
 describe("BUS", () => {
@@ -144,7 +151,7 @@ describe("BUS", () => {
     let nes = initNes();
     nes.bus = initBusSimple();
 
-    nes.bus = mirror8BytesWrite(simpleWrite, 0x2000, nes.bus);
+    nes.bus = mirror8BytesWrite(simpleWrite, simpleRead, 0x2000, nes.bus);
     nes = writeBusNes(0x2000, 2, nes);
 
     expect(readBusNes(0x2000, nes)[0]).toBe(2);
