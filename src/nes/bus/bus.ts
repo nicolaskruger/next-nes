@@ -6,6 +6,8 @@ import {
   write2004SprRam,
   read2004SprRam,
   read2007DataVRam,
+  DMA,
+  write4014DMA,
 } from "../ppu/registers/registers";
 import { write2005scroll } from "../ppu/scroll/scroll";
 
@@ -22,6 +24,8 @@ type OperatorBus = {
   write: Write;
   data: number;
 };
+
+export const getNesBus = (nes: Nes) => nes.bus;
 
 const simpleRead: Read = (addr, nes) => [nes.bus[addr].data, nes];
 
@@ -126,6 +130,10 @@ export const initBus = (): Bus => {
   for (let addr = 0x2000; addr <= 0x2007; addr++) {
     bus = mirror8BytesWrite(selectWrite(addr), selectRead(addr), addr, bus);
   }
+  bus[DMA] = {
+    ...bus[DMA],
+    write: wrapperNoAddrWrite(write4014DMA),
+  };
   return bus;
 };
 

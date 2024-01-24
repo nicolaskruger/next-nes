@@ -43,6 +43,12 @@ const testFlag = (
   expect(isMutable(nes)).toBe(true);
 };
 
+const mutateReadSpr = (addr: number, nes: Nes): number => {
+  const [data, _nes] = readSprRam(addr, nes);
+  nes = _nes;
+  return data;
+};
+
 describe("PPU registers", () => {
   let nes: Nes;
 
@@ -224,5 +230,14 @@ describe("PPU registers", () => {
     expect(result).toBe(0x12);
     expect(getVRamAddr(nesResult)).toBe(0x100);
     expect(getFirstRead(nesResult)).toBe(true);
+  });
+
+  test("write 4014", () => {
+    nes = writeBusNes(0x00, 0x0e, nes);
+    nes = writeBusNes(0xff, 0x0f, nes);
+    nes = writeBusNes(0x4014, 0x00, nes);
+
+    expect(mutateReadSpr(0x00, nes)).toBe(0x0e);
+    expect(mutateReadSpr(0xff, nes)).toBe(0x0f);
   });
 });

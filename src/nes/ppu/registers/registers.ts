@@ -1,8 +1,15 @@
-import { Read, ReadData, readBusNes, writeBusNes } from "@/nes/bus/bus";
+import {
+  Read,
+  ReadData,
+  getNesBus,
+  readBusNes,
+  writeBusNes,
+} from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
 import { AddrVRamStatus, getFirstRead, writeVRam } from "../vram/vram";
+import { repeat } from "@/nes/helper/repeat";
 
 export const getNameTable = (nes: Nes): ReadData => {
   const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
@@ -153,4 +160,25 @@ export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
 export const read2004SprRam = (nes: Nes): [number, Nes] => {
   const [reg2003, nesReg2003] = read2003SprAddr(nes);
   return readSprRam(reg2003, nesReg2003);
+};
+
+export const DMA = 0x4014;
+
+type Read4014 = [number[], Nes];
+
+const selectPage = (page: number, index: number) => (page << 8) | index;
+
+export const write4014DMA = (value: number, nes: Nes): Nes => {
+  getNesBus(nes)[DMA].data = value;
+  const [arrRead, nesRead] = repeat(0x100).reduce(
+    (acc, _, i) => {
+      const [arr, nesAcc] = acc;
+      const [mem, _nes] = readBusNes(selectPage(value, i), nesAcc);
+      return [[...arr, mem], _nes] as Read4014;
+    },
+    [[], nes] as Read4014
+  );
+  return arrRead.reduce((acc, value, i) => {
+    return writeSprRam(i, value, acc);
+  }, nesRead);
 };
