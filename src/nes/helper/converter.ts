@@ -9,6 +9,9 @@ const dexToHexTwoDigitsNoPrefix = (value: number) => dexToHex(value, 2, false);
 
 const dexToHexFourDigitsNoPrefix = (value: number) => dexToHex(value, 4, false);
 
+export const dexToHexSixDigitsPrefixHash = (value: number) =>
+  "#" + dexToHex(value, 6, false);
+
 const hexToDex = (value: string) => Number(`0x${value}`);
 
 export {
