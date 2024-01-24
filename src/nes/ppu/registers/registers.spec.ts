@@ -44,10 +44,13 @@ const testFlag = (
 };
 
 describe("PPU registers", () => {
+  let nes: Nes;
+
+  beforeEach(() => {
+    nes = initNes();
+  });
   test("0x2000 bit 0-1 name table", () => {
     const mutableGetNameTable = (nes: Nes) => mutableGet(nes, getNameTable);
-
-    let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
     expect(mutableGetNameTable(nes)).toBe(0x2000);
@@ -62,8 +65,6 @@ describe("PPU registers", () => {
     expect(mutableGetNameTable(nes)).toBe(0x2c00);
   });
   test("0x2000 bit 2 amount", () => {
-    let nes = initNes();
-
     const mutableGetAmountIncrement = (nes: Nes) =>
       mutableGet(nes, getAmountIncrement);
 
@@ -79,8 +80,6 @@ describe("PPU registers", () => {
     const mutableGetPatternTableSprite = (nes: Nes) =>
       mutableGet(nes, getPatternTableSprite);
 
-    let nes = initNes();
-
     nes = writeBusNes(0x2000, 0, nes);
 
     expect(mutableGetPatternTableSprite(nes)).toBe(0);
@@ -93,7 +92,6 @@ describe("PPU registers", () => {
   test("0x2000 bit 4 pattern table background", () => {
     const mutableGetPatternTableBackground = (nes: Nes) =>
       mutableGet(nes, getPatternTableBackground);
-    let nes = initNes();
 
     nes = writeBusNes(0x200, 0, nes);
 
@@ -107,8 +105,6 @@ describe("PPU registers", () => {
   test("0x2000 bit 5", () => {
     const mutableGetSizeOfSprite = (nes: Nes) =>
       mutableGet(nes, getSizeOfSprite);
-
-    let nes = initNes();
 
     nes = writeBusNes(0x2000, 0, nes);
 
@@ -125,8 +121,6 @@ describe("PPU registers", () => {
 
   test("0x2001 bit 0 color mode", () => {
     const mutateGetColorMode = (nes: Nes) => mutableGet(nes, getColorMode);
-
-    let nes = initNes();
 
     nes = writeBusNes(0x2001, 0, nes);
 
@@ -170,16 +164,12 @@ describe("PPU registers", () => {
   });
 
   test("read, spr addr", () => {
-    let nes = initNes();
-
     nes = writeBusNes(0x2003, 4, nes);
 
     expect(read2003SprAddr(nes)[0]).toBe(4);
   });
 
   test("write spr register", () => {
-    let nes = initNes();
-
     nes = writeBusNes(0x2003, 0x0f, nes);
     nes = writeBusNes(0x2004, 0x0e, nes);
 
@@ -187,8 +177,6 @@ describe("PPU registers", () => {
   });
 
   test("write register", () => {
-    let nes = initNes();
-
     nes = write2006AddrVRam(0x12, nes);
 
     expect(getPpuRegisterStatus(nes)).toBe("low");
@@ -200,8 +188,6 @@ describe("PPU registers", () => {
   });
 
   test("should write to ppu VRAM", () => {
-    let nes = initNes();
-
     nes = writeBusNes(0x2006, 0x12, nes);
     nes = writeBusNes(0x2006, 0x34, nes);
     nes = writeBusNes(0x2000, 1 << 2, nes);
@@ -212,8 +198,6 @@ describe("PPU registers", () => {
   });
 
   test("read 2004 spr ram", () => {
-    let nes = initNes();
-
     nes = writeBusNes(0x2003, 0x12, nes);
     nes = writeSprRam(0x12, 0x34, nes);
 
@@ -223,8 +207,6 @@ describe("PPU registers", () => {
   });
 
   test("read 2007 vram", () => {
-    let nes = initNes();
-
     nes = writeSprRam(0xff, 0x12, nes);
     nes = writeBusNes(0x2006, 0x00, nes);
     nes = writeBusNes(0x2006, 0xff, nes);
