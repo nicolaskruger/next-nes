@@ -49,6 +49,7 @@ export const mirrorBuilder = (
   ...mirror: number[]
 ): Bus => {
   const [addr] = mirror;
+
   mirror.forEach((m) => {
     bus[m] = {
       ...bus[m],

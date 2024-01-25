@@ -1,5 +1,7 @@
 import { Bus, Read, mirrorBuilder } from "@/nes/bus/bus";
+import { toBinary8Bits } from "@/nes/helper/binary";
 import { pa, paOfPa } from "@/nes/helper/pa";
+import { repeat } from "@/nes/helper/repeat";
 import { Nes, getVRamBus as getVRamBus, nesBuilder } from "@/nes/nes";
 
 export type AddrVRamStatus = "low" | "hight";
@@ -60,6 +62,20 @@ const mirrorBuilderVram: MirrorBuilderPpu[] = [
       ),
   },
   {
+    isInRange: (addr) => addr === 0x3f00,
+    bussBuilder: (addr, bus) =>
+      mirrorBuilder(
+        bus,
+        simpleWriteVRam,
+        simpleReadVRam,
+        ...paOfPa(paOfPa(pa(addr, 0x0004, 8), 0x0020, 7), 0x4000, 4)
+      ),
+  },
+  {
+    isInRange: (addr) => pa(0x3f04, 0x04, 7).includes(addr),
+    bussBuilder: (addr, bus) => bus,
+  },
+  {
     isInRange: (addr) => isInRange(addr, 0x3f00, 0x3f1f),
     bussBuilder: (addr, bus) =>
       mirrorBuilder(
@@ -87,14 +103,11 @@ const mirrorBuilderVram: MirrorBuilderPpu[] = [
 ];
 
 const initPpuVRam = (): Bus => {
-  let bus = "_"
-    .repeat(0x10000)
-    .split("")
-    .map((_) => ({
-      data: 0,
-      read: simpleReadVRam,
-      write: simpleWriteVRam,
-    }));
+  let bus = repeat(0x10000).map((_) => ({
+    data: 0,
+    read: simpleReadVRam,
+    write: simpleWriteVRam,
+  }));
 
   for (let addr = 0x0000; addr <= 0x3fff; addr++) {
     bus = mirrorBuilderVram
@@ -102,6 +115,36 @@ const initPpuVRam = (): Bus => {
       ?.bussBuilder(addr, bus) as Bus;
   }
   return bus;
+};
+
+type GetPatter = (index: number, nes: Nes) => number[][];
+
+export const getTileBackground: GetPatter = (index, nes) => {
+  const getStartIndex = () => index * 0x10;
+
+  const readPosTableOne = (pos: number) => getStartIndex() + pos;
+  const readPosTableTwo = (pos: number) => getStartIndex() + pos + 8;
+
+  const sumData = (a: number, b: number) => {
+    const aBinary = toBinary8Bits(a);
+    const bBinary = toBinary8Bits(b);
+    return aBinary.map((v, i) => v | (bBinary[i] << 1));
+  };
+
+  return repeat(8).reduce(
+    ({ nes, arr }, _, pos) => {
+      const [dataTableOne, nesTableOne] = readVRam(readPosTableOne(pos), nes);
+      const [dataTableTwo, nesTableTwo] = readVRam(
+        readPosTableTwo(pos),
+        nesTableOne
+      );
+      return {
+        nes: nesTableTwo,
+        arr: [...arr, sumData(dataTableOne, dataTableTwo)],
+      };
+    },
+    { nes, arr: [] } as { arr: number[][]; nes: Nes }
+  ).arr;
 };
 
 export { initPpuVRam, readVRam, writeVRam };
