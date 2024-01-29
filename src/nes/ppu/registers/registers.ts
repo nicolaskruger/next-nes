@@ -1,10 +1,4 @@
-import {
-  Read,
-  ReadData,
-  getNesBus,
-  readBusNes,
-  writeBusNes,
-} from "@/nes/bus/bus";
+import { ReadData, getNesBus, readBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";

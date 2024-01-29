@@ -117,7 +117,9 @@ const initPpuVRam = (): Bus => {
   return bus;
 };
 
-type GetPatter = (index: number, nes: Nes) => number[][];
+type Tile = number[][];
+
+type GetPatter = (index: number, nes: Nes) => Tile;
 
 export const getTileBackground: GetPatter = (index, nes) => {
   const getStartIndex = () => index * 0x10;
@@ -145,6 +147,18 @@ export const getTileBackground: GetPatter = (index, nes) => {
     },
     { nes, arr: [] } as { arr: number[][]; nes: Nes }
   ).arr;
+};
+
+export type ReadNameTable = [number[], Nes];
+
+export const readNameTable = (nameTable: number, nes: Nes): ReadNameTable => {
+  return repeat(0x3c0).reduce(
+    ([values, nes], _, index) => {
+      const [data, _nes] = readVRam(index + nameTable, nes);
+      return [[...values, data], _nes] as ReadNameTable;
+    },
+    [[], nes] as ReadNameTable
+  );
 };
 
 export { initPpuVRam, readVRam, writeVRam };
