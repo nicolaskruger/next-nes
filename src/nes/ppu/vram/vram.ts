@@ -149,16 +149,28 @@ export const getTileBackground: GetPatter = (index, nes) => {
   ).arr;
 };
 
+export type ReadRange = [number[], Nes];
 export type ReadNameTable = [number[], Nes];
 
-export const readNameTable = (nameTable: number, nes: Nes): ReadNameTable => {
-  return repeat(0x3c0).reduce(
+export const readRangeVRam = (startIndex: number, length: number, nes: Nes) => {
+  return repeat(length).reduce(
     ([values, nes], _, index) => {
-      const [data, _nes] = readVRam(index + nameTable, nes);
+      const [data, _nes] = readVRam(index + startIndex, nes);
       return [[...values, data], _nes] as ReadNameTable;
     },
     [[], nes] as ReadNameTable
   );
+};
+
+export const readNameTable = (nameTable: number, nes: Nes): ReadNameTable => {
+  return readRangeVRam(nameTable, 0x3c0, nes);
+};
+
+export const readAttributeTable = (
+  attributeTable: number,
+  nes: Nes
+): ReadRange => {
+  return readRangeVRam(attributeTable, 0x40, nes);
 };
 
 export { initPpuVRam, readVRam, writeVRam };

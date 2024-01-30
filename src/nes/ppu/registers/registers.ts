@@ -11,6 +11,11 @@ export const getNameTable = (nes: Nes): ReadData => {
   return [[0x2000, 0x2400, 0x2800, 0x2c00][data], nesReg2000];
 };
 
+export const getAttributeTable = (nes: Nes): ReadData => {
+  const [nameTable, _nes] = getNameTable(nes);
+  return [nameTable + 0x3c0, _nes];
+};
+
 export const getAmountIncrement = (nes: Nes): ReadData => {
   const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
   const data = (reg2000 >> 2) & 1;
