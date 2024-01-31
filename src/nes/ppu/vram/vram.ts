@@ -117,11 +117,11 @@ const initPpuVRam = (): Bus => {
   return bus;
 };
 
-type Tile = number[][];
+type Tile = [number[][], Nes];
 
 type GetPatter = (index: number, nes: Nes) => Tile;
 
-export const getTileBackground: GetPatter = (index, nes) => {
+export const getTile: GetPatter = (index, nes) => {
   const getStartIndex = () => index * 0x10;
 
   const readPosTableOne = (pos: number) => getStartIndex() + pos;
@@ -133,7 +133,7 @@ export const getTileBackground: GetPatter = (index, nes) => {
     return aBinary.map((v, i) => v | (bBinary[i] << 1));
   };
 
-  return repeat(8).reduce(
+  const { nes: _nes, arr } = repeat(8).reduce(
     ({ nes, arr }, _, pos) => {
       const [dataTableOne, nesTableOne] = readVRam(readPosTableOne(pos), nes);
       const [dataTableTwo, nesTableTwo] = readVRam(
@@ -146,7 +146,8 @@ export const getTileBackground: GetPatter = (index, nes) => {
       };
     },
     { nes, arr: [] } as { arr: number[][]; nes: Nes }
-  ).arr;
+  );
+  return [arr, _nes];
 };
 
 export type ReadRange = [number[], Nes];

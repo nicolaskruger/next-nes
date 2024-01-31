@@ -1,13 +1,22 @@
 import { Nes } from "@/nes/nes";
 import { getAttributeTable, getNameTable } from "../registers/registers";
-import { readAttributeTable, readNameTable } from "../vram/vram";
+import {
+  getTile,
+  readAttributeTable,
+  readNameTable,
+  readVRam,
+} from "../vram/vram";
 import { repeat } from "@/nes/helper/repeat";
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
+import { colorToHex } from "../color/color";
 
 export type NameTable = number[][];
 export type NameTableReturn = [NameTable, Nes];
 export type AttributeTable = NameTable;
 export type AttributeTableReturn = NameTableReturn;
+export type Background = string[][];
+export type BackgroundReturn = [Background, Nes];
+export type Tile = string[][];
 
 export const renderNameTable = (nes: Nes): NameTableReturn => {
   const [nameTableIndex, nesNameTableIndex] = getNameTable(nes);
@@ -68,4 +77,34 @@ export const renderAttributeTable = (nes: Nes): AttributeTableReturn => {
     attributeTable
   );
   return [multiplyMatrix(attributeTable, 2), nesAttributeTable];
+};
+
+const getColors = (index: number, nes: Nes): [string[], Nes] => {
+  const { colors, nes: _nes } = repeat(4).reduce(
+    (acc, _, i) => {
+      const [color, _nes] = readVRam(index + i, acc.nes);
+      return {
+        nes: _nes,
+        colors: [...acc.colors, colorToHex(color)],
+      };
+    },
+    { nes, colors: [] } as { nes: Nes; colors: string[] }
+  );
+
+  return [colors, nes];
+};
+
+export const renderTile = (
+  nes: Nes,
+  tileIndex: number,
+  palletIndex: number
+): [Tile, Nes] => {
+  const [tile, nesTile] = getTile(tileIndex, nes);
+  const [colors, nesColors] = getColors(palletIndex, nesTile);
+
+  return [tile.map((line) => line.map((v) => colors[v])), nesColors];
+};
+
+export const renderBackGround = (nes: Nes): BackgroundReturn => {
+  throw new Error("not implemented");
 };

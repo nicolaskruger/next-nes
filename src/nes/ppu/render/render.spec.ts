@@ -1,7 +1,6 @@
 import { Nes, initNes } from "@/nes/nes";
-import { renderAttributeTable, renderNameTable } from "./render";
+import { renderAttributeTable, renderNameTable, renderTile } from "./render";
 import { writeVRam } from "../vram/vram";
-import { getNameTable } from "../registers/registers";
 
 const binaryToInt = (binary: string) => parseInt(binary, 2);
 

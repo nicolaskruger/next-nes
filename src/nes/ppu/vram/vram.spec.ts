@@ -1,5 +1,5 @@
 import { Nes, initNes } from "@/nes/nes";
-import { getTileBackground, readVRam, writeVRam } from "./vram";
+import { getTile, readVRam, writeVRam } from "./vram";
 import { parse } from "path";
 
 const readVRamMutate = (addr: number, nes: Nes): number => {
@@ -212,7 +212,7 @@ describe("ppu bus", () => {
     nes = writeVRamBinary(0x000e, "01000010", nes);
     nes = writeVRamBinary(0x000f, "00000000", nes);
 
-    expect(getTileBackground(0, nes)).toStrictEqual([
+    expect(getTile(0, nes)[0]).toStrictEqual([
       [0, 0, 2, 2, 2, 2, 0, 0],
       [0, 2, 2, 2, 2, 2, 2, 0],
       [0, 2, 2, 2, 2, 2, 2, 0],
