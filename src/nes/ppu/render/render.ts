@@ -2,6 +2,7 @@ import { Nes } from "@/nes/nes";
 import { getAttributeTable, getNameTable } from "../registers/registers";
 import { readAttributeTable, readNameTable } from "../vram/vram";
 import { repeat } from "@/nes/helper/repeat";
+import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 
 export type NameTable = number[][];
 export type NameTableReturn = [NameTable, Nes];
@@ -26,7 +27,7 @@ export const renderNameTable = (nes: Nes): NameTableReturn => {
 };
 
 const splitBinary = (binary: number) =>
-  repeat(4).map((_, index) => (binary >> (3 - index)) & ((1 << 1) | 1));
+  repeat(4).map((_, index) => (binary >> (2 * index)) & ((1 << 1) | 1));
 
 export const renderAttributeTable = (nes: Nes): AttributeTableReturn => {
   const [attributeTableIndex, nesAttributeTableIndex] = getAttributeTable(nes);
@@ -44,20 +45,27 @@ export const renderAttributeTable = (nes: Nes): AttributeTableReturn => {
   attributeTable = attributeTableData.reduce<AttributeTable>(
     (acc, curr, index) => {
       const colum = 16;
-      const line = 15;
       const [a, b, c, d] = splitBinary(curr);
+      const getNextX = () => ((index * 2) % colum) + 1;
+      const getNextY = () => Math.floor((index * 2) / colum) * 2 + 1;
+      const getCurrX = () => (index * 2) % colum;
+      const getCurrY = () => Math.floor((index * 2) / colum) * 2;
+      const isLastLine = () => index / 8 >= 7;
       const getIndex = () => [
-        { y: Math.floor(index / line), x: index * colum, value: a },
-        { y: Math.floor(index / line), x: index * colum + 1, value: b },
-        { y: Math.floor(index / line) + 1, x: index * colum, value: c },
-        { y: Math.floor(index / line) + 1, x: index * colum + 1, value: d },
+        { y: getCurrY(), x: getCurrX(), value: a },
+        { y: getCurrY(), x: getNextX(), value: b },
+        { y: getNextY(), x: getCurrX(), value: c },
+        { y: getNextY(), x: getNextX(), value: d },
       ];
 
-      return getIndex().reduce((att, { value, x, y }) => {
-        att[y][x] = value;
-        return att;
-      }, acc as AttributeTable);
+      return getIndex()
+        .slice(0, isLastLine() ? 2 : 4)
+        .reduce((att, { value, x, y }) => {
+          att[y][x] = value;
+          return att;
+        }, acc);
     },
-    attributeTable as AttributeTable
+    attributeTable
   );
+  return [multiplyMatrix(attributeTable, 2), nesAttributeTable];
 };
