@@ -105,6 +105,49 @@ export const renderTile = (
   return [tile.map((line) => line.map((v) => colors[v])), nesColors];
 };
 
+export const initMatrix = <T>(
+  value: T,
+  xSize: number,
+  ySize: number
+): T[][] => {
+  return repeat(ySize).map((_) => repeat(xSize).map((_) => value));
+};
+
+export const renderTileOnScreen = <T>(
+  screen: T[][],
+  tile: T[][],
+  y: number,
+  x: number
+): T[][] => {
+  const tileExceedsY = tile.length + y > screen.length;
+  const tileExceedsX = tile[0].length + x > screen[0].length;
+  if (tileExceedsX || tileExceedsY) throw new Error("tile out of range");
+  for (let yTile = 0; yTile < tile.length; yTile++)
+    for (let xTile = 0; xTile < tile[yTile].length; xTile++) {
+      const xScreen = xTile + x;
+      const yScreen = yTile + y;
+      screen[yScreen][xScreen] = tile[yTile][xTile];
+    }
+  return screen;
+};
+
 export const renderBackGround = (nes: Nes): BackgroundReturn => {
-  throw new Error("not implemented");
+  const [nameTable, nesNameTable] = renderNameTable(nes);
+  const [attributeTable, nesAttributeTable] =
+    renderAttributeTable(nesNameTable);
+  const tileSize = 8;
+  let screen = initMatrix("", 256, 240);
+
+  let _nes = nesAttributeTable;
+  for (let y = 0; y < nameTable.length; y++)
+    for (let x = 0; x < nameTable[y].length; x++) {
+      const tileIndex = nameTable[y][x];
+      const palletIndex = attributeTable[y][x];
+      const [tile, nesTile] = renderTile(_nes, tileIndex, palletIndex);
+      const xScreen = x * tileSize;
+      const yScreen = y * tileSize;
+      _nes = nesTile;
+      screen = renderTileOnScreen(screen, tile, yScreen, xScreen);
+    }
+  return [screen, _nes];
 };

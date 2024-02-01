@@ -1,5 +1,11 @@
 import { Nes, initNes } from "@/nes/nes";
-import { renderAttributeTable, renderNameTable, renderTile } from "./render";
+import {
+  initMatrix,
+  renderAttributeTable,
+  renderNameTable,
+  renderTile,
+  renderTileOnScreen,
+} from "./render";
 import { writeVRam } from "../vram/vram";
 
 const binaryToInt = (binary: string) => parseInt(binary, 2);
@@ -59,5 +65,31 @@ describe("render", () => {
     attributeTable.forEach((table) => {
       expect(table.length).toBe(32);
     });
+  });
+
+  test("render tile on screen", () => {
+    let screen: number[][] = initMatrix(0, 4, 4);
+
+    const tile1 = initMatrix(1, 2, 2);
+    const tile2 = initMatrix(2, 2, 2);
+
+    screen = renderTileOnScreen(screen, tile1, 0, 0);
+    screen = renderTileOnScreen(screen, tile2, 2, 2);
+    expect(screen).toStrictEqual([
+      [1, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 0, 2, 2],
+      [0, 0, 2, 2],
+    ]);
+  });
+
+  test("should not render tile when out of range", () => {
+    let screen: number[][] = initMatrix(0, 4, 4);
+
+    const tile1 = initMatrix(1, 2, 2);
+
+    expect(() => {
+      renderTileOnScreen(screen, tile1, 3, 3);
+    }).toThrow("tile out of range");
   });
 });
