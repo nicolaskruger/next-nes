@@ -1,5 +1,15 @@
 import { Nes } from "../nes";
 import { writeVRam } from "../ppu/vram/vram";
+export const MUSHROOM_TILE = [
+  [0, 0, 2, 2, 2, 2, 0, 0],
+  [0, 2, 2, 2, 2, 2, 2, 0],
+  [0, 2, 2, 2, 2, 2, 2, 0],
+  [2, 2, 2, 2, 2, 2, 2, 2],
+  [2, 2, 2, 2, 2, 2, 2, 2],
+  [2, 2, 2, 2, 2, 2, 2, 2],
+  [0, 3, 1, 1, 1, 1, 3, 0],
+  [0, 0, 1, 1, 1, 1, 0, 0],
+];
 
 export const tileCreator = (index: number, tile: number[][], nes: Nes): Nes => {
   const divideIntoTwoByte = (tile: number[]): [number, number] => {
@@ -17,3 +27,5 @@ export const tileCreator = (index: number, tile: number[][], nes: Nes): Nes => {
     return writeVRam(index + offset + 8, b, nes);
   }, nes);
 };
+export const createMushroomTile = (index: number, nes: Nes) =>
+  tileCreator(index, MUSHROOM_TILE, nes);
