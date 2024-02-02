@@ -1,25 +1,42 @@
 import { colorCreator } from "@/nes/debug/color-creeator";
-import { createMushroomTile, tileCreator } from "@/nes/debug/tile-creator";
+import {
+  createGreenGround,
+  createGround,
+  createMushroomTile,
+} from "@/nes/debug/tile-creator";
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
-import { Nes, initNes } from "@/nes/nes";
+import { initNes } from "@/nes/nes";
 import { renderTile } from "@/nes/ppu/render/render";
-import { writeVRam } from "@/nes/ppu/vram/vram";
 import { render } from "@/nes/render/render";
 import { useEffect, useRef } from "react";
 
 export default function MushRoomTile() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasMushroom = useRef<HTMLCanvasElement>(null);
+  const canvasGround = useRef<HTMLCanvasElement>(null);
+  const canvasGreenGround = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     let nes = initNes();
 
     nes = colorCreator(0x3f00, nes, 0x3f, 0x28, 0x16, 0x27);
+    nes = colorCreator(0x3f04, nes, 0x3f, 0x8, 0x9, 0x18);
     nes = createMushroomTile(0, nes);
+    nes = createGround(0x10, nes);
+    nes = createGreenGround(0x20, nes);
+    const [mushRom] = renderTile(nes, 0, 0x3f00);
+    const [ground] = renderTile(nes, 0x1, 0x3f04);
+    const [green] = renderTile(nes, 0x2, 0x3f04);
 
-    const [tile] = renderTile(nes, 0, 0x3f00);
-
-    render(multiplyMatrix(tile, 10), canvasRef);
+    render(multiplyMatrix(mushRom, 10), canvasMushroom);
+    render(multiplyMatrix(ground, 10), canvasGround);
+    render(multiplyMatrix(green, 10), canvasGreenGround);
   }, []);
 
-  return <canvas ref={canvasRef} width={80} height={80} />;
+  return (
+    <>
+      <canvas ref={canvasMushroom} width={80} height={80} />
+      <canvas ref={canvasGreenGround} width={80} height={80} />
+      <canvas ref={canvasGround} width={80} height={80} />
+    </>
+  );
 }

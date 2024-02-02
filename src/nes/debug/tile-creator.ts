@@ -11,6 +11,28 @@ export const MUSHROOM_TILE = [
   [0, 0, 1, 1, 1, 1, 0, 0],
 ];
 
+export const GROUND = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+];
+
+export const GROUND_GREEN = [
+  [2, 2, 2, 2, 2, 2, 2, 2],
+  [2, 2, 1, 2, 1, 2, 1, 1],
+  [2, 1, 1, 1, 1, 2, 1, 1],
+  [1, 1, 1, 1, 1, 2, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+];
+
 export const tileCreator = (index: number, tile: number[][], nes: Nes): Nes => {
   const divideIntoTwoByte = (tile: number[]): [number, number] => {
     const extractByte = (func: (v: number) => number) => {
@@ -27,5 +49,12 @@ export const tileCreator = (index: number, tile: number[][], nes: Nes): Nes => {
     return writeVRam(index + offset + 8, b, nes);
   }, nes);
 };
+
+export const createGround = (index: number, nes: Nes) =>
+  tileCreator(index, GROUND, nes);
+
 export const createMushroomTile = (index: number, nes: Nes) =>
   tileCreator(index, MUSHROOM_TILE, nes);
+
+export const createGreenGround = (index: number, nes: Nes) =>
+  tileCreator(index, GROUND_GREEN, nes);

@@ -138,11 +138,13 @@ export const renderBackGround = (nes: Nes): BackgroundReturn => {
   const tileSize = 8;
   let screen = initMatrix("", 256, 240);
 
+  const attributeTableBgIndex = (index: number) => 0x3f00 + 4 * index;
+
   let _nes = nesAttributeTable;
   for (let y = 0; y < nameTable.length; y++)
     for (let x = 0; x < nameTable[y].length; x++) {
       const tileIndex = nameTable[y][x];
-      const palletIndex = attributeTable[y][x];
+      const palletIndex = attributeTableBgIndex(attributeTable[y][x]);
       const [tile, nesTile] = renderTile(_nes, tileIndex, palletIndex);
       const xScreen = x * tileSize;
       const yScreen = y * tileSize;
