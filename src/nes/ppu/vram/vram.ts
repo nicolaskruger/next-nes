@@ -153,6 +153,17 @@ export const getTile: GetPatter = (index, nes) => {
 export type ReadRange = [number[], Nes];
 export type ReadNameTable = [number[], Nes];
 
+export const writeRangeVRam = (
+  startIndex: number,
+  values: number[],
+  nes: Nes
+): Nes => {
+  return values.reduce(
+    (acc, curr, index) => writeVRam(startIndex + index, curr, acc),
+    nes
+  );
+};
+
 export const readRangeVRam = (startIndex: number, length: number, nes: Nes) => {
   return repeat(length).reduce(
     ([values, nes], _, index) => {

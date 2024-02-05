@@ -7,7 +7,7 @@ import {
   createGround,
   createMushroomTile,
 } from "./tile-creator";
-import { writeVRam } from "../ppu/vram/vram";
+import { writeRangeVRam, writeVRam } from "../ppu/vram/vram";
 
 export const createAttributeTable = (
   index: number,
@@ -22,7 +22,7 @@ export const createAttributeTable = (
   ];
   let result = nes;
   let addr = 0;
-  for (let y = 0; y < 16; y += 2)
+  for (let y = 0; y < 15; y += 2)
     for (let x = 0; x < 16; x += 2) {
       const slice = y === 14 ? 2 : 4;
       const value = combination(y, x)
@@ -34,13 +34,22 @@ export const createAttributeTable = (
   return result;
 };
 
+export const createNameTable = (
+  index: number,
+  nameTable: number[][],
+  nes: Nes
+): Nes => {
+  const values = nameTable.reduce((acc, curr) => [...acc, ...curr], []);
+  return writeRangeVRam(index, values, nes);
+};
+
 export const createMushroomWord = () => {
   const nameTable = initMatrix(0, 32, 30);
   const attributeTable = initMatrix(0, 16, 15);
 
-  nameTable[27] = repeat(30).map((_) => 1);
-  nameTable[28] = repeat(30).map((_) => 2);
-  nameTable[29] = repeat(30).map((_) => 3);
+  nameTable[27] = repeat(32).map((_) => 1);
+  nameTable[28] = repeat(32).map((_) => 2);
+  nameTable[29] = repeat(32).map((_) => 3);
   attributeTable[14] = repeat(16).map((_) => 1);
 
   let nes = initNes();
@@ -51,4 +60,7 @@ export const createMushroomWord = () => {
   nes = createMushroomTile(0x10, nes);
   nes = createGreenGround(0x20, nes);
   nes = createGround(0x30, nes);
+  nes = createNameTable(0x2000, nameTable, nes);
+  nes = createAttributeTable(0x23c0, attributeTable, nes);
+  return nes;
 };

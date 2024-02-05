@@ -2,11 +2,15 @@ import { Nes, initNes } from "@/nes/nes";
 import {
   initMatrix,
   renderAttributeTable,
+  renderBackGround,
   renderNameTable,
   renderTile,
   renderTileOnScreen,
 } from "./render";
-import { writeVRam } from "../vram/vram";
+import { readRangeVRam, readVRam, writeVRam } from "../vram/vram";
+import { createMushroomWord } from "@/nes/debug/background-creator";
+import { repeat } from "@/nes/helper/repeat";
+import { getAttributeTable } from "../registers/registers";
 
 const binaryToInt = (binary: string) => parseInt(binary, 2);
 
@@ -91,5 +95,41 @@ describe("render", () => {
     expect(() => {
       renderTileOnScreen(screen, tile1, 3, 3);
     }).toThrow("tile out of range");
+  });
+
+  test("render mushroom word", () => {
+    nes = createMushroomWord();
+
+    const [world, nesWorld] = renderBackGround(nes);
+
+    nes = nesWorld;
+
+    const [arr, colorNes] = readRangeVRam(0x3f00, 8, nes);
+
+    nes = colorNes;
+
+    const [mushRoom, nesMushroom] = readRangeVRam(0x2360, 0x20, nes);
+
+    nes = nesMushroom;
+
+    const [green, nesGreen] = readRangeVRam(0x2380, 0x20, nes);
+
+    nes = nesGreen;
+
+    const [ground, nesGround] = readRangeVRam(0x23a0, 0x20, nes);
+
+    nes = nesGround;
+
+    expect(arr).toStrictEqual([0x3f, 0x28, 0x16, 0x27, 0x3f, 0x8, 0x9, 0x18]);
+    expect(mushRoom).toStrictEqual(repeat(32).map((_) => 1));
+    expect(green).toStrictEqual(repeat(32).map((_) => 2));
+    expect(ground).toStrictEqual(repeat(32).map((_) => 3));
+
+    const [att, attNes] = renderAttributeTable(nes);
+
+    nes = attNes;
+
+    expect(att[28]).toStrictEqual(repeat(32).map((_) => 1));
+    expect(att[29]).toStrictEqual(repeat(32).map((_) => 1));
   });
 });
