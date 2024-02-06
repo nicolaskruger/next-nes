@@ -9,6 +9,8 @@ import {
 import { repeat } from "@/nes/helper/repeat";
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { colorToHex } from "../color/color";
+import { BgPos, readSprInfo } from "../spr-ram/spr-ram";
+import { Dictionary } from "@/nes/helper/dictionary";
 
 export type NameTable = number[][];
 export type NameTableReturn = [NameTable, Nes];
@@ -16,6 +18,7 @@ export type AttributeTable = NameTable;
 export type AttributeTableReturn = NameTableReturn;
 export type Background = string[][];
 export type BackgroundReturn = [Background, Nes];
+export type Screen = string[][];
 export type Tile = string[][];
 
 export const renderNameTable = (nes: Nes): NameTableReturn => {
@@ -152,4 +155,84 @@ export const renderBackGround = (nes: Nes): BackgroundReturn => {
       screen = renderTileOnScreen(screen, tile, yScreen, xScreen);
     }
   return [screen, _nes];
+};
+
+export const horizontalMirror = <T>(sprite: T[][]): T[][] => sprite.reverse();
+
+export const verticalMirror = <T>(sprite: T[][]): T[][] =>
+  sprite.map((spr) => spr.reverse());
+
+const getBgColor = (nes: Nes) => {
+  const [value, _nes] = readVRam(0x3f00, nes);
+  return [colorToHex(value), _nes] as [string, Nes];
+};
+
+export const renderSprite = (
+  sprIndex: number,
+  background: Background,
+  nes: Nes
+): [Screen, Nes] => {
+  const [
+    {
+      bgPos,
+      horizontalMirror: hMirror,
+      pallet,
+      tile,
+      verticalMirror: vMirror,
+      x,
+      y,
+    },
+    _nes,
+  ] = readSprInfo(sprIndex, nes);
+
+  const palletIndex = 0x3f10 + 4 * pallet;
+
+  let [sprite, nesSprite] = getTile(tile, nes);
+  let [colors, nesColors] = getColors(palletIndex, nesSprite);
+
+  if (hMirror) sprite = horizontalMirror(sprite);
+  if (vMirror) sprite = verticalMirror(sprite);
+
+  const [bgColor, nesBgColor] = getBgColor(nesColors);
+
+  const renderFront = () => {
+    for (let yy = 0; yy < 8; yy++) {
+      for (let xx = 0; xx < 8; xx++) {
+        const sprValue = sprite[yy][xx];
+        if (sprValue !== 0) background[yy + y][xx + x] = colors[sprValue];
+      }
+    }
+    return background;
+  };
+  const renderBack = () => {
+    for (let yy = 0; yy < 8; yy++) {
+      for (let xx = 0; xx < 8; xx++) {
+        const sprValue = sprite[yy][xx];
+        const bgValue = background[yy + y][xx + x];
+        if (sprValue !== 0 && bgValue === bgColor)
+          background[yy + y][xx + x] = colors[sprValue];
+      }
+    }
+    return background;
+  };
+
+  const render: Dictionary<BgPos, () => Screen> = {
+    back: renderBack,
+    front: renderFront,
+  };
+
+  return [render[bgPos](), nesBgColor];
+};
+
+type ScreenNes = [Screen, Nes];
+
+export const renderScreen = (nes: Nes): ScreenNes => {
+  const [bg, nesBg] = renderBackGround(nes);
+  return repeat(64).reduce(
+    (acc, _, index) => {
+      const [bg, _nes] = acc;
+      return renderSprite(index, bg, _nes);
+    },
+    [bg, nesBg] as ScreenNes
+  );
 };

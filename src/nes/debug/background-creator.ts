@@ -5,9 +5,12 @@ import { colorCreator } from "./color-creeator";
 import {
   createGreenGround,
   createGround,
+  createMage,
   createMushroomTile,
+  createStick,
 } from "./tile-creator";
 import { writeRangeVRam, writeVRam } from "../ppu/vram/vram";
+import { spriteCreator } from "./sprite-creator";
 
 export const createAttributeTable = (
   index: number,
@@ -48,6 +51,7 @@ export const createMushroomWord = () => {
   const attributeTable = initMatrix(0, 16, 15);
 
   nameTable[27] = repeat(32).map((_) => 1);
+  nameTable[27][0] = 5;
   nameTable[28] = repeat(32).map((_) => 2);
   nameTable[29] = repeat(32).map((_) => 3);
   attributeTable[14] = repeat(16).map((_) => 1);
@@ -56,11 +60,23 @@ export const createMushroomWord = () => {
 
   nes = colorCreator(0x3f00, nes, 0x3f, 0x28, 0x16, 0x27);
   nes = colorCreator(0x3f04, nes, 0x3f, 0x8, 0x9, 0x18);
+  nes = colorCreator(0x3f10, nes, 0x3f, 0x03, 0x3f, 0x30);
+  nes = colorCreator(0x3f14, nes, 0x3f, 0x24, 0x3f, 0x30);
+  nes = colorCreator(0x3f18, nes, 0x3f, 0x28, 0x3f, 0x30);
+  nes = colorCreator(0x3f1c, nes, 0x3f, 0x2c, 0x3f, 0x30);
 
   nes = createMushroomTile(0x10, nes);
   nes = createGreenGround(0x20, nes);
   nes = createGround(0x30, nes);
+  nes = createMage(0x40, nes);
+  nes = createStick(0x50, nes);
   nes = createNameTable(0x2000, nameTable, nes);
   nes = createAttributeTable(0x23c0, attributeTable, nes);
+
+  nes = spriteCreator(0, 0, 4, "front", false, false, 0, 0, nes);
+  nes = spriteCreator(1, 1, 4, "back", false, false, 0, 8 * 27, nes);
+  nes = spriteCreator(2, 2, 4, "front", true, false, 8, 0, nes);
+  nes = spriteCreator(3, 3, 4, "front", false, true, 16, 0, nes);
+
   return nes;
 };

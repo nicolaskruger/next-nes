@@ -1,21 +1,22 @@
 import { Nes, initNes } from "@/nes/nes";
 import {
+  horizontalMirror,
   initMatrix,
   renderAttributeTable,
   renderBackGround,
   renderNameTable,
-  renderTile,
   renderTileOnScreen,
+  verticalMirror,
 } from "./render";
 import { readRangeVRam, readVRam, writeVRam } from "../vram/vram";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { repeat } from "@/nes/helper/repeat";
-import { getAttributeTable } from "../registers/registers";
 
 const binaryToInt = (binary: string) => parseInt(binary, 2);
 
 describe("render", () => {
   let nes: Nes;
+  let world: Screen;
 
   beforeEach(() => {
     nes = initNes();
@@ -132,4 +133,35 @@ describe("render", () => {
     expect(att[28]).toStrictEqual(repeat(32).map((_) => 1));
     expect(att[29]).toStrictEqual(repeat(32).map((_) => 1));
   });
+
+  test("horizontal mirror", () => {
+    const spr = [
+      [1, 2],
+      [3, 4],
+    ];
+    const result = [
+      [3, 4],
+      [1, 2],
+    ];
+
+    expect(horizontalMirror(spr)).toStrictEqual(result);
+  });
+
+  test("vertical mirror", () => {
+    const spr = [
+      [1, 2],
+      [3, 4],
+    ];
+    const result = [
+      [2, 1],
+      [4, 3],
+    ];
+
+    expect(verticalMirror(spr)).toStrictEqual(result);
+  });
+
+  test.todo("render sprite in front of screen");
+  test.todo("create sprite in back of screen");
+  test.todo("create sprite horizontal turn");
+  test.todo("create sprite vertical turn");
 });

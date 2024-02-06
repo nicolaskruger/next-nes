@@ -33,6 +33,28 @@ export const GROUND_GREEN = [
   [1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
+export const MAGE = [
+  [0, 0, 1, 1, 1, 1, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 0],
+  [0, 1, 1, 1, 2, 2, 2, 1],
+  [1, 1, 1, 2, 3, 2, 3, 0],
+  [1, 0, 1, 2, 2, 2, 2, 0],
+  [0, 0, 3, 1, 2, 2, 1, 0],
+  [0, 1, 2, 1, 1, 1, 2, 3],
+  [0, 0, 1, 1, 1, 1, 1, 0],
+];
+
+export const STICK = [
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+];
+
 export const tileCreator = (index: number, tile: number[][], nes: Nes): Nes => {
   const divideIntoTwoByte = (tile: number[]): [number, number] => {
     const extractByte = (func: (v: number) => number) => {
@@ -58,3 +80,9 @@ export const createMushroomTile = (index: number, nes: Nes) =>
 
 export const createGreenGround = (index: number, nes: Nes) =>
   tileCreator(index, GROUND_GREEN, nes);
+
+export const createMage = (index: number, nes: Nes) =>
+  tileCreator(index, MAGE, nes);
+
+export const createStick = (index: number, nes: Nes) =>
+  tileCreator(index, STICK, nes);
