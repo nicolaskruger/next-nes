@@ -2,7 +2,7 @@ import { Bus, Read, mirrorBuilder } from "@/nes/bus/bus";
 import { toBinary8Bits } from "@/nes/helper/binary";
 import { pa, paOfPa } from "@/nes/helper/pa";
 import { repeat } from "@/nes/helper/repeat";
-import { Nes, getVRamBus as getVRamBus, nesBuilder } from "@/nes/nes";
+import { Nes, getVRam, getVRamBus as getVRamBus, nesBuilder } from "@/nes/nes";
 
 export type AddrVRamStatus = "low" | "hight";
 
@@ -183,6 +183,36 @@ export const readAttributeTable = (
   nes: Nes
 ): ReadRange => {
   return readRangeVRam(attributeTable, 0x40, nes);
+};
+
+export const horizontalMirror = (nes: Nes): Nes => {
+  let vramBus = getVRamBus(nes);
+
+  for (let addr = 0x2000; addr < 0x2400; addr++) {
+    vramBus = mirrorBuilder(
+      vramBus,
+      simpleWriteVRam,
+      simpleReadVRam,
+      addr,
+      addr + 0x400
+    );
+  }
+  for (let addr = 0x2800; addr < 0x2c00; addr++) {
+    vramBus = mirrorBuilder(
+      vramBus,
+      simpleWriteVRam,
+      simpleReadVRam,
+      addr,
+      addr + 0x400
+    );
+  }
+  return nesBuilder(nes)
+    .vram({ ...getVRam(nes), bus: vramBus })
+    .build();
+};
+
+export const verticalMirror = (nes: Nes): Nes => {
+  throw new Error("not implemented");
 };
 
 export { initPpuVRam, readVRam, writeVRam };

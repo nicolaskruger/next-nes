@@ -122,7 +122,7 @@ describe("render", () => {
     nes = nesGround;
 
     expect(arr).toStrictEqual([0x3f, 0x28, 0x16, 0x27, 0x3f, 0x8, 0x9, 0x18]);
-    expect(mushRoom).toStrictEqual(repeat(32).map((_) => 1));
+    expect(mushRoom).toStrictEqual([5, ...repeat(31).map((_) => 1)]);
     expect(green).toStrictEqual(repeat(32).map((_) => 2));
     expect(ground).toStrictEqual(repeat(32).map((_) => 3));
 
