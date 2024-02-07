@@ -3,6 +3,7 @@ import {
   getTile,
   horizontalMirror,
   readVRam,
+  singleScreen,
   verticalMirror,
   writeVRam,
 } from "./vram";
@@ -274,5 +275,27 @@ describe("ppu bus", () => {
     const reg2c00 = readVRamMutate(0x2c00, nes);
 
     expect(reg2c00).toBe(2);
+  });
+
+  test("single screen", () => {
+    nes = singleScreen(nes);
+
+    nes = writeVRam(0x2000, 1, nes);
+
+    const reg2000 = readVRamMutate(0x2000, nes);
+
+    expect(reg2000).toBe(1);
+
+    const reg2400 = readVRamMutate(0x2400, nes);
+
+    expect(reg2400).toBe(1);
+
+    const reg2800 = readVRamMutate(0x2800, nes);
+
+    expect(reg2800).toBe(1);
+
+    const reg2c00 = readVRamMutate(0x2c00, nes);
+
+    expect(reg2c00).toBe(1);
   });
 });

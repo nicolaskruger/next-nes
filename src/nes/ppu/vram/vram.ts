@@ -237,4 +237,20 @@ export const verticalMirror = (nes: Nes): Nes => {
     .build();
 };
 
+export const singleScreen = (nes: Nes): Nes => {
+  let vramBus = getVRamBus(nes);
+
+  for (let addr = 0x2000; addr < 0x2400; addr++) {
+    vramBus = mirrorBuilder(
+      vramBus,
+      simpleWriteVRam,
+      simpleReadVRam,
+      ...pa(addr, 0x400, 4)
+    );
+  }
+  return nesBuilder(nes)
+    .vram({ ...getVRam(nes), bus: vramBus })
+    .build();
+};
+
 export { initPpuVRam, readVRam, writeVRam };
