@@ -159,9 +159,4 @@ describe("render", () => {
 
     expect(verticalMirror(spr)).toStrictEqual(result);
   });
-
-  test.todo("render sprite in front of screen");
-  test.todo("create sprite in back of screen");
-  test.todo("create sprite horizontal turn");
-  test.todo("create sprite vertical turn");
 });

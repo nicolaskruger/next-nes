@@ -1,5 +1,11 @@
 import { Nes, initNes } from "@/nes/nes";
-import { getTile, horizontalMirror, readVRam, writeVRam } from "./vram";
+import {
+  getTile,
+  horizontalMirror,
+  readVRam,
+  verticalMirror,
+  writeVRam,
+} from "./vram";
 import { parse } from "path";
 
 const readVRamMutate = (addr: number, nes: Nes): number => {
@@ -241,6 +247,29 @@ describe("ppu bus", () => {
     const reg2800 = readVRamMutate(0x2800, nes);
 
     expect(reg2800).toBe(2);
+
+    const reg2c00 = readVRamMutate(0x2c00, nes);
+
+    expect(reg2c00).toBe(2);
+  });
+
+  test("vertical mirror", () => {
+    nes = verticalMirror(nes);
+
+    nes = writeVRam(0x2000, 1, nes);
+    nes = writeVRam(0x2400, 2, nes);
+
+    const reg2000 = readVRamMutate(0x2000, nes);
+
+    expect(reg2000).toBe(1);
+
+    const reg2400 = readVRamMutate(0x2400, nes);
+
+    expect(reg2400).toBe(2);
+
+    const reg2800 = readVRamMutate(0x2800, nes);
+
+    expect(reg2800).toBe(1);
 
     const reg2c00 = readVRamMutate(0x2c00, nes);
 

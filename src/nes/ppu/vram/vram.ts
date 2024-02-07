@@ -212,7 +212,29 @@ export const horizontalMirror = (nes: Nes): Nes => {
 };
 
 export const verticalMirror = (nes: Nes): Nes => {
-  throw new Error("not implemented");
+  let vramBus = getVRamBus(nes);
+
+  for (let addr = 0x2000; addr < 0x2400; addr++) {
+    vramBus = mirrorBuilder(
+      vramBus,
+      simpleWriteVRam,
+      simpleReadVRam,
+      addr,
+      addr + 0x800
+    );
+  }
+  for (let addr = 0x2400; addr < 0x2800; addr++) {
+    vramBus = mirrorBuilder(
+      vramBus,
+      simpleWriteVRam,
+      simpleReadVRam,
+      addr,
+      addr + 0x800
+    );
+  }
+  return nesBuilder(nes)
+    .vram({ ...getVRam(nes), bus: vramBus })
+    .build();
 };
 
 export { initPpuVRam, readVRam, writeVRam };
