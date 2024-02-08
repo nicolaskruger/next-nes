@@ -18,7 +18,7 @@ describe("background creator", () => {
 
     nes = createAttributeTable(0x23c0, attributeTable, nes);
 
-    const [att, _nes] = renderAttributeTable(nes);
+    const [att, _nes] = renderAttributeTable(nes, 0);
 
     expect(att.length).toBe(30);
     expect(att[0].length).toBe(32);

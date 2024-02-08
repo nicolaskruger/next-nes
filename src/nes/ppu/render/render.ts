@@ -1,5 +1,9 @@
 import { Nes } from "@/nes/nes";
-import { getAttributeTable, getNameTable } from "../registers/registers";
+import {
+  getAttributeTable,
+  getNameTable,
+  setZeroHitFlag,
+} from "../registers/registers";
 import {
   getTile,
   readAttributeTable,
@@ -12,6 +16,8 @@ import { colorToHex } from "../color/color";
 import { BgPos, readSprInfo } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
 import { cutBackground, cutFromScreen } from "@/nes/debug/cut-from-screen";
+import { getScrollX, getScrollY } from "../scroll/scroll";
+import { setZeroFlag } from "@/nes/cpu/cpu";
 
 export type NameTable = number[][];
 export type NameTableReturn = [NameTable, Nes];
@@ -183,7 +189,7 @@ export const renderFourScreens = (nes: Nes): BackgroundReturn => {
 
 export const renderBackGround = (nes: Nes): BackgroundReturn => {
   const [screen, _nes] = renderFourScreens(nes);
-  return [cutBackground(screen, 0, 0), _nes];
+  return [cutBackground(screen, getScrollX(_nes), getScrollY(_nes)), _nes];
 };
 
 export const spriteHorizontalMirror = <T>(sprite: T[][]): T[][] =>
@@ -195,6 +201,25 @@ export const spriteVerticalMirror = <T>(sprite: T[][]): T[][] =>
 const getBgColor = (nes: Nes) => {
   const [value, _nes] = readVRam(0x3f00, nes);
   return [colorToHex(value), _nes] as [string, Nes];
+};
+
+export const validateSprZeroHitFlag = (nes: Nes, bg: Background): Nes => {
+  const [
+    { horizontalMirror: hMirror, tile, verticalMirror: vMirror, x, y },
+    _nes,
+  ] = readSprInfo(0, nes);
+  let [sprite, nesSprite] = getTile(tile, nes);
+  if (hMirror) sprite = spriteHorizontalMirror(sprite);
+  if (vMirror) sprite = spriteVerticalMirror(sprite);
+  const [bgColor, nesBgColor] = getBgColor(nesSprite);
+
+  for (let yy = 0; yy < 8; yy++) {
+    for (let xx = 0; xx < 8; xx++) {
+      const isHitFlag = bg[yy + y][xx + x] !== bgColor && sprite[yy][xx] !== 0;
+      if (isHitFlag) return setZeroHitFlag(nesBgColor, 1);
+    }
+  }
+  return setZeroHitFlag(nesBgColor, 0);
 };
 
 export const renderSprite = (

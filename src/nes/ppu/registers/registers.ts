@@ -1,9 +1,11 @@
-import { ReadData, getNesBus, readBusNes } from "@/nes/bus/bus";
+import { ReadData, getNesBus, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
 import { AddrVRamStatus, getFirstRead, writeVRam } from "../vram/vram";
 import { repeat } from "@/nes/helper/repeat";
+import { write } from "fs";
+import { setBit } from "@/nes/helper/set-bit";
 
 export const getNameTable = (nes: Nes): ReadData => {
   const [reg2000, nesReg2000] = readBusNes(0x2000, nes);
@@ -87,6 +89,11 @@ export const isMoreThan8SpritesOnScanLine = (nes: Nes): [boolean, Nes] =>
 
 export const isZeroHitFlag = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2002, 6);
+
+export const setZeroHitFlag = (nes: Nes, bit: number) => {
+  const [reg2002, nesReg2002] = readBusNes(0x2002, nes);
+  return writeBusNes(0x2002, setBit(reg2002, bit, 6), nesReg2002);
+};
 
 export const isVBlankOccurring = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2002, 7);

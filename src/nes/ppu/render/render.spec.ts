@@ -7,10 +7,15 @@ import {
   renderNameTable,
   renderTileOnScreen,
   spriteVerticalMirror,
+  validateSprZeroHitFlag,
 } from "./render";
 import { readRangeVRam, readVRam, writeVRam } from "../vram/vram";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { repeat } from "@/nes/helper/repeat";
+import { tileCreator } from "@/nes/debug/tile-creator";
+import { colorCreator } from "@/nes/debug/color-creeator";
+import { spriteCreator } from "@/nes/debug/sprite-creator";
+import { isZeroHitFlag } from "../registers/registers";
 
 const binaryToInt = (binary: string) => parseInt(binary, 2);
 
@@ -22,7 +27,7 @@ describe("render", () => {
     nes = initNes();
   });
   test("name table", () => {
-    const [nameTable] = renderNameTable(nes);
+    const [nameTable] = renderNameTable(nes, 0);
 
     expect(nameTable.length).toBe(30);
     nameTable.forEach((table) => {
@@ -34,7 +39,7 @@ describe("render", () => {
   test("attribute table", () => {
     nes = writeVRam(0x23c0, binaryToInt("11100100"), nes);
     nes = writeVRam(0x23f8, binaryToInt("11100100"), nes);
-    const [attributeTable] = renderAttributeTable(nes);
+    const [attributeTable] = renderAttributeTable(nes, 0);
 
     expect(attributeTable[0][0]).toBe(0);
     expect(attributeTable[0][1]).toBe(0);
@@ -126,7 +131,7 @@ describe("render", () => {
     expect(green).toStrictEqual(repeat(32).map((_) => 2));
     expect(ground).toStrictEqual(repeat(32).map((_) => 3));
 
-    const [att, attNes] = renderAttributeTable(nes);
+    const [att, attNes] = renderAttributeTable(nes, 0);
 
     nes = attNes;
 
@@ -158,5 +163,16 @@ describe("render", () => {
     ];
 
     expect(spriteVerticalMirror(spr)).toStrictEqual(result);
+  });
+
+  test("validate spr 0", () => {
+    nes = createMushroomWord();
+    nes = spriteCreator(0, 0, 4, "back", false, false, 0, 8 * 27, nes);
+
+    const [bg] = renderBackGround(nes);
+
+    nes = validateSprZeroHitFlag(nes, bg);
+
+    expect(isZeroHitFlag(nes)[0]).toBe(true);
   });
 });
