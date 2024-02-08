@@ -283,11 +283,12 @@ type ScreenNes = [Screen, Nes];
 
 export const renderScreen = (nes: Nes): ScreenNes => {
   const [bg, nesBg] = renderBackGround(nes);
+  const nesHitFlag = validateSprZeroHitFlag(nesBg, bg);
   return repeat(64).reduce(
     (acc, _, index) => {
       const [bg, _nes] = acc;
       return renderSprite(index, bg, _nes);
     },
-    [bg, nesBg] as ScreenNes
+    [bg, nesHitFlag] as ScreenNes
   );
 };
