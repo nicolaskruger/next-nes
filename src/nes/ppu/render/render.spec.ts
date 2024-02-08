@@ -1,12 +1,12 @@
 import { Nes, initNes } from "@/nes/nes";
 import {
-  horizontalMirror,
+  spriteHorizontalMirror,
   initMatrix,
   renderAttributeTable,
   renderBackGround,
   renderNameTable,
   renderTileOnScreen,
-  verticalMirror,
+  spriteVerticalMirror,
 } from "./render";
 import { readRangeVRam, readVRam, writeVRam } from "../vram/vram";
 import { createMushroomWord } from "@/nes/debug/background-creator";
@@ -144,7 +144,7 @@ describe("render", () => {
       [1, 2],
     ];
 
-    expect(horizontalMirror(spr)).toStrictEqual(result);
+    expect(spriteHorizontalMirror(spr)).toStrictEqual(result);
   });
 
   test("vertical mirror", () => {
@@ -157,6 +157,6 @@ describe("render", () => {
       [4, 3],
     ];
 
-    expect(verticalMirror(spr)).toStrictEqual(result);
+    expect(spriteVerticalMirror(spr)).toStrictEqual(result);
   });
 });

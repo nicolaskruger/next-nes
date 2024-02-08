@@ -16,6 +16,10 @@ export const cutFromScreen = (
   return cut;
 };
 
+export const cutBackground = (screen: Screen, x: number, y: number) => {
+  return cutFromScreen(screen, x, y, 256, 240);
+};
+
 export const cutTile = (screen: Screen, xTile: number, yTile: number) => {
   return cutFromScreen(screen, xTile * 8, yTile * 8, 8, 8);
 };

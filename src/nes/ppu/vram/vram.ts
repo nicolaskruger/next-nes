@@ -253,4 +253,6 @@ export const singleScreen = (nes: Nes): Nes => {
     .build();
 };
 
+export const fourScreen = (nes: Nes): Nes => nes;
+
 export { initPpuVRam, readVRam, writeVRam };

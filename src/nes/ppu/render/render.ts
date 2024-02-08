@@ -11,6 +11,7 @@ import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { colorToHex } from "../color/color";
 import { BgPos, readSprInfo } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
+import { cutBackground, cutFromScreen } from "@/nes/debug/cut-from-screen";
 
 export type NameTable = number[][];
 export type NameTableReturn = [NameTable, Nes];
@@ -21,12 +22,9 @@ export type BackgroundReturn = [Background, Nes];
 export type Screen = string[][];
 export type Tile = string[][];
 
-export const renderNameTable = (nes: Nes): NameTableReturn => {
-  const [nameTableIndex, nesNameTableIndex] = getNameTable(nes);
-  const [nameTableData, nesNameTable] = readNameTable(
-    nameTableIndex,
-    nesNameTableIndex
-  );
+export const renderNameTable = (nes: Nes, index: number): NameTableReturn => {
+  const nameTableIndex = 0x2000 + index * 0x400;
+  const [nameTableData, nesNameTable] = readNameTable(nameTableIndex, nes);
 
   const nameTable: NameTable = repeat(30).reduce((acc, _, index) => {
     const getChunkSize = () => 0x20;
@@ -41,12 +39,15 @@ export const renderNameTable = (nes: Nes): NameTableReturn => {
 const splitBinary = (binary: number) =>
   repeat(4).map((_, index) => (binary >> (2 * index)) & ((1 << 1) | 1));
 
-export const renderAttributeTable = (nes: Nes): AttributeTableReturn => {
-  const [attributeTableIndex, nesAttributeTableIndex] = getAttributeTable(nes);
+export const renderAttributeTable = (
+  nes: Nes,
+  index: number
+): AttributeTableReturn => {
+  const attributeTableIndex = 0x23c0 + index * 0x400;
 
   const [attributeTableData, nesAttributeTable] = readAttributeTable(
     attributeTableIndex,
-    nesAttributeTableIndex
+    nes
   );
 
   const initAttributeTable = () =>
@@ -134,10 +135,15 @@ export const renderTileOnScreen = <T>(
   return screen;
 };
 
-export const renderBackGround = (nes: Nes): BackgroundReturn => {
-  const [nameTable, nesNameTable] = renderNameTable(nes);
-  const [attributeTable, nesAttributeTable] =
-    renderAttributeTable(nesNameTable);
+export const renderSelectScreen = (
+  index: number,
+  nes: Nes
+): BackgroundReturn => {
+  const [nameTable, nesNameTable] = renderNameTable(nes, index);
+  const [attributeTable, nesAttributeTable] = renderAttributeTable(
+    nesNameTable,
+    index
+  );
   const tileSize = 8;
   let screen = initMatrix("", 256, 240);
 
@@ -157,9 +163,33 @@ export const renderBackGround = (nes: Nes): BackgroundReturn => {
   return [screen, _nes];
 };
 
-export const horizontalMirror = <T>(sprite: T[][]): T[][] => sprite.reverse();
+type FourScreen = [string[][][], Nes];
 
-export const verticalMirror = <T>(sprite: T[][]): T[][] =>
+export const renderFourScreens = (nes: Nes): BackgroundReturn => {
+  let [[A, B, C, D], _nes] = repeat(4).reduce(
+    (acc, curr, i) => {
+      const [screens, _nes] = acc;
+      const [newScreen, newNes] = renderSelectScreen(i, _nes);
+      return [[...screens, newScreen], newNes];
+    },
+    [[], nes] as FourScreen
+  );
+  A = [...A, ...C];
+  B = [...B, ...D];
+  A = A.map((a, index) => [...a, ...B[index]]);
+
+  return [A, _nes];
+};
+
+export const renderBackGround = (nes: Nes): BackgroundReturn => {
+  const [screen, _nes] = renderFourScreens(nes);
+  return [cutBackground(screen, 0, 0), _nes];
+};
+
+export const spriteHorizontalMirror = <T>(sprite: T[][]): T[][] =>
+  sprite.reverse();
+
+export const spriteVerticalMirror = <T>(sprite: T[][]): T[][] =>
   sprite.map((spr) => spr.reverse());
 
 const getBgColor = (nes: Nes) => {
@@ -190,8 +220,8 @@ export const renderSprite = (
   let [sprite, nesSprite] = getTile(tile, nes);
   let [colors, nesColors] = getColors(palletIndex, nesSprite);
 
-  if (hMirror) sprite = horizontalMirror(sprite);
-  if (vMirror) sprite = verticalMirror(sprite);
+  if (hMirror) sprite = spriteHorizontalMirror(sprite);
+  if (vMirror) sprite = spriteVerticalMirror(sprite);
 
   const [bgColor, nesBgColor] = getBgColor(nesColors);
 
