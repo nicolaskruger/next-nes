@@ -14,6 +14,10 @@ const useSize = () => {
   };
   useEffect(() => {
     window.addEventListener("resize", handleResize, false);
+    setDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
   }, []);
   return dimensions;
 };
