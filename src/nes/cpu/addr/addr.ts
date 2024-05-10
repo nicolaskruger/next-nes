@@ -139,14 +139,12 @@ const ABS = (nes: Nes): Addr => {
 
   const addr = (high << 8) | low;
 
-  const [data, nesData] = readBusNes(addr, nesHigh);
-
   PC++;
 
   return {
     cross: false,
-    data,
-    nes: setPC(PC, nesData),
+    data: addr,
+    nes: setPC(PC, nesHigh),
     addr,
   };
 };
@@ -161,16 +159,14 @@ const ABSX = (nes: Nes): Addr => {
 
   const addr = ((high << 8) | low) + cpu.X;
 
-  const [data, nesData] = readBusNes(addr, nesHigh);
-
   const cross = low + cpu.X > 0xff;
 
   PC++;
 
   return {
     cross,
-    data,
-    nes: setPC(PC, nesData),
+    data: addr,
+    nes: setPC(PC, nesHigh),
     addr,
   };
 };
@@ -185,16 +181,14 @@ const ABSY = (nes: Nes): Addr => {
 
   const addr = ((high << 8) | low) + cpu.Y;
 
-  const [data, nesData] = readBusNes(addr, nesHigh);
-
   const cross = low + cpu.Y > 0xff;
 
   PC++;
 
   return {
     cross,
-    data,
-    nes: setPC(PC, nesData),
+    data: addr,
+    nes: setPC(PC, nesHigh),
     addr,
   };
 };

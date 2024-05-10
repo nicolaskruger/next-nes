@@ -7,6 +7,23 @@ const getCanvas = (ref: CanvasRef) => ref.current as HTMLCanvasElement;
 const getCanvasContext = (ref: CanvasRef) =>
   getCanvas(ref).getContext("2d") as CanvasRenderingContext2D;
 
+export const renderMultiply = (
+  screen: string[][],
+  canvas: CanvasRef,
+  multiply: number
+) => {
+  for (let y = 0; y < screen.length; y++)
+    for (let x = 0; x < screen[y].length; x++) {
+      getCanvasContext(canvas).fillStyle = screen[y][x];
+      getCanvasContext(canvas).fillRect(
+        x * multiply,
+        y * multiply,
+        multiply,
+        multiply
+      );
+    }
+};
+
 export const render = (screen: string[][], canvas: CanvasRef) => {
   for (let y = 0; y < screen.length; y++)
     for (let x = 0; x < screen[y].length; x++) {

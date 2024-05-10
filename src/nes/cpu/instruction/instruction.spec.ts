@@ -60,6 +60,7 @@ import {
   TXS,
   TYA,
 } from "./instruction";
+import { initPpu } from "@/nes/ppu/ppu";
 
 const initBus = (): Bus =>
   "_"
@@ -84,7 +85,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [], addrVRam: 0xff, addrVramStatus: "hight", sprRam: [] },
+  ppu: initPpu(),
 });
 
 const toCycles = (nes: Nes) => (cycles: number) => {

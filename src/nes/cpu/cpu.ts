@@ -30,10 +30,10 @@ const getBreakCommand = (nes: Nes): number => (nes.cpu.STATUS >> 4) & 1;
 const getOverFlowFlag = (nes: Nes): number => (nes.cpu.STATUS >> 5) & 1;
 const getNegativeFlag = (nes: Nes): number => (nes.cpu.STATUS >> 6) & 1;
 
-const setCpu = (key: keyof Cpu, value: number, nes: Nes): Nes => ({
-  ...nes,
-  cpu: { ...nes.cpu, [key]: value },
-});
+const setCpu = (key: keyof Cpu, value: number, nes: Nes): Nes => {
+  nes.cpu[key] = value;
+  return nes;
+};
 const setACC = (value: number, nes: Nes) => setCpu("ACC", value, nes);
 const setX = (value: number, nes: Nes) => setCpu("X", value, nes);
 const setY = (value: number, nes: Nes) => setCpu("Y", value, nes);
@@ -50,12 +50,12 @@ const getPC = (nes: Nes): number => getCpu("PC", nes);
 const getSTK = (nes: Nes): number => getCpu("STK", nes);
 const getSTATUS = (nes: Nes): number => getCpu("STATUS", nes);
 
-const setFlag = (value: number, offset: number, nes: Nes): Cpu => ({
-  ...nes.cpu,
-  STATUS: value
+const setFlag = (value: number, offset: number, nes: Nes): Cpu => {
+  nes.cpu.STATUS = value
     ? nes.cpu.STATUS | (1 << offset)
-    : nes.cpu.STATUS & ~(1 << offset),
-});
+    : nes.cpu.STATUS & ~(1 << offset);
+  return nes.cpu;
+};
 
 const setCarryFlag = (value: number, nes: Nes): Nes => ({
   ...nes,
@@ -179,6 +179,8 @@ function flagBuilder(result: FlagResult, nes: Nes) {
     build: () => nes,
   };
 }
+
+export const getCycles = (nes: Nes) => nes.cpu.cycles;
 
 const initCpu = (): Cpu => ({
   ACC: 0,

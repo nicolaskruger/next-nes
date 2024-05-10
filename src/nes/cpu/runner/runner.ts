@@ -3,6 +3,9 @@ import { compile } from "../compiler/compiler";
 import { Bus, readBusNes, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Cpu, getPC } from "../cpu";
 import { instructionDictionary } from "../intructionDictionary/instructionDictionary";
+import { initVram } from "@/nes/ppu/vram/vram";
+import { initSprRam } from "@/nes/ppu/spr-ram/spr-ram";
+import { initPpu } from "@/nes/ppu/ppu";
 
 const initBusRunner = (): Bus =>
   "_"
@@ -26,10 +29,10 @@ const initCpuRunner = (): Cpu => ({
 export const initNesRunner = (): Nes => ({
   cpu: initCpuRunner(),
   bus: initBusRunner(),
-  ppu: { vram: [], addrVRam: 0x00, addrVramStatus: "hight", sprRam: [] },
+  ppu: initPpu(),
 });
 
-const compileNes = (program: number[], nes: Nes): Nes => {
+export const compileNes = (program: number[], nes: Nes): Nes => {
   const bus: Bus = nes.bus.map((bus, i) => {
     const data = program[i - 0x8000] | bus.data;
     return { ...bus, data };

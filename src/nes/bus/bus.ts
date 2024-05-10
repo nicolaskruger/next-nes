@@ -29,10 +29,10 @@ export const getNesBus = (nes: Nes) => nes.bus;
 
 const simpleRead: Read = (addr, nes) => [nes.bus[addr].data, nes];
 
-const simpleWrite: Write = (addr, value, nes) => ({
-  ...nes,
-  bus: nes.bus.map((v, i) => (i === addr ? { ...v, data: value } : { ...v })),
-});
+const simpleWrite: Write = (addr, value, nes) => {
+  nes.bus[addr].data = value;
+  return nes;
+};
 
 /**
  *

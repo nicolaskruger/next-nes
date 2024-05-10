@@ -16,6 +16,7 @@ import {
 } from "./addr";
 import { Cpu } from "../cpu";
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
+import { initPpu } from "@/nes/ppu/ppu";
 
 const initBusAllRam = (): Bus =>
   "_"
@@ -49,7 +50,7 @@ const initCpu = (): Cpu => ({
 const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
-  ppu: { vram: [], addrVRam: 0xff, sprRam: [], addrVramStatus: "hight" },
+  ppu: initPpu(),
 });
 
 const initNesAllRam = (): Nes => {
@@ -317,16 +318,11 @@ describe("test addressing mode", () => {
       data: 0x12,
     };
 
-    nes.bus[0x1234] = {
-      ...nes.bus[0x1234],
-      data: 0x77,
-    };
-
     const { cross, data, nes: newNes, addr } = ABS(nes);
 
     expect(cross).toBe(false);
 
-    expect(data).toBe(0x77);
+    expect(data).toBe(0x1234);
 
     expect(newNes.cpu.PC).toBe(3);
 
@@ -356,7 +352,7 @@ describe("test addressing mode", () => {
 
     expect(cross).toBe(false);
 
-    expect(data).toBe(0x77);
+    expect(data).toBe(0x1234);
 
     expect(newNes.cpu.PC).toBe(3);
 
@@ -385,7 +381,7 @@ describe("test addressing mode", () => {
 
     expect(cross).toBe(true);
 
-    expect(data).toBe(0x77);
+    expect(data).toBe(0x1300);
 
     expect(newNes.cpu.PC).toBe(3);
 
@@ -415,7 +411,7 @@ describe("test addressing mode", () => {
 
     expect(cross).toBe(false);
 
-    expect(data).toBe(0x77);
+    expect(data).toBe(0x1234);
 
     expect(newNes.cpu.PC).toBe(3);
 
@@ -444,7 +440,7 @@ describe("test addressing mode", () => {
 
     expect(cross).toBe(true);
 
-    expect(data).toBe(0x77);
+    expect(data).toBe(0x1300);
 
     expect(newNes.cpu.PC).toBe(3);
 

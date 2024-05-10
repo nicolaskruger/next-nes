@@ -106,13 +106,8 @@ const Y = (nes: Nes) => (Y: number) => {
 };
 
 const directWriteBus = (nes: Nes) => (addr: number, value: number) => {
-  const bus: Bus = nes.bus.map((b, i) => {
-    if (addr === i) return { ...b, data: value };
-    return b;
-  });
-  const _nes: Nes = { ...nes, bus };
-
-  return nesBuilder(_nes);
+  nes.bus[addr].data = value;
+  return nesBuilder(nes);
 };
 
 const allBus = (nes: Nes) => (bus: Bus) => {
@@ -128,10 +123,7 @@ export const getVRam = (nes: Nes) => nes.ppu.vram;
 export const getVRamBus = (nes: Nes) => nes.ppu.vram.bus;
 
 const buildNesPpu = (nes: Nes, addr: number, value: number) => {
-  getVRamBus(nes)[addr] = {
-    ...getVRamBus(nes)[addr],
-    data: value,
-  };
+  getVRamBus(nes)[addr].data = value;
   return nes;
 };
 
