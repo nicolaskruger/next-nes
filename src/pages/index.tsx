@@ -11,7 +11,8 @@ export default function Page() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mult = useMult();
   const [nes, setNes] = useState(createMushroomWord());
-  const { ...keypress } = useControl();
+  const { control, ...keypress } = useControl();
+
   useEffect(() => {
     render(multiplyMatrix(renderScreen(nes)[0], mult), canvasRef);
   }, [mult]);
