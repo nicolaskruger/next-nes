@@ -11,6 +11,8 @@ import {
 } from "./tile-creator";
 import { writeRangeVRam, writeVRam } from "../ppu/vram/vram";
 import { spriteCreator } from "./sprite-creator";
+import { compile } from "../cpu/compiler/compiler";
+import { compileNes } from "../cpu/runner/runner";
 
 export const createAttributeTable = (
   index: number,
@@ -77,6 +79,12 @@ export const createMushroomWord = () => {
   nes = spriteCreator(1, 1, 4, "back", false, false, 0, 8 * 27, nes);
   nes = spriteCreator(2, 2, 4, "front", true, false, 8, 0, nes);
   nes = spriteCreator(3, 3, 4, "front", false, true, 16, 0, nes);
+
+  const program = compile(`
+    JMP $8000
+  `);
+
+  nes = compileNes(program, nes);
 
   return nes;
 };

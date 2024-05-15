@@ -27,5 +27,5 @@ export const tick = (nes: Nes) => {
   const totalTime = PERIOD_MILI * cycles;
   const delayTime = totalTime - executeTime;
 
-  return { nes: _nes, executeTime, totalTime, delayTime };
+  return { nes: _nes, executeTime, totalTime, delayTime, cycles };
 };
