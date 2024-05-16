@@ -24,5 +24,5 @@ export const useGameLoop = (_nes: Nes) => {
     };
   }, []);
 
-  return { nes, controlProps: { ...props } };
+  return { nes, setNes, controlProps: { ...props } };
 };

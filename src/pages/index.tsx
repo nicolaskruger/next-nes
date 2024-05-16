@@ -6,21 +6,27 @@ import { createMushroomWord } from "@/nes/debug/background-creator";
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { renderScreen } from "@/nes/ppu/render/render";
 import { render } from "@/nes/render/render";
-import { useEffect, useRef, useState } from "react";
+import { rom } from "@/nes/rom/rom";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 export default function Page() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mult = useMult();
-  const { nes, controlProps } = useGameLoop(createMushroomWord());
+  const { nes, controlProps, setNes } = useGameLoop(createMushroomWord());
+  const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
+    const _nes = await rom(nes, e?.target?.files?.[0] as File);
+    setNes(_nes);
+  };
 
   useEffect(() => {
     render(multiplyMatrix(renderScreen(nes)[0], mult), canvasRef);
-  }, [mult]);
+  }, [mult, nes]);
   return (
     <main
       {...controlProps}
-      className="w-screen h-screen flex justify-center items-center"
+      className="w-screen h-screen flex justify-center items-center flex-col space-y-1"
     >
+      <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
       <canvas ref={canvasRef} width={WIDTH * mult} height={HEIGHT * mult} />
     </main>
   );
