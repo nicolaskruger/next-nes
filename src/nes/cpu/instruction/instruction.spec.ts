@@ -61,6 +61,7 @@ import {
   TYA,
 } from "./instruction";
 import { initPpu } from "@/nes/ppu/ppu";
+import { initBanks } from "@/nes/banks/bank";
 
 const initBus = (): Bus =>
   "_"
@@ -86,6 +87,7 @@ const initNes = (): Nes => ({
   bus: initBus(),
   cpu: initCpu(),
   ppu: initPpu(),
+  banks: initBanks(),
 });
 
 const toCycles = (nes: Nes) => (cycles: number) => {
@@ -611,7 +613,7 @@ describe("instruction test", () => {
       .toSTK(0xfd)
       .toBuss(0x01ff, 2)
       .toBuss(0x01fe, 1)
-      .toPC(0xfffe)
+      .toPC(2)
       .toCycles(7)
       .toStatus((1 << 4) | 1);
   });

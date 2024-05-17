@@ -5,6 +5,7 @@ import {
   getCarryFlag,
   getNegativeFlag,
   getOverFlowFlag,
+  getPC,
   getSTATUS,
   getSTK,
   getX,
@@ -40,7 +41,7 @@ export type CalculateCycles = Pick<
 
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 
-const make8bitSigned = (value: number) => {
+export const make8bitSigned = (value: number) => {
   if (is8bitsNegative(value)) return ~0xff | value;
   return value;
 };
@@ -223,7 +224,7 @@ const BRK = ({ nes, baseCycles }: Instruction): Nes => {
 
   _nes = setBreakCommand(1, _nes);
 
-  return nesBuilder(_nes).PC(0xfffe).cycles(baseCycles).build();
+  return nesBuilder(_nes).cycles(baseCycles).build();
 };
 
 const BVC = (instruction: Instruction): Nes => {
