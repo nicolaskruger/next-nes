@@ -1,4 +1,5 @@
-import { decompile } from "./decompile";
+import { initNes } from "@/nes/nes";
+import { decompile, findCurrentInstruction } from "./decompile";
 
 const allAddrProgram = `
 CLC
@@ -52,6 +53,10 @@ describe("decompile", () => {
       LDA_IND_Y
     );
 
-    expect(decompile(program)).toBe(allAddrProgram);
+    const dec = decompile(program);
+
+    expect(dec.program).toBe(allAddrProgram);
+
+    expect(findCurrentInstruction(initNes(), dec)).toBe(0);
   });
 });

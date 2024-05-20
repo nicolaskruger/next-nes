@@ -2,6 +2,8 @@ import { Dictionary } from "@/nes/helper/dictionary";
 import { instructionDictionary } from "../intructionDictionary/instructionDictionary";
 import { dexToHex } from "@/nes/helper/converter";
 import { make8bitSigned } from "../instruction/instruction";
+import { Nes } from "@/nes/nes";
+import { getPC } from "../cpu";
 
 const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   IMP: [1, () => ""],
@@ -50,20 +52,46 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   INDIRECT_INDEXED: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
 };
 
-export const decompile = (program: number[]): string => {
+type InstData = {
+  inst: string;
+  index: number;
+};
+
+type Decompile = {
+  program: string;
+  instruction: InstData[];
+};
+
+export const decompile = (program: number[]): Decompile => {
   let code: string[] = [];
+  const dec: InstData[] = [];
 
   for (let i = 0; i < program.length; ) {
     const { addr, instruction } = instructionDictionary[program[i]];
     const [size, func] = instSize[addr.name];
 
-    code.push(
-      `${instruction.name} ${func(
-        ...program.slice(i + 1)
-      ).toUpperCase()}`.trim()
-    );
+    const inst = `${instruction.name} ${func(
+      ...program.slice(i + 1)
+    ).toUpperCase()}`.trim();
+
+    dec.push({
+      index: i,
+      inst,
+    });
+
+    code.push(inst);
     i += size;
   }
 
-  return code.join("\n");
+  return { instruction: dec, program: code.join("\n") };
 };
+
+export const findCurrentInstruction = (
+  nes: Nes,
+  { instruction }: Decompile
+) => {
+  const pc = getPC(nes);
+  return instruction.findIndex(({ index }) => index === pc - 0x8000);
+};
+
+export const splitInstructions = (program: string) => program.split("\n");
