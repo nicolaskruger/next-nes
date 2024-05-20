@@ -52,12 +52,12 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   INDIRECT_INDEXED: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
 };
 
-type InstData = {
+export type InstData = {
   inst: string;
   index: number;
 };
 
-type Decompile = {
+export type Decompile = {
   program: string;
   instruction: InstData[];
 };

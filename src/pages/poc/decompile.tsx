@@ -1,3 +1,4 @@
+import { Code } from "@/components/code/code.spec";
 import { RenderNes } from "@/components/render-nes/reder-nes";
 import { useMult } from "@/hooks/mult/mult";
 import {
@@ -5,7 +6,6 @@ import {
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
 import { createMushroomWord } from "@/nes/debug/background-creator";
-import { dexToHexFourDigitsPrefix } from "@/nes/helper/converter";
 import { useRef, useState } from "react";
 
 export default function Decompile() {
@@ -21,15 +21,7 @@ export default function Decompile() {
     <main className="flex w-screen h-screen">
       <div className="w-1/3 flex-col flex">
         <div className="w-full h-2/3 bg-blue-500 overflow-y-scroll pl-3">
-          <ul>
-            {prog.instruction.map(({ inst }, i) => {
-              return (
-                <li className={currIns === i ? "text-red-500" : ""} key={i}>
-                  {dexToHexFourDigitsPrefix(i)}: {inst}
-                </li>
-              );
-            })}
-          </ul>
+          <Code currIns={currIns} dec={prog} />
         </div>
         <div className="w-full h-1/3 bg-red-500"></div>
       </div>
