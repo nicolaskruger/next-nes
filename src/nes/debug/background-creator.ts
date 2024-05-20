@@ -81,6 +81,19 @@ export const createMushroomWord = () => {
   nes = spriteCreator(3, 3, 4, "front", false, true, 16, 0, nes);
 
   const program = compile(`
+    CLC
+    LSR A
+    LDA #10
+    LDA $00
+    STY $10,X
+    LDX $10,Y
+    BNE *+4
+    JMP $1234
+    STA $3000,X
+    AND $4000,Y
+    JMP ($FFFC)
+    LDA ($40,X)
+    LDA ($40),Y
     JMP $8000
   `);
 

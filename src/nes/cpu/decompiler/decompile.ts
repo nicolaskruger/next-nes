@@ -86,6 +86,9 @@ export const decompile = (program: number[]): Decompile => {
   return { instruction: dec, program: code.join("\n") };
 };
 
+export const decompileNes = (nes: Nes): Decompile =>
+  decompile(nes.bus.map((v) => v.data).slice(0x8000));
+
 export const findCurrentInstruction = (
   nes: Nes,
   { instruction }: Decompile
