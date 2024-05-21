@@ -33,8 +33,8 @@ export const RenderNes = ({ nes, mult, canvasRef }: PropsRenderNes) => {
   const [countScreen, setCountScreen] = useState(0);
 
   useEffect(() => {
-    setCountScreen((c) => ++c % 10);
     if (countScreen === 0) setScreen(renderScreen(nes)[0]);
+    setCountScreen((c) => ++c % 10);
   }, [nes]);
 
   useEffect(() => {

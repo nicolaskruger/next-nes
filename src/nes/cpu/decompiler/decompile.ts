@@ -1,8 +1,8 @@
 import { Dictionary } from "@/nes/helper/dictionary";
 import { instructionDictionary } from "../intructionDictionary/instructionDictionary";
-import { dexToHex } from "@/nes/helper/converter";
+import { dexToHex, dexToHexFourDigitsPrefix } from "@/nes/helper/converter";
 import { make8bitSigned } from "../instruction/instruction";
-import { Nes } from "@/nes/nes";
+import { Nes, initNes } from "@/nes/nes";
 import { getPC } from "../cpu";
 
 const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
@@ -50,6 +50,7 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   ],
   INDEXED_INDIRECT: [2, (a) => `($${dexToHex(a, 2, false)},X)`],
   INDIRECT_INDEXED: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
+  XXX: [1, (a) => `${a}`],
 };
 
 export type InstData = {
@@ -67,7 +68,10 @@ export const decompile = (program: number[]): Decompile => {
   const dec: InstData[] = [];
 
   for (let i = 0; i < program.length; ) {
-    const { addr, instruction } = instructionDictionary[program[i]];
+    const { addr, instruction } = instructionDictionary[program[i]] || {
+      addr: function XXX(v) {},
+      instruction: (ins) => initNes(),
+    };
     const [size, func] = instSize[addr.name];
 
     const inst = `${instruction.name} ${func(

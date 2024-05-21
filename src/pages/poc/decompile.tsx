@@ -7,8 +7,9 @@ import {
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
 import { createMushroomWord } from "@/nes/debug/background-creator";
+import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 export default function Decompile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,6 +29,12 @@ export default function Decompile() {
     setCurr(findCurrentInstruction(_nes, prog));
   };
 
+  const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
+    const _nes = await rom(nes, e?.target?.files?.[0] as File);
+    setNes(_nes);
+    setProg(decompileNes(_nes));
+  };
+
   return (
     <main className="flex w-screen h-screen">
       <div className="w-1/3 flex-col flex">
@@ -39,6 +46,7 @@ export default function Decompile() {
       </div>
       <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
         <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />
+        <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
         <button onClick={next}>next</button>
       </div>
     </main>
