@@ -38,7 +38,7 @@ export default function Decompile() {
         <div className="w-full h-1/3 bg-red-500"></div>
       </div>
       <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
-        {/* <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} /> */}
+        <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />
         <button onClick={next}>next</button>
       </div>
     </main>

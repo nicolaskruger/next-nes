@@ -31,3 +31,15 @@ export const render = (screen: string[][], canvas: CanvasRef) => {
       getCanvasContext(canvas).fillRect(x, y, 1, 1);
     }
 };
+
+export const renderPixel = (
+  pixel: string,
+  x: number,
+  y: number,
+  canvas: CanvasRef,
+  multiply?: number
+) => {
+  const mult = multiply ? multiply : 1;
+  getCanvasContext(canvas).fillStyle = pixel;
+  getCanvasContext(canvas).fillRect(x * mult, y * mult, mult, mult);
+};
