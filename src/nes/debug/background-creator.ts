@@ -88,10 +88,9 @@ export const createMushroomWord = () => {
     STY $10,X
     LDX $10,Y
     BNE *+4
-    JMP $1234
+    JMP $800f
     STA $3000,X
     AND $4000,Y
-    JMP ($FFFC)
     LDA ($40,X)
     LDA ($40),Y
     JMP $8000
