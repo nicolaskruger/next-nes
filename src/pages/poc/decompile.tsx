@@ -42,7 +42,7 @@ export default function Decompile() {
           <Code currIns={currIns} dec={prog} />
           {currIns}
         </div>
-        <div className="w-full h-1/3 bg-red-500"></div>
+        <div className="w-full h-1/3 bg-red-500 overflow-y-scroll"></div>
       </div>
       <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
         <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />

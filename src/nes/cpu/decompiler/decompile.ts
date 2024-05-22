@@ -50,11 +50,12 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   ],
   INDEXED_INDIRECT: [2, (a) => `($${dexToHex(a, 2, false)},X)`],
   INDIRECT_INDEXED: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
-  XXX: [1, (a) => `${a}`],
+  XXX: [1, (a) => ``],
 };
 
 export type InstData = {
   inst: string;
+  opCode: string;
   index: number;
 };
 
@@ -70,7 +71,9 @@ export const decompile = (program: number[]): Decompile => {
   for (let i = 0; i < program.length; ) {
     const { addr, instruction } = instructionDictionary[program[i]] || {
       addr: function XXX(v) {},
-      instruction: (ins) => initNes(),
+      instruction: function XXX(ins) {
+        return initNes();
+      },
     };
     const [size, func] = instSize[addr.name];
 
@@ -80,6 +83,7 @@ export const decompile = (program: number[]): Decompile => {
 
     dec.push({
       index: i,
+      opCode: dexToHex(program[i], 2, true),
       inst,
     });
 
@@ -99,6 +103,14 @@ export const findCurrentInstruction = (
 ) => {
   const pc = getPC(nes);
   return instruction.findIndex(({ index }) => index === pc - 0x8000);
+};
+
+export const decAllBytes = (nes: Nes): string[] => {
+  const program = nes.bus.map((v) => v.data).slice(0x8000);
+  return program.map(
+    (p, i) =>
+      `${dexToHexFourDigitsPrefix(i + 0x8000)} - ${dexToHexFourDigitsPrefix(p)}`
+  );
 };
 
 export const splitInstructions = (program: string) => program.split("\n");

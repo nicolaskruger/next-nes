@@ -78,8 +78,7 @@ const KB8 = 8192;
 export const rom = async (nes: Nes, rom: File): Promise<Nes> => {
   let _nes = nes;
   validFile(rom);
-  const text = await rom.text();
-  const buffer = Buffer.from(text);
+  const buffer = Buffer.from(await rom.arrayBuffer());
   const romBytes: number[] = [];
   buffer.forEach((byte) => romBytes.push(byte));
   romBytes.slice(0, 6).forEach((byte, i) => {
