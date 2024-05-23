@@ -177,11 +177,11 @@ const BIT = ({ nes, data, baseCycles }: Instruction): Nes => {
     })
     .customFlagBuilder({
       set: setOverFlowFlag,
-      flag: ({ result }) => (result >> 6) & 1,
+      flag: ({ result }) => (data >> 6) & 1,
     })
     .customFlagBuilder({
       set: setNegativeFlag,
-      flag: ({ result }) => (result >> 7) & 1,
+      flag: ({ result }) => (data >> 7) & 1,
     })
     .nesBuilder()
     .cycles(baseCycles)
@@ -371,8 +371,11 @@ const INX = (instruction: Instruction): Nes =>
 const INY = (instruction: Instruction): Nes =>
   increment(getY, setY, instruction);
 
-const JMP = ({ baseCycles, nes, data }: Instruction): Nes =>
-  nesBuilder(nes).cycles(baseCycles).PC(data).build();
+const JMP = ({ baseCycles, nes, data, addr }: Instruction): Nes =>
+  nesBuilder(nes)
+    .cycles(baseCycles)
+    .PC(addr as number)
+    .build();
 
 const JSR = ({ nes, baseCycles, data }: Instruction): Nes =>
   nesBuilder(nes)

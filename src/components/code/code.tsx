@@ -6,7 +6,6 @@ type CodeProps = {
   currIns: number;
 };
 
-// eslint-disable-next-line react/display-name
 export const Code = ({ dec, currIns }: CodeProps) => {
   return (
     <ul>

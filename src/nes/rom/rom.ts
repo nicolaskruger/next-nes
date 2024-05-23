@@ -11,6 +11,7 @@ import {
 } from "../banks/bank";
 import { repeat } from "../helper/repeat";
 import { fourScreen, horizontalMirror, verticalMirror } from "../ppu/vram/vram";
+import { writeBusNes } from "../bus/bus";
 
 const validFile = (rom: File) => {
   if (!/\.nes$/gi.test(rom.name)) throw new Error("invalid format");
@@ -72,8 +73,8 @@ const byte6 = (byte: number, nes: Nes): Byte6 => {
   };
 };
 
-const KB16 = 16384;
-const KB8 = 8192;
+export const KB16 = (0x10000 - 0x8000) / 2;
+export const KB8 = KB16 / 2;
 
 export const rom = async (nes: Nes, rom: File): Promise<Nes> => {
   let _nes = nes;
@@ -88,16 +89,16 @@ export const rom = async (nes: Nes, rom: File): Promise<Nes> => {
   const { nes: nes6, lowMapper, byteTrainer } = byte6(romBytes[6], _nes);
   _nes = nes6;
 
-  const mapper = (romBytes[7] << 4) | lowMapper;
+  const mapper = (romBytes[7] >> 4) | lowMapper;
 
   if (mapper !== 0) {
     throw new Error("mapper not implemented");
   }
 
   let bT: number[] = [];
-  const skip = byteTrainer ? 512 + 10 : 10;
+  const skip = byteTrainer ? 512 + 16 : 16;
 
-  if (byteTrainer) bT = romBytes.slice(10, 512 + 10);
+  if (byteTrainer) bT = romBytes.slice(16, 512 + 16);
 
   let prgRom = getPrgRom(_nes);
 
@@ -120,5 +121,6 @@ export const rom = async (nes: Nes, rom: File): Promise<Nes> => {
   _nes = startPrgRom(_nes);
   _nes = startChrRom(_nes);
 
+  _nes = writeBusNes(0x2002, 1 << 7, _nes);
   return _nes;
 };

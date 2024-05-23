@@ -1,4 +1,4 @@
-import { Code } from "@/components/code/code.spec";
+import { Code } from "@/components/code/code";
 import { RenderNes } from "@/components/render-nes/reder-nes";
 import { useMult } from "@/hooks/mult/mult";
 import {
@@ -7,6 +7,7 @@ import {
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
 import { createMushroomWord } from "@/nes/debug/background-creator";
+import { initNes } from "@/nes/nes";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -15,12 +16,12 @@ export default function Decompile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const mult = useMult({ H: 1, W: 2 / 3 });
-  const [nes, setNes] = useState(createMushroomWord());
+  const [nes, setNes] = useState(initNes());
   const [prog, setProg] = useState<Dec>({ instruction: [], program: "" });
   const [currIns, setCurr] = useState(0);
 
   useEffect(() => {
-    setProg(decompileNes(createMushroomWord()));
+    setProg(decompileNes(initNes()));
   }, []);
 
   const next = () => {

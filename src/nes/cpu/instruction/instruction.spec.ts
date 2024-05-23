@@ -1210,6 +1210,7 @@ describe("instruction test", () => {
       cross: true,
       offsetOnCross: 0,
       data,
+      addr: data,
       nes,
     });
 

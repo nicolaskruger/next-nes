@@ -29,9 +29,12 @@ export const setChrRom = (nes: Nes, rom: number[][]) => {
 
 export const startPrgRom = (nes: Nes): Nes => {
   const prgRom = getPrgRom(nes);
-  return prgRom[0].reduce((acc, curr, i) => {
-    return writeBusNes(0x8000 + i, curr, acc);
-  }, nes);
+  return prgRom
+    .slice(0, 2)
+    .reduce((acc, curr) => [...acc, ...curr], [] as number[])
+    .reduce((acc, curr, i) => {
+      return writeBusNes(0x8000 + i, curr, acc);
+    }, nes);
 };
 
 export const startChrRom = (nes: Nes): Nes => {

@@ -15,9 +15,8 @@ import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { colorToHex } from "../color/color";
 import { BgPos, readSprInfo } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
-import { cutBackground, cutFromScreen } from "@/nes/debug/cut-from-screen";
+import { cutBackground } from "@/nes/debug/cut-from-screen";
 import { getScrollX, getScrollY } from "../scroll/scroll";
-import { setZeroFlag } from "@/nes/cpu/cpu";
 
 export type NameTable = number[][];
 export type NameTableReturn = [NameTable, Nes];
