@@ -1,6 +1,6 @@
 import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
-import { Cpu } from "../cpu";
+import { Cpu, getZeroFlag } from "../cpu";
 import {
   ASL,
   ADC,
@@ -62,6 +62,7 @@ import {
 } from "./instruction";
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
+import { repeat } from "@/nes/helper/repeat";
 
 const initBus = (): Bus =>
   "_"
@@ -1939,5 +1940,44 @@ describe("instruction test", () => {
     } as Instruction);
 
     expectNes(_nes).toCycles(2).toACC(0x00).toEncodeStatus("cZidbvn");
+  });
+  test("should not affect the status", () => {
+    let nes = initNes();
+
+    nes.cpu.STATUS = 7;
+
+    nes = INX({
+      baseCycles: 0,
+      cross: false,
+      data: 0,
+      nes,
+      offsetOnCross: 0,
+      acc: false,
+      addr: 0,
+    });
+
+    expect(nes.cpu.STATUS).toBe(5);
+
+    expect(nes.cpu.X).toBe(1);
+  });
+
+  test("should be zero flag after 255 incrementes", () => {
+    let nes = initNes();
+
+    nes.cpu.STATUS = 7;
+    repeat(256).reduce((acc, curr) => {
+      return INX({
+        baseCycles: 0,
+        cross: false,
+        data: 0,
+        nes: acc,
+        offsetOnCross: 0,
+        acc: false,
+        addr: 0,
+      });
+    }, nes);
+
+    expect(nes.cpu.X).toBe(0);
+    expect(getZeroFlag(nes)).toBe(1);
   });
 });

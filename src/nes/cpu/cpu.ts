@@ -50,7 +50,7 @@ const getPC = (nes: Nes): number => getCpu("PC", nes);
 const getSTK = (nes: Nes): number => getCpu("STK", nes);
 const getSTATUS = (nes: Nes): number => getCpu("STATUS", nes);
 
-const setFlag = (value: number, offset: number, nes: Nes): Cpu => {
+export const setFlag = (value: number, offset: number, nes: Nes): Cpu => {
   nes.cpu.STATUS = value
     ? nes.cpu.STATUS | (1 << offset)
     : nes.cpu.STATUS & ~(1 << offset);

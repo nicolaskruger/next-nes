@@ -6,7 +6,6 @@ import {
   decompileNes,
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
-import { createMushroomWord } from "@/nes/debug/background-creator";
 import { initNes } from "@/nes/nes";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
@@ -26,6 +25,7 @@ export default function Decompile() {
 
   const next = () => {
     const _nes = tick(nes).nes;
+    console.log(_nes);
     setNes(_nes);
     setCurr(findCurrentInstruction(_nes, prog));
   };
