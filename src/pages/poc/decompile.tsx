@@ -29,7 +29,7 @@ export default function Decompile() {
       ...nes,
     };
     let count = numInst;
-    while (count--) {
+    while (_nes.cpu.PC !== 0x805e) {
       _nes = tick(nes).nes;
     }
     console.log(_nes);

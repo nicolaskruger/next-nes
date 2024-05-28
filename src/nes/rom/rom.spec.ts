@@ -47,5 +47,6 @@ describe("ROM", () => {
     } catch (e) {
       console.log(nes);
     }
+    console.log(nes);
   });
 });
