@@ -213,7 +213,7 @@ describe("PPU registers", () => {
   });
 
   test("read 2007 vram", () => {
-    nes = writeSprRam(0xff, 0x12, nes);
+    nes.ppu.vram.bus[0xff].data = 0x12;
     nes = writeBusNes(0x2006, 0x00, nes);
     nes = writeBusNes(0x2006, 0xff, nes);
 

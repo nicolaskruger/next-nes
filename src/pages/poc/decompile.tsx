@@ -18,13 +18,20 @@ export default function Decompile() {
   const [nes, setNes] = useState(initNes());
   const [prog, setProg] = useState<Dec>({ instruction: [], program: "" });
   const [currIns, setCurr] = useState(0);
+  const [numInst, setNumInst] = useState(1);
 
   useEffect(() => {
     setProg(decompileNes(initNes()));
   }, []);
 
   const next = () => {
-    const _nes = tick(nes).nes;
+    let _nes = {
+      ...nes,
+    };
+    let count = numInst;
+    while (count--) {
+      _nes = tick(nes).nes;
+    }
     console.log(_nes);
     setNes(_nes);
     setCurr(findCurrentInstruction(_nes, prog));
@@ -49,6 +56,11 @@ export default function Decompile() {
         <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />
         <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
         <button onClick={next}>next</button>
+        <input
+          type="number"
+          value={numInst}
+          onChange={(e) => setNumInst(Number(e.target.value))}
+        />
       </div>
     </main>
   );

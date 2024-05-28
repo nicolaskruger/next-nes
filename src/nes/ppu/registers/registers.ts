@@ -2,7 +2,12 @@ import { ReadData, getNesBus, readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { Nes, nesBuilder } from "@/nes/nes";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { Dictionary } from "@/nes/helper/dictionary";
-import { AddrVRamStatus, getFirstRead, writeVRam } from "../vram/vram";
+import {
+  AddrVRamStatus,
+  getFirstRead,
+  readVRam,
+  writeVRam,
+} from "../vram/vram";
 import { repeat } from "@/nes/helper/repeat";
 import { write } from "fs";
 import { setBit } from "@/nes/helper/set-bit";
@@ -143,7 +148,7 @@ export const read2007DataVRam = (nes: Nes): [data: number, nes: Nes] => {
     return [0, nesBuilder(nes).firstReadPpu(false).build()];
   } else {
     const [nextAddr, nesNextAddr] = calcNewAddrVRam(nes);
-    const [result, nesResult] = readSprRam(getAddrVRam(nes), nesNextAddr);
+    const [result, nesResult] = readVRam(getAddrVRam(nes), nesNextAddr);
     return [
       result,
       nesBuilder(nesResult).addrVram(nextAddr).firstReadPpu(true).build(),
