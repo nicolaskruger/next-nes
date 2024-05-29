@@ -1,5 +1,5 @@
 import { error } from "console";
-import { Nes } from "../nes";
+import { Nes, initNes } from "../nes";
 import {
   bankSize,
   getChrRom,
@@ -77,7 +77,7 @@ export const KB16 = (0x10000 - 0x8000) / 2;
 export const KB8 = KB16 / 2;
 
 export const rom = async (nes: Nes, rom: File): Promise<Nes> => {
-  let _nes = nes;
+  let _nes = initNes();
   validFile(rom);
   const buffer = Buffer.from(await rom.arrayBuffer());
   const romBytes: number[] = [];

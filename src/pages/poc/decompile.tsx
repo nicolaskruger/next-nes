@@ -1,27 +1,31 @@
 import { Code } from "@/components/code/code";
 import { RenderNes } from "@/components/render-nes/reder-nes";
+import { RenderTiles } from "@/components/render-tiles/render-tiles";
 import { useMult } from "@/hooks/mult/mult";
 import {
   Decompile as Dec,
   decompileNes,
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
+import { createMushroomWord } from "@/nes/debug/background-creator";
 import { initNes } from "@/nes/nes";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
+const startNes = () => createMushroomWord();
+
 export default function Decompile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const mult = useMult({ H: 1, W: 2 / 3 });
-  const [nes, setNes] = useState(initNes());
+  const [nes, setNes] = useState(startNes());
   const [prog, setProg] = useState<Dec>({ instruction: [], program: "" });
   const [currIns, setCurr] = useState(0);
   const [numInst, setNumInst] = useState(1);
 
   useEffect(() => {
-    setProg(decompileNes(initNes()));
+    setProg(decompileNes(startNes()));
   }, []);
 
   const next = () => {
@@ -29,9 +33,9 @@ export default function Decompile() {
       ...nes,
     };
     let count = numInst;
-    while (_nes.cpu.PC !== 0x805e) {
-      _nes = tick(nes).nes;
-    }
+    // while (_nes.cpu.PC !== 0x805e) {
+    _nes = tick(nes).nes;
+    // }
     console.log(_nes);
     setNes(_nes);
     setCurr(findCurrentInstruction(_nes, prog));
@@ -50,7 +54,9 @@ export default function Decompile() {
           <Code currIns={currIns} dec={prog} />
           {currIns}
         </div>
-        <div className="w-full h-1/3 bg-red-500 overflow-y-scroll"></div>
+        <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
+          <RenderTiles nes={nes} />
+        </div>
       </div>
       <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
         <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />
