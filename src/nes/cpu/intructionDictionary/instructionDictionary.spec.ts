@@ -2,6 +2,7 @@ import {
   ABS,
   ABSX,
   ABSY,
+  ABS_ADDR,
   ACC,
   IMM,
   IMP,
@@ -910,7 +911,7 @@ describe("test instruction dictionary", () => {
       .toBe(0x8d, {
         baseCycles: 4,
         offsetCycles: 0,
-        addr: ABS,
+        addr: ABS_ADDR,
       })
       .toBe(0x9d, {
         baseCycles: 5,

@@ -144,15 +144,23 @@ export const write2007DataVRam = (data: number, nes: Nes): Nes => {
 };
 
 export const read2007DataVRam = (nes: Nes): [data: number, nes: Nes] => {
-  if (getFirstRead(nes)) {
-    return [0, nesBuilder(nes).firstReadPpu(false).build()];
-  } else {
+  const process = (): [data: number, nes: Nes] => {
     const [nextAddr, nesNextAddr] = calcNewAddrVRam(nes);
     const [result, nesResult] = readVRam(getAddrVRam(nes), nesNextAddr);
     return [
       result,
       nesBuilder(nesResult).addrVram(nextAddr).firstReadPpu(true).build(),
     ];
+  };
+
+  const addr = getAddrVRam(nes);
+  if (addr >= 0x3f00 && addr <= 0x3fff) {
+    return process();
+  }
+  if (getFirstRead(nes)) {
+    return [0, nesBuilder(nes).firstReadPpu(false).build()];
+  } else {
+    return process();
   }
 };
 

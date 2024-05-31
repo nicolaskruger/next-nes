@@ -58,7 +58,7 @@ const useControl = () => {
     setControl((cont) => ({ ...cont, [key]: false }));
   };
 
-  return { onKeyDown, onKeyUp, tabindex: 0, control };
+  return { onKeyDown, onKeyUp, tabIndex: 0, control };
 };
 
 export { useControl };

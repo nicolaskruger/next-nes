@@ -1,9 +1,29 @@
 import fs from "fs";
-import { initNes } from "../nes";
+import { Nes, initNes } from "../nes";
 import { KB16, KB8, rom } from "./rom";
 import { readBusNes } from "../bus/bus";
 import { tick } from "../tick";
-import { decompileNes } from "../cpu/decompiler/decompile";
+import { getACC, getPC } from "../cpu/cpu";
+import { getAddrVRam } from "../ppu/registers/registers";
+import { compileNes } from "../cpu/runner/runner";
+import { compile } from "../cpu/compiler/compiler";
+import { repeat } from "../helper/repeat";
+import { readRangeVRam, readVRam } from "../ppu/vram/vram";
+
+const tickUntilTimes = (addr: number, times: number, nes: Nes): Nes => {
+  while (times) {
+    if (getPC(nes) === addr) --times;
+    nes = tick(nes).nes;
+  }
+  return nes;
+};
+
+const tickUntil = (addr: number, nes: Nes): Nes => {
+  while (getPC(nes) !== addr) {
+    nes = tick(nes).nes;
+  }
+  return nes;
+};
 describe("ROM", () => {
   test("nestest", async () => {
     const romFile = fs.readFileSync("./roms/nestest.nes");
@@ -40,6 +60,31 @@ describe("ROM", () => {
       name: "demo.nes",
     } as File);
 
+    nes = tickUntil(0x8049, nes);
+
+    expect(getAddrVRam(nes)).toBe(0x3f00);
+
+    // nes = tickUntil(0x8052, nes);
+
+    // expect(nes.ppu.vram.bus.slice(0x3f00, 0x3f20).map(({ data }) => data)).toBe(
+    //   [
+    //     0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+    //     0x0f, 0x00, 0x00, 0x00, 0x0f, 0x20, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+    //     0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+    //   ]
+    // );
+
+    [
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x20, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+    ].forEach((v, i) => {
+      nes = tickUntilTimes(0x8052, 1, nes);
+      expect(getAddrVRam(nes)).toBe(0x3f01 + i);
+      expect(getACC(nes)).toBe(v);
+      expect(readVRam(0x3f00 + i, nes)[0]).toBe(v);
+    });
+
     try {
       while (nes.cpu.PC !== 0x805e) {
         nes = tick(nes).nes;
@@ -47,6 +92,47 @@ describe("ROM", () => {
     } catch (e) {
       console.log(nes);
     }
+    expect(readRangeVRam(0x3f00, 0x20, nes)[0]).toStrictEqual([
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x20, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+    ]);
     console.log(nes);
+  });
+
+  test("write 2007 register", () => {
+    let nes = initNes();
+
+    const program = `
+      lda #63
+      sta $2006
+      lda #0
+      sta $2006
+      lda #15
+      sta $2007
+      sta $2007
+      sta $2007
+      sta $2007
+      sta $2007
+      sta $2007
+    `;
+
+    nes = compileNes(compile(program), nes);
+
+    nes = tick(nes).nes; // lda #53
+    expect(getACC(nes)).toBe(63);
+    nes = tick(nes).nes; // sta $2006
+    nes = tick(nes).nes; // lda #0
+    expect(getACC(nes)).toBe(0);
+    nes = tick(nes).nes; // sta $2006
+    expect(getAddrVRam(nes)).toBe(0x3f00);
+    nes = tick(nes).nes; // lda #15
+    expect(getACC(nes)).toBe(0x0f);
+
+    repeat(6).forEach((_, i) => {
+      nes = tick(nes).nes; // sta $2007
+      expect(getAddrVRam(nes)).toBe(0x3f01 + i);
+      expect(readVRam(0x3f00 + i, nes)[0]).toBe(0xf);
+    });
   });
 });

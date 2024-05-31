@@ -20,6 +20,7 @@ import {
   write2006AddrVRam,
   getAddrVRam as getPpuAddrVRam,
   getPpuRegisterStatus,
+  getAddrVRam,
 } from "./registers";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { getFirstRead, getVRamAddr, readVRam } from "../vram/vram";
@@ -230,6 +231,17 @@ describe("PPU registers", () => {
     expect(result).toBe(0x12);
     expect(getVRamAddr(nesResult)).toBe(0x100);
     expect(getFirstRead(nesResult)).toBe(true);
+  });
+
+  test("read 2007 vram", () => {
+    nes.ppu.vram.bus[0xff].data = 0x12;
+    nes = writeBusNes(0x2006, 0x3f, nes);
+    nes = writeBusNes(0x2006, 0x00, nes);
+    expect(getAddrVRam(nes)).toBe(0x3f00);
+    nes = readBusNes(0x2007, nes)[1];
+    expect(getAddrVRam(nes)).toBe(0x3f01);
+    nes = readBusNes(0x2007, nes)[1];
+    expect(getAddrVRam(nes)).toBe(0x3f02);
   });
 
   test("write 4014", () => {

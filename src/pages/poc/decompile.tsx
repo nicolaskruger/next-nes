@@ -8,6 +8,7 @@ import {
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
 import { createMushroomWord } from "@/nes/debug/background-creator";
+import { dexToHex } from "@/nes/helper/converter";
 import { initNes } from "@/nes/nes";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
@@ -23,6 +24,7 @@ export default function Decompile() {
   const [prog, setProg] = useState<Dec>({ instruction: [], program: "" });
   const [currIns, setCurr] = useState(0);
   const [numInst, setNumInst] = useState(1);
+  const [fileName, setFileName] = useState("");
 
   useEffect(() => {
     setProg(decompileNes(startNes()));
@@ -33,9 +35,25 @@ export default function Decompile() {
       ...nes,
     };
     let count = numInst;
-    // while (_nes.cpu.PC !== 0x805e) {
     _nes = tick(nes).nes;
-    // }
+    setNes(_nes);
+    setCurr(findCurrentInstruction(_nes, prog));
+    console.log(_nes);
+    console.log(
+      _nes.ppu.vram.bus
+        .slice(0x3f00, 0x3f20)
+        .map(({ data }) => dexToHex(data, 2, true))
+    );
+  };
+  const finish = () => {
+    let _nes = {
+      ...nes,
+    };
+    let count = numInst;
+    if (fileName === "demo.nes")
+      while (_nes.cpu.PC !== 0x805e) {
+        _nes = tick(nes).nes;
+      }
     console.log(_nes);
     setNes(_nes);
     setCurr(findCurrentInstruction(_nes, prog));
@@ -43,6 +61,7 @@ export default function Decompile() {
 
   const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
     const _nes = await rom(nes, e?.target?.files?.[0] as File);
+    setFileName(e?.target?.files?.[0].name as string);
     setNes(_nes);
     setProg(decompileNes(_nes));
   };
@@ -62,6 +81,7 @@ export default function Decompile() {
         <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />
         <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
         <button onClick={next}>next</button>
+        <button onClick={finish}>finish</button>
         <input
           type="number"
           value={numInst}
