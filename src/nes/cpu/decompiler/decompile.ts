@@ -4,7 +4,12 @@ import { dexToHex, dexToHexFourDigitsPrefix } from "@/nes/helper/converter";
 import { make8bitSigned } from "../instruction/instruction";
 import { Nes, initNes } from "@/nes/nes";
 import { getPC } from "../cpu";
-import { ABSX_ADDR, ABSY_ADDR, ABS_ADDR } from "../addr/addr";
+import {
+  ABSX_ADDR,
+  ABSY_ADDR,
+  ABS_ADDR,
+  INDEXED_INDIRECT_ADDR,
+} from "../addr/addr";
 
 const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   IMP: [1, () => ""],
@@ -71,6 +76,7 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
     },
   ],
   INDEXED_INDIRECT: [2, (a) => `($${dexToHex(a, 2, false)},X)`],
+  INDEXED_INDIRECT_ADDR: [2, (a) => `($${dexToHex(a, 2, false)},X)`],
   INDIRECT_INDEXED: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
   XXX: [1, (a) => ``],
 };

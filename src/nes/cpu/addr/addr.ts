@@ -299,13 +299,35 @@ const INDEXED_INDIRECT = (nes: Nes): Addr => {
   const [low, nesLow] = readBusNes((addr + X) % 256, nesAddr);
   const [high, nesHigh] = readBusNes((addr + X + 1) % 256, nesLow);
   const [data, nesData] = readBusNes((high << 8) | low, nesHigh);
+  const finalAddr = (high << 8) | low;
 
   PC++;
 
   return {
     data,
     cross,
+    addr: finalAddr,
     nes: setPC(PC, nesData),
+  };
+};
+
+export const INDEXED_INDIRECT_ADDR = (nes: Nes): Addr => {
+  const { cpu } = nes;
+  let PC = cpu.PC;
+  const X = cpu.X;
+  const [addr, nesAddr] = readBusNes(++PC, nes);
+  const cross = X + addr + 1 > 0xff;
+  const [low, nesLow] = readBusNes((addr + X) % 256, nesAddr);
+  const [high, nesHigh] = readBusNes((addr + X + 1) % 256, nesLow);
+
+  const finalAddr = (high << 8) | low;
+  PC++;
+
+  return {
+    data: 0,
+    cross,
+    addr: finalAddr,
+    nes: setPC(PC, nesHigh),
   };
 };
 

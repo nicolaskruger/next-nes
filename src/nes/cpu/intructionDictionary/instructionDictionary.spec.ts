@@ -9,6 +9,7 @@ import {
   IMM,
   IMP,
   INDEXED_INDIRECT,
+  INDEXED_INDIRECT_ADDR,
   INDIRECT,
   INDIRECT_INDEXED,
   RELATIVE,
@@ -928,7 +929,7 @@ describe("test instruction dictionary", () => {
       .toBe(0x81, {
         baseCycles: 6,
         offsetCycles: 0,
-        addr: INDEXED_INDIRECT,
+        addr: INDEXED_INDIRECT_ADDR,
       })
       .toBe(0x91, {
         baseCycles: 6,
