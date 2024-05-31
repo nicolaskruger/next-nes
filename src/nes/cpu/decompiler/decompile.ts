@@ -9,6 +9,7 @@ import {
   ABSY_ADDR,
   ABS_ADDR,
   INDEXED_INDIRECT_ADDR,
+  INDIRECT_INDEXED_ADDR,
 } from "../addr/addr";
 
 const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
@@ -78,6 +79,7 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   INDEXED_INDIRECT: [2, (a) => `($${dexToHex(a, 2, false)},X)`],
   INDEXED_INDIRECT_ADDR: [2, (a) => `($${dexToHex(a, 2, false)},X)`],
   INDIRECT_INDEXED: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
+  INDIRECT_INDEXED_ADDR: [2, (a) => `($${dexToHex(a, 2, false)}),Y`],
   XXX: [1, (a) => ``],
 };
 

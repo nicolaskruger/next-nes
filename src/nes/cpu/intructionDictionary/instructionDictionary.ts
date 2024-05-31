@@ -14,6 +14,7 @@ import {
   INDEXED_INDIRECT_ADDR,
   INDIRECT,
   INDIRECT_INDEXED,
+  INDIRECT_INDEXED_ADDR,
   RELATIVE,
   ZERO_PAGE,
   ZERO_PAGE_X,
@@ -919,7 +920,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0x91: {
     baseCycles: 6,
     offsetCycles: 0,
-    addr: INDIRECT_INDEXED,
+    addr: INDIRECT_INDEXED_ADDR,
     instruction: STA,
   },
   0x86: {

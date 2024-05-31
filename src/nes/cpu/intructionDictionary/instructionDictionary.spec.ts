@@ -12,6 +12,7 @@ import {
   INDEXED_INDIRECT_ADDR,
   INDIRECT,
   INDIRECT_INDEXED,
+  INDIRECT_INDEXED_ADDR,
   RELATIVE,
   ZERO_PAGE,
   ZERO_PAGE_X,
@@ -934,7 +935,7 @@ describe("test instruction dictionary", () => {
       .toBe(0x91, {
         baseCycles: 6,
         offsetCycles: 0,
-        addr: INDIRECT_INDEXED,
+        addr: INDIRECT_INDEXED_ADDR,
       });
   });
 

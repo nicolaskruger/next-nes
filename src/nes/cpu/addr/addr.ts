@@ -298,8 +298,8 @@ const INDEXED_INDIRECT = (nes: Nes): Addr => {
   const cross = X + addr + 1 > 0xff;
   const [low, nesLow] = readBusNes((addr + X) % 256, nesAddr);
   const [high, nesHigh] = readBusNes((addr + X + 1) % 256, nesLow);
-  const [data, nesData] = readBusNes((high << 8) | low, nesHigh);
   const finalAddr = (high << 8) | low;
+  const [data, nesData] = readBusNes(finalAddr, nesHigh);
 
   PC++;
 
@@ -340,14 +340,37 @@ const INDIRECT_INDEXED = (nes: Nes): Addr => {
   const [low, nesLow] = readBusNes(addr % 256, nesAddr);
   const [high, nesHigh] = readBusNes((addr + 1) % 256, nesLow);
   cross ||= low + Y > 0xff;
-  const [data, nesData] = readBusNes((high << 8) | (low + Y) % 256, nesHigh);
+  const finalAddr = (high << 8) | (low + Y) % 256;
+  const [data, nesData] = readBusNes(finalAddr, nesHigh);
 
   PC++;
 
   return {
     data,
+    addr: finalAddr,
     cross,
     nes: setPC(PC, nesData),
+  };
+};
+
+export const INDIRECT_INDEXED_ADDR = (nes: Nes): Addr => {
+  const { cpu } = nes;
+  let PC = cpu.PC;
+  const Y = cpu.Y;
+  const [addr, nesAddr] = readBusNes(++PC, nes);
+  let cross = addr + 1 > 0xff;
+  const [low, nesLow] = readBusNes(addr % 256, nesAddr);
+  const [high, nesHigh] = readBusNes((addr + 1) % 256, nesLow);
+  cross ||= low + Y > 0xff;
+  const finalAddr = (high << 8) | (low + Y) % 256;
+
+  PC++;
+
+  return {
+    data: 0,
+    addr: finalAddr,
+    cross,
+    nes: setPC(PC, nesHigh),
   };
 };
 
