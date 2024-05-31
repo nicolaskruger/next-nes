@@ -3,6 +3,7 @@ import {
   ABS,
   ABSX,
   ABSY,
+  ABS_ADDR,
   ACC,
   IMM,
   IMP,
@@ -14,8 +15,8 @@ import {
   ZERO_PAGE_X,
   ZERO_PAGE_Y,
 } from "./addr";
-import { Cpu } from "../cpu";
-import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
+import { Cpu, getPC } from "../cpu";
+import { Bus, simpleRead, simpleWrite, writeBusNes } from "@/nes/bus/bus";
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
 
@@ -631,5 +632,19 @@ describe("test addressing mode", () => {
     expect(data).toBe(0x2);
 
     expect(newNes.cpu.PC).toBe(2);
+  });
+
+  test("abs addr", () => {
+    let _nes = initNesAllRam();
+
+    _nes = writeBusNes(0x01, 0x34, _nes);
+    _nes = writeBusNes(0x02, 0x12, _nes);
+
+    const { cross, data, nes: newNes, addr } = ABS_ADDR(_nes);
+
+    expect(getPC(newNes)).toBe(3);
+    expect(cross).toBeFalsy();
+    expect(data).toBe(0);
+    expect(addr).toBe(0x1234);
   });
 });
