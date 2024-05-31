@@ -4,6 +4,7 @@ import {
   ABSX,
   ABSX_ADDR,
   ABSY,
+  ABSY_ADDR,
   ABS_ADDR,
   ACC,
   IMM,
@@ -513,6 +514,66 @@ describe("test addressing mode", () => {
 
     expect(addr).toBe(0x1300);
   });
+
+  test("absolute y addr, test, not cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0x30,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x1234] = {
+      ...nes.bus[0x1234],
+      data: 0x77,
+    };
+
+    nes.cpu.Y = 0x04;
+
+    const { cross, data, nes: newNes, addr } = ABSY_ADDR(nes);
+
+    expect(cross).toBe(false);
+
+    expect(data).toBe(0);
+
+    expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1234);
+  });
+  test("absolute y addr, test, cross border", () => {
+    const nes = initNesAllRam();
+
+    nes.bus[1] = {
+      ...nes.bus[1],
+      data: 0x01,
+    };
+    nes.bus[2] = {
+      ...nes.bus[1],
+      data: 0x12,
+    };
+
+    nes.bus[0x1300] = {
+      ...nes.bus[0x1300],
+      data: 0x77,
+    };
+
+    nes.cpu.Y = 0xff;
+
+    const { cross, data, nes: newNes, addr } = ABSY_ADDR(nes);
+
+    expect(cross).toBe(true);
+
+    expect(data).toBe(0);
+
+    expect(newNes.cpu.PC).toBe(3);
+
+    expect(addr).toBe(0x1300);
+  });
+
   test("indirect, when cross border on address and value", () => {
     const nes = initNesAllRam();
 

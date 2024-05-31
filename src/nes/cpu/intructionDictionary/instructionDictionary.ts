@@ -4,6 +4,7 @@ import {
   ABSX,
   ABSX_ADDR,
   ABSY,
+  ABSY_ADDR,
   ABS_ADDR,
   ACC,
   Addr,
@@ -905,7 +906,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0x99: {
     baseCycles: 5,
     offsetCycles: 0,
-    addr: ABSY,
+    addr: ABSY_ADDR,
     instruction: STA,
   },
   0x81: {
