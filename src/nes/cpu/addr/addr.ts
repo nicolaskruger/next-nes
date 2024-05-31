@@ -195,6 +195,28 @@ const ABSX = (nes: Nes): Addr => {
   };
 };
 
+export const ABSX_ADDR = (nes: Nes): Addr => {
+  const { cpu } = nes;
+
+  let PC = cpu.PC + 1;
+
+  const [low, nesLow] = readBusNes(PC++, nes);
+  const [high, nesHigh] = readBusNes(PC, nesLow);
+
+  const addr = ((high << 8) | low) + cpu.X;
+
+  const cross = low + cpu.X > 0xff;
+
+  PC++;
+
+  return {
+    cross,
+    data: 0,
+    nes: setPC(PC, nesHigh),
+    addr,
+  };
+};
+
 const ABSY = (nes: Nes): Addr => {
   const { cpu } = nes;
 

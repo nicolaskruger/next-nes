@@ -2,6 +2,7 @@ import { Nes } from "@/nes/nes";
 import {
   ABS,
   ABSX,
+  ABSX_ADDR,
   ABSY,
   ABS_ADDR,
   ACC,
@@ -898,7 +899,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0x9d: {
     baseCycles: 5,
     offsetCycles: 0,
-    addr: ABSX,
+    addr: ABSX_ADDR,
     instruction: STA,
   },
   0x99: {

@@ -4,6 +4,7 @@ import { dexToHex, dexToHexFourDigitsPrefix } from "@/nes/helper/converter";
 import { make8bitSigned } from "../instruction/instruction";
 import { Nes, initNes } from "@/nes/nes";
 import { getPC } from "../cpu";
+import { ABSX_ADDR, ABS_ADDR } from "../addr/addr";
 
 const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
   IMP: [1, () => ""],
@@ -27,7 +28,21 @@ const instSize: Dictionary<string, [number, (...data: number[]) => string]> = {
       return `$${dexToHex(data, 4, false)}`;
     },
   ],
+  ABS_ADDR: [
+    3,
+    (a, b) => {
+      const data = (b << 8) | a;
+      return `$${dexToHex(data, 4, false)}`;
+    },
+  ],
   ABSX: [
+    3,
+    (a, b) => {
+      const data = (b << 8) | a;
+      return `$${dexToHex(data, 4, false)},X`;
+    },
+  ],
+  ABSX_ADDR: [
     3,
     (a, b) => {
       const data = (b << 8) | a;
