@@ -954,7 +954,7 @@ describe("test instruction dictionary", () => {
       .toBe(0x8e, {
         baseCycles: 4,
         offsetCycles: 0,
-        addr: ABS,
+        addr: ABS_ADDR,
       });
   });
 
