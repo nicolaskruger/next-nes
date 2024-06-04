@@ -505,12 +505,12 @@ describe("test instruction dictionary", () => {
       .toBe(0xee, {
         baseCycles: 6,
         offsetCycles: 0,
-        addr: ABS,
+        addr: ABS_ADDR,
       })
       .toBe(0xfe, {
         baseCycles: 7,
         offsetCycles: 0,
-        addr: ABSX,
+        addr: ABSX_ADDR,
       });
   });
 
