@@ -404,13 +404,13 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0xce: {
     baseCycles: 6,
     offsetCycles: 0,
-    addr: ABS,
+    addr: ABS_ADDR,
     instruction: DEC,
   },
   0xde: {
     baseCycles: 7,
     offsetCycles: 0,
-    addr: ABSX,
+    addr: ABSX_ADDR,
     instruction: DEC,
   },
   0xca: {
