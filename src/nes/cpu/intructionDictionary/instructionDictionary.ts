@@ -956,7 +956,7 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
   0x8c: {
     baseCycles: 4,
     offsetCycles: 0,
-    addr: ABS,
+    addr: ABS_ADDR,
     instruction: STY,
   },
   0xaa: {
