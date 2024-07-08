@@ -24,6 +24,17 @@ const tickUntil = (addr: number, nes: Nes): Nes => {
   }
   return nes;
 };
+
+const tickUntilEndDemoRom = (nes: Nes) => tickUntil(0x805e, nes);
+
+const initDemoRom = async () => {
+  const romFile = fs.readFileSync("./games/demo/demo.nes");
+  let nes = initNes();
+  return await rom(nes, {
+    arrayBuffer: async () => romFile,
+    name: "demo.nes",
+  } as unknown as File);
+};
 describe("ROM", () => {
   test("nestest", async () => {
     const romFile = fs.readFileSync("./roms/nestest.nes");
@@ -33,7 +44,7 @@ describe("ROM", () => {
         await rom(nes, {
           arrayBuffer: async () => romFile,
           name: "nestest.nes",
-        } as File)
+        } as unknown as File)
     ).not.toThrow();
   });
 
@@ -43,7 +54,7 @@ describe("ROM", () => {
     nes = await rom(nes, {
       arrayBuffer: async () => Buffer.from(romFile),
       name: "nestest.nes",
-    } as File);
+    } as unknown as File);
 
     expect(nes.bus[0x8000].data).toBe(0x78);
     expect(readBusNes(0x2002, nes)[0]).toBe(128);
@@ -52,27 +63,27 @@ describe("ROM", () => {
     console.log(KB16, KB8);
   });
 
+  test("demo.nes write pallet", async () => {
+    let nes = await initDemoRom();
+    nes = tickUntilEndDemoRom(nes);
+    expect(readRangeVRam(0x3f00, 0x20, nes)[0]).toStrictEqual([
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x20, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+      0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
+    ]);
+  });
+
   test("demo.nes debug", async () => {
     const romFile = fs.readFileSync("./games/demo/demo.nes");
     let nes = initNes();
     nes = await rom(nes, {
       arrayBuffer: async () => romFile,
       name: "demo.nes",
-    } as File);
+    } as unknown as File);
 
     nes = tickUntil(0x8049, nes);
 
     expect(getAddrVRam(nes)).toBe(0x3f00);
-
-    // nes = tickUntil(0x8052, nes);
-
-    // expect(nes.ppu.vram.bus.slice(0x3f00, 0x3f20).map(({ data }) => data)).toBe(
-    //   [
-    //     0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
-    //     0x0f, 0x00, 0x00, 0x00, 0x0f, 0x20, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
-    //     0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
-    //   ]
-    // );
 
     [
       0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,

@@ -1,3 +1,4 @@
+import { initBanks } from "../banks/bank";
 import { Cpu } from "../cpu/cpu";
 import { Nes } from "../nes";
 import { initScroll } from "../ppu/scroll/scroll";
@@ -56,6 +57,7 @@ const initCpu = (): Cpu => ({
 });
 
 const initNes = (): Nes => ({
+  banks: initBanks(),
   bus: initBus(),
   cpu: initCpu(),
   ppu: {

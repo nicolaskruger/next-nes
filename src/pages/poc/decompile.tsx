@@ -36,7 +36,7 @@ export default function Decompile() {
     };
     let count = numInst;
     _nes = tick(nes).nes;
-    setNes(_nes);
+    setNes({ ..._nes, d: Math.random() });
     setCurr(findCurrentInstruction(_nes, prog));
     console.log(_nes);
     console.log(
