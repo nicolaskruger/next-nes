@@ -1,4 +1,5 @@
 import { Code } from "@/components/code/code";
+import { Pallets } from "@/components/pallets/pallets";
 import { RenderNes } from "@/components/render-nes/reder-nes";
 import { RenderTiles } from "@/components/render-tiles/render-tiles";
 import { useMult } from "@/hooks/mult/mult";
@@ -9,7 +10,7 @@ import {
 } from "@/nes/cpu/decompiler/decompile";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { dexToHex } from "@/nes/helper/converter";
-import { initNes } from "@/nes/nes";
+import { Nes, initNes } from "@/nes/nes";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -36,7 +37,7 @@ export default function Decompile() {
     };
     let count = numInst;
     _nes = tick(nes).nes;
-    setNes({ ..._nes, d: Math.random() });
+    setNes({ ..._nes, d: Math.random() } as unknown as Nes);
     setCurr(findCurrentInstruction(_nes, prog));
     console.log(_nes);
     console.log(
@@ -74,7 +75,8 @@ export default function Decompile() {
           {currIns}
         </div>
         <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-          <RenderTiles nes={nes} />
+          <Pallets nes={nes} />
+          {/* <RenderTiles nes={nes} /> */}
         </div>
       </div>
       <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">

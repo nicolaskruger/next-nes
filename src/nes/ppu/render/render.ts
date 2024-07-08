@@ -88,7 +88,7 @@ export const renderAttributeTable = (
   return [multiplyMatrix(attributeTable, 2), nesAttributeTable];
 };
 
-const getColors = (index: number, nes: Nes): [string[], Nes] => {
+export const getColors = (index: number, nes: Nes): [string[], Nes] => {
   const { colors, nes: _nes } = repeat(4).reduce(
     (acc, _, i) => {
       const [color, _nes] = readVRam(index + i, acc.nes);
