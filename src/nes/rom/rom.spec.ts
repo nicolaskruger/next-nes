@@ -54,6 +54,13 @@ describe("ROM", () => {
     ]);
   });
 
+  test("demo.nes enable rendering", async () => {
+    let nes = await initDemoRom();
+    nes = tickUntilEndDemoRom(nes);
+    expect(readBusNes(0x2000, nes)[0]).toBe(0x80);
+    expect(readBusNes(0x2001, nes)[0]).toBe(0x10);
+  });
+
   test("demo.nes debug", async () => {
     const romFile = fs.readFileSync("./games/demo/demo.nes");
     let nes = initNes();
