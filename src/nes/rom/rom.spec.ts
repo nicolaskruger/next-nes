@@ -1,40 +1,21 @@
 import fs from "fs";
-import { Nes, initNes } from "../nes";
+import { initNes } from "../nes";
 import { KB16, KB8, rom } from "./rom";
 import { readBusNes } from "../bus/bus";
 import { tick } from "../tick";
-import { getACC, getPC } from "../cpu/cpu";
+import { getACC } from "../cpu/cpu";
 import { getAddrVRam } from "../ppu/registers/registers";
 import { compileNes } from "../cpu/runner/runner";
 import { compile } from "../cpu/compiler/compiler";
 import { repeat } from "../helper/repeat";
 import { readRangeVRam, readVRam } from "../ppu/vram/vram";
+import {
+  initDemoRom,
+  tickUntil,
+  tickUntilEndDemoRom,
+  tickUntilTimes,
+} from "../debug/rom-debug";
 
-const tickUntilTimes = (addr: number, times: number, nes: Nes): Nes => {
-  while (times) {
-    if (getPC(nes) === addr) --times;
-    nes = tick(nes).nes;
-  }
-  return nes;
-};
-
-const tickUntil = (addr: number, nes: Nes): Nes => {
-  while (getPC(nes) !== addr) {
-    nes = tick(nes).nes;
-  }
-  return nes;
-};
-
-const tickUntilEndDemoRom = (nes: Nes) => tickUntil(0x805e, nes);
-
-const initDemoRom = async () => {
-  const romFile = fs.readFileSync("./games/demo/demo.nes");
-  let nes = initNes();
-  return await rom(nes, {
-    arrayBuffer: async () => romFile,
-    name: "demo.nes",
-  } as unknown as File);
-};
 describe("ROM", () => {
   test("nestest", async () => {
     const romFile = fs.readFileSync("./roms/nestest.nes");

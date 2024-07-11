@@ -3,6 +3,7 @@ import { Pallets } from "@/components/pallets/pallets";
 import { RenderNes } from "@/components/render-nes/reder-nes";
 import { RenderTiles } from "@/components/render-tiles/render-tiles";
 import { useMult } from "@/hooks/mult/mult";
+import { getPC } from "@/nes/cpu/cpu";
 import {
   Decompile as Dec,
   decompileNes,
@@ -35,7 +36,6 @@ export default function Decompile() {
     let _nes = {
       ...nes,
     };
-    let count = numInst;
     _nes = tick(nes).nes;
     setNes({ ..._nes, d: Math.random() } as unknown as Nes);
     setCurr(findCurrentInstruction(_nes, prog));
@@ -50,10 +50,9 @@ export default function Decompile() {
     let _nes = {
       ...nes,
     };
-    let count = numInst;
     if (fileName === "demo.nes")
-      while (_nes.cpu.PC !== 0x805e) {
-        _nes = tick(nes).nes;
+      while (getPC(_nes) !== 0x805e) {
+        _nes = tick(_nes).nes;
       }
     console.log(_nes);
     setNes(_nes);

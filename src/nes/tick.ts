@@ -1,7 +1,7 @@
 import { readBusNes } from "./bus/bus";
 import { getCycles, getPC } from "./cpu/cpu";
 import { instructionDictionary } from "./cpu/intructionDictionary/instructionDictionary";
-import { Nes, nesBuilder } from "./nes";
+import { Nes } from "./nes";
 
 export const FREQUENCY = 1.66 * Math.pow(10, 6);
 export const PERIOD = 1 / FREQUENCY;
