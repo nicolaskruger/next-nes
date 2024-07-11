@@ -1,4 +1,10 @@
-import { Bus, simpleRead, simpleWrite } from "@/nes/bus/bus";
+import {
+  Bus,
+  readBusNes,
+  simpleRead,
+  simpleWrite,
+  writeBusNes,
+} from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
 import { Cpu, getZeroFlag } from "../cpu";
 import {
@@ -59,10 +65,12 @@ import {
   TXA,
   TXS,
   TYA,
+  NMI,
 } from "./instruction";
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
 import { repeat } from "@/nes/helper/repeat";
+import { write } from "fs";
 
 const initBus = (): Bus =>
   "_"
@@ -1979,5 +1987,22 @@ describe("instruction test", () => {
 
     expect(nes.cpu.X).toBe(0);
     expect(getZeroFlag(nes)).toBe(1);
+  });
+
+  test("NMI, flag inactive", () => {
+    let nes = initNes();
+    const _nes = NMI(nes);
+    expect(nes).toStrictEqual(_nes);
+  });
+
+  test("NMI, flag active", () => {
+    let nes = initNes();
+    nes.cpu.PC = 0x8000;
+    nes = writeBusNes(0x2000, 1 << 7, nes);
+    nes = writeBusNes(0xfffa, 0x12, nes);
+    nes = writeBusNes(0xfffb, 0x34, nes);
+    nes = NMI(nes);
+    expectNes(nes).toPC(0x3412);
+    expect(readBusNes(0x01ff, nes)[0]).toBe(0x8000);
   });
 });

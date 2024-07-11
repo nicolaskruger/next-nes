@@ -1,3 +1,4 @@
+import { readBusNes } from "../bus/bus";
 import { Nes, nesBuilder } from "../nes";
 
 type Cpu = {
@@ -49,6 +50,11 @@ const getY = (nes: Nes): number => getCpu("Y", nes);
 const getPC = (nes: Nes): number => getCpu("PC", nes);
 const getSTK = (nes: Nes): number => getCpu("STK", nes);
 const getSTATUS = (nes: Nes): number => getCpu("STATUS", nes);
+
+export const getNMIFlag = (nes: Nes): [boolean, Nes] => {
+  const [data, _nes] = readBusNes(0x2000, nes);
+  return [data >> 7 === 1, _nes];
+};
 
 export const setFlag = (value: number, offset: number, nes: Nes): Cpu => {
   nes.cpu.STATUS = value

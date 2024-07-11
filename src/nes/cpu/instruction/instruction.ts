@@ -3,6 +3,7 @@ import {
   flagBuilder,
   getACC,
   getCarryFlag,
+  getNMIFlag,
   getNegativeFlag,
   getOverFlowFlag,
   getPC,
@@ -23,6 +24,7 @@ import {
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
 import { readBusNes, writeBusNes } from "@/nes/bus/bus";
+import { repeat } from "@/nes/helper/repeat";
 
 type Instruction = {
   nes: Nes;
@@ -654,6 +656,23 @@ const TXS = ({ nes, baseCycles }: Instruction): Nes =>
   nesBuilder(nes).cycles(baseCycles).X(getSTK(nes)).build();
 const TYA = ({ nes, baseCycles }: Instruction): Nes =>
   transferNumberToAccumulator(getY, nes, baseCycles);
+
+const NMI = (nes: Nes): Nes => {
+  let [active, nes00] = getNMIFlag(nes);
+  if (!active) return nes00;
+  const [addr, nesAddr] = [0xfffa, 0xfffb].reduce(
+    ([num, _nes], addr, i) => {
+      const [nNum, nNes] = readBusNes(addr, _nes);
+      return [(nNum << (8 * i)) | num, nNes] as [number, Nes];
+    },
+    [0, nes00] as [number, Nes]
+  );
+  return nesBuilder(nesAddr)
+    .pushToStack(getPC(nesAddr))
+    .pushToStack(getSTATUS(nesAddr))
+    .PC(addr)
+    .build();
+};
 export {
   ADC,
   AND,
@@ -711,6 +730,7 @@ export {
   TXA,
   TXS,
   TYA,
+  NMI,
 };
 
 export type { Instruction };
