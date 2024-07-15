@@ -62,7 +62,7 @@ const isRegister = (
   return [!!((reg >> bit) & 1), nesReg];
 };
 
-export const isMNIOccur = (nes: Nes): [boolean, Nes] =>
+export const isNMIOccur = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2000, 7);
 
 type ColorMode = "mono" | "color";
@@ -102,6 +102,17 @@ export const setZeroHitFlag = (nes: Nes, bit: number) => {
 
 export const isVBlankOccurring = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2002, 7);
+
+export const setVBlank = (nes: Nes, bit: boolean): Nes => {
+  const [byte, _nes] = readBusNes(0x2002, nes);
+  if (bit) return writeBusNes(0x2002, byte | (1 << 7), _nes);
+  return writeBusNes(0x2002, byte & ~(1 << 7), _nes);
+};
+
+export const toggleVBlack = (nes: Nes): Nes => {
+  const [bit, nesVBlank] = isVBlankOccurring(nes);
+  return setVBlank(nesVBlank, bit);
+};
 
 export const read2003SprAddr = (nes: Nes) => readBusNes(0x2003, nes);
 

@@ -10,7 +10,7 @@ import {
   isBgLeftMost8Pix,
   isDisableBg,
   isDisableSpr,
-  isMNIOccur,
+  isNMIOccur,
   isSprLeftMost8Pix,
   isMoreThan8SpritesOnScanLine,
   shouldIgnoreWritesToVRAM,
@@ -123,7 +123,7 @@ describe("PPU registers", () => {
   });
 
   test("0x2000 bit 7", () => {
-    testFlag(0x2000, 1 << 7, isMNIOccur);
+    testFlag(0x2000, 1 << 7, isNMIOccur);
   });
 
   test("0x2001 bit 0 color mode", () => {

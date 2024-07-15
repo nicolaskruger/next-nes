@@ -17,9 +17,11 @@ import {
 import {
   CalculateCycles,
   calculateCycles,
+  NMI,
   pushToStack,
 } from "./cpu/instruction/instruction";
 import { Ppu, initPpu } from "./ppu/ppu";
+import { toggleVBlack } from "./ppu/registers/registers";
 import { Scroll, ScrollStatus, getScroll } from "./ppu/scroll/scroll";
 import { AddrVRamStatus, VRam } from "./ppu/vram/vram";
 
@@ -171,6 +173,8 @@ const firstReadPpu = (nes: Nes) => (firstRead: boolean) => {
   return nesBuilder(nes).vram({ firstRead } as VRam);
 };
 
+const nmi = (nes: Nes) => () => nesBuilder(NMI(nes));
+
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
@@ -201,6 +205,8 @@ function nesBuilder(nes: Nes) {
     scrollY: scrollY(nes),
     firstReadPpu: firstReadPpu(nes),
     vram: vram(nes),
+    NMI: nmi(nes),
+    toggleVBlack: () => nesBuilder(toggleVBlack(nes)),
   };
 }
 
