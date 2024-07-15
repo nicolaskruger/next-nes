@@ -9,6 +9,7 @@ import {
   decompileNes,
   findCurrentInstruction,
 } from "@/nes/cpu/decompiler/decompile";
+import { NMI } from "@/nes/cpu/instruction/instruction";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { dexToHex } from "@/nes/helper/converter";
 import { Nes, initNes } from "@/nes/nes";
@@ -50,10 +51,19 @@ export default function Decompile() {
     let _nes = {
       ...nes,
     };
-    if (fileName === "demo.nes")
+
+    const end = () => {
       while (getPC(_nes) !== 0x805e) {
         _nes = tick(_nes).nes;
       }
+    };
+
+    if (fileName === "demo.nes") {
+      end();
+      _nes = NMI(_nes);
+      end();
+    }
+
     console.log(_nes);
     setNes(_nes);
     setCurr(findCurrentInstruction(_nes, prog));
@@ -74,8 +84,8 @@ export default function Decompile() {
           {currIns}
         </div>
         <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-          <Pallets nes={nes} />
-          {/* <RenderTiles nes={nes} /> */}
+          {/* <Pallets nes={nes} /> */}
+          <RenderTiles nes={nes} />
         </div>
       </div>
       <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">

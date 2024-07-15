@@ -105,6 +105,15 @@ export const isVBlankOccurring = (nes: Nes): [boolean, Nes] =>
 
 export const read2003SprAddr = (nes: Nes) => readBusNes(0x2003, nes);
 
+export const write2003SpAddr = (nes: Nes, value: number) =>
+  writeBusNes(0x2003, value, nes);
+
+export const read2003SprAddrIncrement = (nes: Nes): ReadData => {
+  let [data, _nes] = read2003SprAddr(nes);
+  _nes = write2003SpAddr(_nes, data + 1);
+  return [data, _nes];
+};
+
 const writeStatusRegister: Dictionary<
   AddrVRamStatus,
   (value: number, nes: Nes) => Nes
@@ -169,15 +178,14 @@ export const getAddrVRam = (nes: Nes) => nes.ppu.vram.addr;
 export const getPpuRegisterStatus = (nes: Nes) => nes.ppu.vram.addrStatus;
 
 export const write2004SprRam = (addr: number, value: number, nes: Nes): Nes => {
-  const [sprAddr, nesAddr] = read2003SprAddr(nes);
-
+  const [sprAddr, nesAddr] = read2003SprAddrIncrement(nes);
   let _nes = writeSprRam(sprAddr, value, nesAddr);
   _nes.bus[addr].data = value;
   return _nes;
 };
 
 export const read2004SprRam = (nes: Nes): [number, Nes] => {
-  const [reg2003, nesReg2003] = read2003SprAddr(nes);
+  const [reg2003, nesReg2003] = read2003SprAddrIncrement(nes);
   return readSprRam(reg2003, nesReg2003);
 };
 

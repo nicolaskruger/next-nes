@@ -15,6 +15,8 @@ import {
   tickUntilEndDemoRom,
   tickUntilTimes,
 } from "../debug/rom-debug";
+import { NMI } from "../cpu/instruction/instruction";
+import { readRangeSprRam } from "../ppu/spr-ram/spr-ram";
 
 describe("ROM", () => {
   test("nestest", async () => {
@@ -61,6 +63,18 @@ describe("ROM", () => {
     expect(readBusNes(0x2001, nes)[0]).toBe(0x10);
   });
 
+  test("demo.nes write sprites", async () => {
+    let nes = await initDemoRom();
+    nes = tickUntilEndDemoRom(nes);
+    nes = NMI(nes);
+    nes = tickUntilEndDemoRom(nes);
+    const [data] = readRangeSprRam(0, 4 * 7, nes);
+    expect(data).toStrictEqual([
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x6c,
+      0x6c, 0x01, 0x00, 0x76, 0x6c, 0x02, 0x00, 0x80, 0x6c, 0x02, 0x00, 0x8a,
+      0x6c, 0x03, 0x00, 0x94,
+    ]);
+  });
   test("demo.nes debug", async () => {
     const romFile = fs.readFileSync("./games/demo/demo.nes");
     let nes = initNes();
