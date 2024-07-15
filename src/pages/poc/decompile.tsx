@@ -40,12 +40,6 @@ export default function Decompile() {
     _nes = tick(nes).nes;
     setNes({ ..._nes, d: Math.random() } as unknown as Nes);
     setCurr(findCurrentInstruction(_nes, prog));
-    console.log(_nes);
-    console.log(
-      _nes.ppu.vram.bus
-        .slice(0x3f00, 0x3f20)
-        .map(({ data }) => dexToHex(data, 2, true))
-    );
   };
   const finish = () => {
     let _nes = {
@@ -76,6 +70,19 @@ export default function Decompile() {
     setProg(decompileNes(_nes));
   };
 
+  const play = () => {
+    setInterval(() => {
+      let { nes: _nes, executeTime } = tick(nes);
+      while (executeTime < 1000 / 50) {
+        const _tick = tick(_nes);
+        _nes = _tick.nes;
+        executeTime += _tick.executeTime;
+      }
+      setNes({ ..._nes, d: Math.random() } as unknown as Nes);
+      setCurr(findCurrentInstruction(_nes, prog));
+    }, 1);
+  };
+
   return (
     <main className="flex w-screen h-screen">
       <div className="w-1/3 flex-col flex">
@@ -93,6 +100,7 @@ export default function Decompile() {
         <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
         <button onClick={next}>next</button>
         <button onClick={finish}>finish</button>
+        <button onClick={play}>play</button>
         <input
           type="number"
           value={numInst}
