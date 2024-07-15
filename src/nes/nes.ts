@@ -21,7 +21,7 @@ import {
   pushToStack,
 } from "./cpu/instruction/instruction";
 import { Ppu, initPpu } from "./ppu/ppu";
-import { toggleVBlack } from "./ppu/registers/registers";
+import { toggleVBlank } from "./ppu/registers/registers";
 import { Scroll, ScrollStatus, getScroll } from "./ppu/scroll/scroll";
 import { AddrVRamStatus, VRam } from "./ppu/vram/vram";
 
@@ -206,7 +206,7 @@ function nesBuilder(nes: Nes) {
     firstReadPpu: firstReadPpu(nes),
     vram: vram(nes),
     NMI: nmi(nes),
-    toggleVBlack: () => nesBuilder(toggleVBlack(nes)),
+    toggleVBlack: () => nesBuilder(toggleVBlank(nes)),
   };
 }
 

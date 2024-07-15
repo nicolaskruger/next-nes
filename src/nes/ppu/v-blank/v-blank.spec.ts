@@ -1,5 +1,5 @@
 import { NMI } from "../../cpu/instruction/instruction";
-import { isNMIOccur, toggleVBlack } from "../registers/registers";
+import { isNMIOccur, toggleVBlank } from "../registers/registers";
 import { initNes } from "@/nes/nes";
 import { MAX_CYCLES, vBlack } from "./v-blank";
 
@@ -7,12 +7,12 @@ jest.mock("../../cpu/instruction/instruction");
 jest.mock("../registers/registers");
 describe("v-blank", () => {
   let NMIMocked = jest.mocked(NMI);
-  let toggleVBlackMocked = jest.mocked(toggleVBlack);
+  let toggleVBlackMocked = jest.mocked(toggleVBlank);
   let isNMIOccurMocked = jest.mocked(isNMIOccur);
   let nes = initNes();
   beforeEach(() => {
     NMIMocked = jest.mocked(NMI);
-    toggleVBlackMocked = jest.mocked(toggleVBlack);
+    toggleVBlackMocked = jest.mocked(toggleVBlank);
     isNMIOccurMocked = jest.mocked(isNMIOccur);
     nes = initNes();
   });

@@ -21,6 +21,8 @@ import {
   getAddrVRam as getPpuAddrVRam,
   getPpuRegisterStatus,
   getAddrVRam,
+  setVBlank,
+  toggleVBlank,
 } from "./registers";
 import { readSprRam, writeSprRam } from "../spr-ram/spr-ram";
 import { getFirstRead, getVRamAddr, readVRam } from "../vram/vram";
@@ -251,5 +253,24 @@ describe("PPU registers", () => {
 
     expect(mutateReadSpr(0x00, nes)).toBe(0x0e);
     expect(mutateReadSpr(0xff, nes)).toBe(0x0f);
+  });
+
+  test("set VBlank", () => {
+    nes = setVBlank(nes, true);
+    expect(isVBlankOccurring(nes)[0]).toBe(true);
+  });
+
+  test("clear VBlank", () => {
+    nes = setVBlank(nes, false);
+    expect(isVBlankOccurring(nes)[0]).toBe(false);
+  });
+
+  test("toggle VBlank", () => {
+    nes = setVBlank(nes, true);
+    expect(isVBlankOccurring(nes)[0]).toBe(true);
+    nes = toggleVBlank(nes);
+    expect(isVBlankOccurring(nes)[0]).toBe(false);
+    nes = toggleVBlank(nes);
+    expect(isVBlankOccurring(nes)[0]).toBe(true);
   });
 });

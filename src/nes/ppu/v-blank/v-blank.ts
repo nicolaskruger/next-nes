@@ -1,5 +1,5 @@
 import { Nes } from "@/nes/nes";
-import { isNMIOccur, toggleVBlack } from "../registers/registers";
+import { isNMIOccur, toggleVBlank } from "../registers/registers";
 import { NMI } from "@/nes/cpu/instruction/instruction";
 
 export const MAX_CYCLES = 400;
@@ -22,6 +22,6 @@ export const vBlack = (nes: Nes, cycles: number): Nes => {
   const [nmi, nmiNes] = isNMIOccur(nes);
   const reducerNes: ((nes: Nes) => Nes)[] = [];
   if (nmi) reducerNes.push(NMI);
-  reducerNes.push(toggleVBlack);
+  reducerNes.push(toggleVBlank);
   return reducerNes.reduce((acc, curr) => curr(acc), nmiNes);
 };

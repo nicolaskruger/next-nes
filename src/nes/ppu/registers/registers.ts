@@ -109,9 +109,9 @@ export const setVBlank = (nes: Nes, bit: boolean): Nes => {
   return writeBusNes(0x2002, byte & ~(1 << 7), _nes);
 };
 
-export const toggleVBlack = (nes: Nes): Nes => {
+export const toggleVBlank = (nes: Nes): Nes => {
   const [bit, nesVBlank] = isVBlankOccurring(nes);
-  return setVBlank(nesVBlank, bit);
+  return setVBlank(nesVBlank, !bit);
 };
 
 export const read2003SprAddr = (nes: Nes) => readBusNes(0x2003, nes);
