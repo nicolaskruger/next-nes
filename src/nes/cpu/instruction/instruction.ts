@@ -25,6 +25,7 @@ import {
 import { MASK_8 } from "@/nes/helper/mask";
 import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { repeat } from "@/nes/helper/repeat";
+import { finishNMI, getNMIInfo, startNMI } from "../interrupt/interrupt";
 
 type Instruction = {
   nes: Nes;
@@ -213,6 +214,7 @@ export const pushToStack = (nes: Nes, data: number): Nes => {
 const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
   let STK = getSTK(nes);
   STK++;
+  finishNMI(nes, STK);
   if (STK > 0xff) throw new Error("stack overflow");
   const [value, _nes] = readBusNes(0x0100 | STK, nes);
   return [value, setSTK(STK, _nes)];
@@ -658,8 +660,10 @@ const TYA = ({ nes, baseCycles }: Instruction): Nes =>
   transferNumberToAccumulator(getY, nes, baseCycles);
 
 const NMI = (nes: Nes): Nes => {
+  const nmi = getNMIInfo(nes);
   let [active, nes00] = getNMIFlag(nes);
-  if (!active) return nes00;
+  if (!active || nmi.occur) return nes00;
+  nes00 = startNMI(nes00);
   const [addr, nesAddr] = [0xfffa, 0xfffb].reduce(
     ([num, _nes], addr, i) => {
       const [nNum, nNes] = readBusNes(addr, _nes);

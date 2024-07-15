@@ -69,10 +69,12 @@ const NesView = ({ nes }: NesViewProps) => {
     }
   };
 
-  const cpuArray = Object.keys(cpu).map((key) => ({
-    key,
-    data: cpu[key as keyof Cpu],
-  }));
+  const cpuArray = Object.keys(cpu)
+    .filter((key) => key !== "interrupt")
+    .map((key) => ({
+      key,
+      data: cpu[key as keyof Omit<Cpu, "interrupt">],
+    }));
 
   return (
     <div>

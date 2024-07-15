@@ -6,6 +6,8 @@ import { instructionDictionary } from "../intructionDictionary/instructionDictio
 import { initVram } from "@/nes/ppu/vram/vram";
 import { initSprRam } from "@/nes/ppu/spr-ram/spr-ram";
 import { initPpu } from "@/nes/ppu/ppu";
+import { initInterrupt } from "../interrupt/interrupt";
+import { initBanks } from "@/nes/banks/bank";
 
 const initBusRunner = (): Bus =>
   "_"
@@ -25,11 +27,13 @@ const initCpuRunner = (): Cpu => ({
   STK: 0xff,
   X: 0,
   Y: 0,
+  interrupt: initInterrupt(),
 });
 export const initNesRunner = (): Nes => ({
   cpu: initCpuRunner(),
   bus: initBusRunner(),
   ppu: initPpu(),
+  banks: initBanks(),
 });
 
 export const compileNes = (program: number[], nes: Nes): Nes => {

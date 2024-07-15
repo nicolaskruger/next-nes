@@ -1,8 +1,9 @@
 import { Nes } from "@/nes/nes";
-import { isNMIOccur, toggleVBlank } from "../registers/registers";
+import { toggleVBlank } from "../registers/registers";
 import { NMI } from "@/nes/cpu/instruction/instruction";
+import { getCycles } from "@/nes/cpu/cpu";
 
-export const MAX_CYCLES = 400;
+export const MAX_CYCLES = 10;
 
 export type VBlank = {
   cycles: number;
@@ -14,14 +15,10 @@ export const initVBlank = (): VBlank => ({
 
 const getVBlank = (nes: Nes) => nes.ppu.vBlank;
 
-export const vBlack = (nes: Nes, cycles: number): Nes => {
+export const vBlack = (nes: Nes): Nes => {
   const vBlack = getVBlank(nes);
-  vBlack.cycles += cycles;
+  vBlack.cycles += getCycles(nes);
   if (vBlack.cycles < MAX_CYCLES) return nes;
-
-  const [nmi, nmiNes] = isNMIOccur(nes);
-  const reducerNes: ((nes: Nes) => Nes)[] = [];
-  if (nmi) reducerNes.push(NMI);
-  reducerNes.push(toggleVBlank);
-  return reducerNes.reduce((acc, curr) => curr(acc), nmiNes);
+  vBlack.cycles = 0;
+  return [NMI, toggleVBlank].reduce((acc, curr) => curr(acc), nes);
 };

@@ -1,5 +1,6 @@
 import { readBusNes } from "../bus/bus";
 import { Nes, nesBuilder } from "../nes";
+import { initInterrupt, Interrupt } from "./interrupt/interrupt";
 
 type Cpu = {
   PC: number;
@@ -9,6 +10,7 @@ type Cpu = {
   Y: number;
   STATUS: number;
   cycles: number;
+  interrupt: Interrupt;
 };
 
 type FlagResult = {
@@ -31,7 +33,11 @@ const getBreakCommand = (nes: Nes): number => (nes.cpu.STATUS >> 4) & 1;
 const getOverFlowFlag = (nes: Nes): number => (nes.cpu.STATUS >> 5) & 1;
 const getNegativeFlag = (nes: Nes): number => (nes.cpu.STATUS >> 6) & 1;
 
-const setCpu = (key: keyof Cpu, value: number, nes: Nes): Nes => {
+const setCpu = (
+  key: keyof Omit<Cpu, "interrupt">,
+  value: number,
+  nes: Nes
+): Nes => {
   nes.cpu[key] = value;
   return nes;
 };
@@ -43,7 +49,8 @@ const setSTK = (value: number, nes: Nes) => setCpu("STK", value, nes);
 const setSTATUS = (value: number, nes: Nes) => setCpu("STATUS", value, nes);
 const setCycles = (value: number, nes: Nes) => setCpu("cycles", value, nes);
 
-const getCpu = (key: keyof Cpu, nes: Nes): number => nes.cpu[key];
+const getCpu = (key: keyof Omit<Cpu, "interrupt">, nes: Nes): number =>
+  nes.cpu[key];
 const getACC = (nes: Nes): number => getCpu("ACC", nes);
 const getX = (nes: Nes): number => getCpu("X", nes);
 const getY = (nes: Nes): number => getCpu("Y", nes);
@@ -196,6 +203,7 @@ const initCpu = (): Cpu => ({
   X: 0,
   Y: 0,
   cycles: 0,
+  interrupt: initInterrupt(),
 });
 
 export {

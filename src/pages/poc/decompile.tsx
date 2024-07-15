@@ -60,7 +60,7 @@ export default function Decompile() {
 
     if (fileName === "demo.nes") {
       end();
-      _nes = NMI(_nes);
+      // _nes = NMI(_nes);
       end();
     }
 

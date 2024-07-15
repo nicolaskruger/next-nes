@@ -2,6 +2,7 @@ import { readBusNes } from "./bus/bus";
 import { getCycles, getPC } from "./cpu/cpu";
 import { instructionDictionary } from "./cpu/intructionDictionary/instructionDictionary";
 import { Nes } from "./nes";
+import { vBlack } from "./ppu/v-blank/v-blank";
 
 export const FREQUENCY = 1.66 * Math.pow(10, 6);
 export const PERIOD = 1 / FREQUENCY;
@@ -27,5 +28,6 @@ export const tick = (nes: Nes) => {
   const totalTime = PERIOD_MILI * cycles;
   const delayTime = totalTime - executeTime;
 
+  _nes = vBlack(_nes);
   return { nes: _nes, executeTime, totalTime, delayTime, cycles };
 };
