@@ -2,9 +2,9 @@ import { RefObject } from "react";
 
 type CanvasRef = RefObject<HTMLCanvasElement>;
 
-const getCanvas = (ref: CanvasRef) => ref.current as HTMLCanvasElement;
+export const getCanvas = (ref: CanvasRef) => ref.current as HTMLCanvasElement;
 
-const getCanvasContext = (ref: CanvasRef) =>
+export const getCanvasContext = (ref: CanvasRef) =>
   getCanvas(ref).getContext("2d") as CanvasRenderingContext2D;
 
 export const renderMultiply = (

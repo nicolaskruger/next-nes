@@ -16,6 +16,7 @@ export default function MushRoomTile() {
   const canvasGreenGround = useRef<HTMLCanvasElement>(null);
 
   const img = useRef<HTMLImageElement>();
+  const imgM = useRef<HTMLImageElement>();
 
   useEffect(() => {
     let nes = initNes();
@@ -30,10 +31,10 @@ export default function MushRoomTile() {
     const [green] = renderTile(nes, 0x2, 0x3f04);
 
     render(multiplyMatrix(mushRom, 10), canvasMushroom);
-    render(multiplyMatrix(ground, 10), canvasGround);
-    render(multiplyMatrix(green, 10), canvasGreenGround);
-
     img!.current!.src = canvasMushroom.current?.toDataURL() as string;
+    render(multiplyMatrix(ground, 10), canvasMushroom);
+    imgM!.current!.src = canvasMushroom.current?.toDataURL() as string;
+    render(multiplyMatrix(green, 10), canvasGreenGround);
   }, []);
 
   return (
@@ -42,6 +43,7 @@ export default function MushRoomTile() {
       <canvas ref={canvasGreenGround} width={80} height={80} />
       <canvas ref={canvasGround} width={80} height={80} />
       <img ref={img} alt="" />
+      <img ref={imgM} alt="" />
     </>
   );
 }
