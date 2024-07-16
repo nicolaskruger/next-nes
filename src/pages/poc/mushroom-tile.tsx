@@ -8,12 +8,14 @@ import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { initNes } from "@/nes/nes";
 import { renderTile } from "@/nes/ppu/render/render";
 import { render } from "@/nes/render/render";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function MushRoomTile() {
   const canvasMushroom = useRef<HTMLCanvasElement>(null);
   const canvasGround = useRef<HTMLCanvasElement>(null);
   const canvasGreenGround = useRef<HTMLCanvasElement>(null);
+
+  const img = useRef<HTMLImageElement>();
 
   useEffect(() => {
     let nes = initNes();
@@ -30,13 +32,16 @@ export default function MushRoomTile() {
     render(multiplyMatrix(mushRom, 10), canvasMushroom);
     render(multiplyMatrix(ground, 10), canvasGround);
     render(multiplyMatrix(green, 10), canvasGreenGround);
+
+    img!.current!.src = canvasMushroom.current?.toDataURL() as string;
   }, []);
 
   return (
     <>
-      <canvas ref={canvasMushroom} width={80} height={80} />
+      <canvas className="hidden" ref={canvasMushroom} width={80} height={80} />
       <canvas ref={canvasGreenGround} width={80} height={80} />
       <canvas ref={canvasGround} width={80} height={80} />
+      <img ref={img} alt="" />
     </>
   );
 }
