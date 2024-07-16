@@ -1,14 +1,41 @@
 import { RefObject } from "react";
 import { Nes } from "../nes";
-import { repeat } from "../helper/repeat";
-import { HEIGHT, WIDTH } from "@/constants/size";
 import { getCanvasContext } from "./render";
+import { renderAttributeTable, renderNameTable } from "../ppu/render/render";
 
 type GetImage = (tile: number, pallet: number) => RefObject<HTMLImageElement>;
 
 type CanvasRef = RefObject<HTMLCanvasElement>;
 
-const GRID = 8 * 8;
+const renderSelectScreen = (
+  nes: Nes,
+  index: number,
+  getImage: GetImage,
+  multi: number,
+  canvas: CanvasRef
+): Nes => {
+  const [nameTable, nesNameTable] = renderNameTable(nes, index);
+  const [attributeTable, nesAttributeTable] = renderAttributeTable(
+    nesNameTable,
+    index
+  );
+
+  const attributeTableBgIndex = (index: number) => 0x3f00 + 4 * index;
+
+  const ctx = getCanvasContext(canvas);
+
+  for (let y = 0; y < nameTable.length; y++)
+    for (let x = 0; x < nameTable[y].length; x++) {
+      const tileIndex = nameTable[y][x] * 0x10;
+      const palletIndex = attributeTableBgIndex(attributeTable[y][x]);
+      ctx.drawImage(
+        getImage(tileIndex, palletIndex).current as HTMLImageElement,
+        8 * multi * x,
+        8 * multi * y
+      );
+    }
+  return nesAttributeTable;
+};
 
 export const render = (
   nes: Nes,
@@ -16,15 +43,7 @@ export const render = (
   multi: number,
   canvas: CanvasRef
 ): Nes => {
-  const ctx = getCanvasContext(canvas);
+  let _nes = renderSelectScreen(nes, 0, getImage, multi, canvas);
 
-  repeat((WIDTH * HEIGHT) / GRID).forEach((_, i) => {
-    ctx.drawImage(
-      getImage(0x0040, 0x3f00).current as HTMLImageElement,
-      8 * multi * (i % (WIDTH / 8)),
-      8 * multi * Math.floor(i / (WIDTH / 8))
-    );
-  });
-
-  return nes;
+  return _nes;
 };
