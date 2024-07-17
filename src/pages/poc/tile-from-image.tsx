@@ -1,5 +1,5 @@
-import { TileBuilder } from "@/components/tile-builder/tile-builder";
-import { useTile } from "@/hooks/tile/useTile";
+import { PrerenderBuilder } from "@/components/tile-builder/tile-builder";
+import { usePrerender } from "@/hooks/tile/useTile";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { Nes } from "@/nes/nes";
@@ -9,9 +9,10 @@ import { render } from "@/nes/render/render-img-tile";
 import { useEffect, useRef, useState } from "react";
 
 export default function Page() {
-  const { getTile, imgs } = useTile();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [nes, setNes] = useState<Nes>(createMushroomWord());
+  const props = usePrerender(nes, 2);
+  const { getTile } = props;
   useEffect(() => {
     setNes((nes) => {
       const start = performance.now();
@@ -26,7 +27,7 @@ export default function Page() {
 
   return (
     <>
-      <TileBuilder imgs={imgs} multi={2} nes={nes} />
+      <PrerenderBuilder {...props} />
       <canvas ref={canvasRef} width={256 * 2} height={240 * 2} />
     </>
   );

@@ -11,7 +11,7 @@ type TileBuilderProps = {
   nes: Nes;
 };
 
-export const TileBuilder = ({ imgs, multi, nes }: TileBuilderProps) => {
+export const PrerenderBuilder = ({ imgs, multi, nes }: TileBuilderProps) => {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
