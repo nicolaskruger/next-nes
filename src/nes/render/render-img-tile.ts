@@ -2,6 +2,8 @@ import { RefObject } from "react";
 import { Nes } from "../nes";
 import { getCanvasContext } from "./render";
 import { renderAttributeTable, renderNameTable } from "../ppu/render/render";
+import { repeat } from "../helper/repeat";
+import { readSprInfo, SprInfo } from "../ppu/spr-ram/spr-ram";
 
 type GetImage = (tile: number, pallet: number) => RefObject<HTMLImageElement>;
 
@@ -37,6 +39,32 @@ const renderSelectScreen = (
   return nesAttributeTable;
 };
 
+const formatSprInfo = (sprInfo: SprInfo, multi: number) => {
+  sprInfo.tile *= 0x10;
+  sprInfo.pallet = sprInfo.pallet * 4 + 0x3f10;
+  sprInfo.x *= multi;
+  sprInfo.y *= multi;
+  return sprInfo;
+};
+
+const renderSprites = (
+  nes: Nes,
+  canvas: CanvasRef,
+  getImage: GetImage,
+  multi: number
+): Nes => {
+  const ctx = getCanvasContext(canvas);
+
+  return repeat(64).reduce((acc, curr, index) => {
+    const [sprInfo, _nes] = readSprInfo(index, acc);
+
+    const { tile, pallet, x, y } = formatSprInfo(sprInfo, multi);
+
+    ctx.drawImage(getImage(tile, pallet).current as HTMLImageElement, x, y);
+    return _nes;
+  }, nes);
+};
+
 export const render = (
   nes: Nes,
   getImage: GetImage,
@@ -44,6 +72,6 @@ export const render = (
   canvas: CanvasRef
 ): Nes => {
   let _nes = renderSelectScreen(nes, 0, getImage, multi, canvas);
-
+  _nes = renderSprites(_nes, canvas, getImage, multi);
   return _nes;
 };
