@@ -1,8 +1,10 @@
 import { Code } from "@/components/code/code";
 import { Pallets } from "@/components/pallets/pallets";
 import { RenderNes } from "@/components/render-nes/reder-nes";
-import { RenderTiles } from "@/components/render-tiles/render-tiles";
+import { RenderTiles } from "@/components/render-tiles/render-tiles-img";
+import { PrerenderBuilder } from "@/components/tile-builder/tile-builder";
 import { useMult } from "@/hooks/mult/mult";
+import { usePrerender } from "@/hooks/tile/useTile";
 import { getPC } from "@/nes/cpu/cpu";
 import {
   Decompile as Dec,
@@ -13,6 +15,8 @@ import { NMI } from "@/nes/cpu/instruction/instruction";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { dexToHex } from "@/nes/helper/converter";
 import { Nes, initNes } from "@/nes/nes";
+import { setRefreshPallet } from "@/nes/ppu/refresh/refresh";
+import { render } from "@/nes/render/render-img-tile";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -24,22 +28,26 @@ export default function Decompile() {
 
   const mult = useMult({ H: 1, W: 2 / 3 });
   const [nes, setNes] = useState(startNes());
-  const [prog, setProg] = useState<Dec>({ instruction: [], program: "" });
+  const [prog, setProg] = useState<Dec>(decompileNes(nes));
   const [currIns, setCurr] = useState(0);
   const [numInst, setNumInst] = useState(1);
   const [fileName, setFileName] = useState("");
-
+  const { refreshPallet, ...props } = usePrerender(startNes(), 2);
+  const { getTile } = props;
   useEffect(() => {
-    setProg(decompileNes(startNes()));
+    setNes((nes) => {
+      const _nes = render(nes, getTile, 2, canvasRef); //30 ms
+      return setRefreshPallet(_nes, refreshPallet);
+    });
   }, []);
 
+  const setNesDecompile = (nes: Nes) => {
+    setNes(nes);
+    setCurr(findCurrentInstruction(nes, prog));
+  };
+
   const next = () => {
-    let _nes = {
-      ...nes,
-    };
-    _nes = tick(nes).nes;
-    setNes({ ..._nes, d: Math.random() } as unknown as Nes);
-    setCurr(findCurrentInstruction(_nes, prog));
+    setNesDecompile(tick(nes).nes);
   };
   const finish = () => {
     let _nes = {
@@ -52,15 +60,9 @@ export default function Decompile() {
       }
     };
 
-    if (fileName === "demo.nes") {
-      end();
-      // _nes = NMI(_nes);
-      end();
-    }
+    if (fileName === "demo.nes") end();
 
-    console.log(_nes);
-    setNes(_nes);
-    setCurr(findCurrentInstruction(_nes, prog));
+    setNesDecompile(_nes);
   };
 
   const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -84,29 +86,32 @@ export default function Decompile() {
   };
 
   return (
-    <main className="flex w-screen h-screen">
-      <div className="w-1/3 flex-col flex">
-        <div className="w-full h-2/3 bg-blue-500 overflow-y-scroll pl-3">
-          <Code currIns={currIns} dec={prog} />
-          {currIns}
+    <>
+      <PrerenderBuilder {...props} />
+      <main className="flex w-screen h-screen">
+        <div className="w-1/3 flex-col flex">
+          <div className="w-full h-2/3 bg-blue-500 overflow-y-scroll pl-3">
+            <Code currIns={currIns} dec={prog} />
+            {currIns}
+          </div>
+          <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
+            {/* <Pallets nes={nes} /> */}
+            <RenderTiles getTile={getTile} imgs={props.imgs} />
+          </div>
         </div>
-        <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-          {/* <Pallets nes={nes} /> */}
-          <RenderTiles nes={nes} />
+        <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
+          <canvas ref={canvasRef} width={256 * 2} height={240 * 2} />
+          <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
+          <button onClick={next}>next</button>
+          <button onClick={finish}>finish</button>
+          <button onClick={play}>play</button>
+          <input
+            type="number"
+            value={numInst}
+            onChange={(e) => setNumInst(Number(e.target.value))}
+          />
         </div>
-      </div>
-      <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
-        <RenderNes nes={nes} canvasRef={canvasRef} mult={mult} />
-        <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
-        <button onClick={next}>next</button>
-        <button onClick={finish}>finish</button>
-        <button onClick={play}>play</button>
-        <input
-          type="number"
-          value={numInst}
-          onChange={(e) => setNumInst(Number(e.target.value))}
-        />
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

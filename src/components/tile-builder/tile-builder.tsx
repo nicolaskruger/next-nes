@@ -9,24 +9,19 @@ type TileBuilderProps = {
   imgs: RefObject<HTMLImageElement>[];
   multi: number;
   nes: Nes;
+  canvas: RefObject<HTMLCanvasElement>;
+  refresh: () => void;
 };
 
-export const PrerenderBuilder = ({ imgs, multi, nes }: TileBuilderProps) => {
-  const canvas = useRef<HTMLCanvasElement>(null);
-
+export const PrerenderBuilder = ({
+  imgs,
+  multi,
+  nes,
+  canvas,
+  refresh,
+}: TileBuilderProps) => {
   useEffect(() => {
-    const start = performance.now();
-    imgs
-      .map((img, i) => ({
-        tile: renderTile(nes, Math.floor(i / 8), 0x3f00 + 0x4 * (i % 8))[0],
-        img,
-      }))
-      .forEach(({ tile, img }) => {
-        render(multiplyMatrix(tile, multi), canvas);
-        img!.current!.src = canvas.current?.toDataURL() as string;
-      });
-    const finish = performance.now();
-    console.log(finish - start);
+    refresh();
   }, []);
 
   return (
@@ -37,7 +32,7 @@ export const PrerenderBuilder = ({ imgs, multi, nes }: TileBuilderProps) => {
         width={multi * 8}
         height={multi * 8}
       />
-      <div className="flex flex-wrap">
+      <div className="flex flex-wrap ">
         {imgs.map((img, key) => (
           <img key={key} ref={img} />
         ))}

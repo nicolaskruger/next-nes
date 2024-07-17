@@ -10,9 +10,7 @@ const size = (8 * 0x2000) / 0x10;
 export const usePrerender = (nes: Nes, multi: number) => {
   const canvas = useRef<HTMLCanvasElement>(null);
 
-  const [imgs, setImgs] = useState<RefObject<HTMLImageElement>[]>(
-    repeat(size).map((_) => createRef<HTMLImageElement>())
-  );
+  const imgs = repeat(size).map((_) => createRef<HTMLImageElement>());
 
   const getTile = (tile: number, pallet: number) =>
     imgs[8 * Math.floor(tile / 0x10) + Math.floor((pallet - 0x3f00) / 4)];
@@ -32,11 +30,35 @@ export const usePrerender = (nes: Nes, multi: number) => {
     console.log(finish - start);
   };
 
+  const refreshPallet = (address: number) => {
+    const index = Math.floor((address - 0x3f00) / 4);
+    imgs
+      .map((img, i) =>
+        i % 8 === index
+          ? {
+              tile: renderTile(
+                nes,
+                Math.floor(i / 8),
+                0x3f00 + 0x4 * (i % 8)
+              )[0],
+              img,
+            }
+          : null
+      )
+      .filter((v) => v !== null)
+      .forEach(({ tile, img }) => {
+        render(multiplyMatrix(tile, multi), canvas);
+        img!.current!.src = canvas.current?.toDataURL() as string;
+      });
+  };
+
   return {
     getTile,
     imgs,
     refresh,
     multi,
     nes,
+    canvas,
+    refreshPallet,
   };
 };

@@ -3,6 +3,7 @@ import { toBinary8Bits } from "@/nes/helper/binary";
 import { pa, paOfPa } from "@/nes/helper/pa";
 import { repeat } from "@/nes/helper/repeat";
 import { Nes, getVRam, getVRamBus as getVRamBus, nesBuilder } from "@/nes/nes";
+import { refreshPallet } from "../refresh/refresh";
 
 export type AddrVRamStatus = "low" | "hight";
 
@@ -102,12 +103,25 @@ const mirrorBuilderVram: MirrorBuilderPpu[] = [
   },
 ];
 
+const writeRefreshPallet = (addr: number, value: number, nes: Nes): Nes => {
+  refreshPallet(nes, addr);
+  return simpleWriteVRam(addr, value, nes);
+};
+
 const initPpuVRam = (): Bus => {
-  let bus = repeat(0x10000).map((_) => ({
-    data: 0,
-    read: simpleReadVRam,
-    write: simpleWriteVRam,
-  }));
+  let bus = repeat(0x10000).map((_, addr) =>
+    addr >= 0x3f00 && addr < 0x3f20
+      ? {
+          data: 0,
+          read: simpleReadVRam,
+          write: simpleWriteVRam,
+        }
+      : {
+          data: 0,
+          read: simpleReadVRam,
+          write: writeRefreshPallet,
+        }
+  );
 
   for (let addr = 0x0000; addr <= 0x3fff; addr++) {
     bus = mirrorBuilderVram
