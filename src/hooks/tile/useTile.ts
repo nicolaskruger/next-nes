@@ -9,7 +9,7 @@ const size = (8 * 0x2000) / 0x10;
 
 export const usePrerender = (nes: Nes, multi: number) => {
   const canvas = useRef<HTMLCanvasElement>(null);
-
+  const [loading, setLoading] = useState(true);
   const [imgs, setImgs] = useState(
     repeat(size).map((_) => createRef<HTMLImageElement>())
   );
@@ -18,6 +18,7 @@ export const usePrerender = (nes: Nes, multi: number) => {
     imgs[8 * Math.floor(tile / 0x10) + Math.floor((pallet - 0x3f00) / 4)];
 
   const refresh = () => {
+    setLoading(true);
     const start = performance.now();
     imgs
       .map((img, i) => ({
@@ -31,9 +32,11 @@ export const usePrerender = (nes: Nes, multi: number) => {
     const finish = performance.now();
     console.log(finish - start);
     setImgs([...imgs]);
+    setLoading(false);
   };
 
   const refreshPallet = (address: number) => {
+    setLoading(true);
     const index = Math.floor((address - 0x3f00) / 4);
     imgs
       .map((img, i) =>
@@ -54,6 +57,7 @@ export const usePrerender = (nes: Nes, multi: number) => {
         img!.current!.src = canvas.current?.toDataURL() as string;
       });
     setImgs([...imgs]);
+    setLoading(false);
   };
 
   return {
@@ -64,5 +68,6 @@ export const usePrerender = (nes: Nes, multi: number) => {
     nes,
     canvas,
     refreshPallet,
+    loading,
   };
 };

@@ -1,20 +1,12 @@
 import { Code } from "@/components/code/code";
-import { Pallets } from "@/components/pallets/pallets";
-import { RenderNes } from "@/components/render-nes/reder-nes";
+
 import { RenderTiles } from "@/components/render-tiles/render-tiles-img";
 import { PrerenderBuilder } from "@/components/tile-builder/tile-builder";
-import { useMult } from "@/hooks/mult/mult";
 import { usePrerender } from "@/hooks/tile/useTile";
 import { getPC } from "@/nes/cpu/cpu";
-import {
-  Decompile as Dec,
-  decompileNes,
-  findCurrentInstruction,
-} from "@/nes/cpu/decompiler/decompile";
-import { NMI } from "@/nes/cpu/instruction/instruction";
+
 import { createMushroomWord } from "@/nes/debug/background-creator";
-import { dexToHex } from "@/nes/helper/converter";
-import { Nes, initNes } from "@/nes/nes";
+import { Nes } from "@/nes/nes";
 import { setRefreshPallet } from "@/nes/ppu/refresh/refresh";
 import { render } from "@/nes/render/render-img-tile";
 import { rom } from "@/nes/rom/rom";
@@ -30,7 +22,7 @@ export default function Decompile() {
   const [numInst, setNumInst] = useState(1);
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(startNes(), 2);
-  const { getTile } = props;
+  const { getTile, loading } = props;
   useEffect(() => {
     setNes((nes) => {
       const _nes = render(nes, getTile, 2, canvasRef); //30 ms
@@ -98,11 +90,7 @@ export default function Decompile() {
           <button onClick={next}>next</button>
           <button onClick={finish}>finish</button>
           <button onClick={play}>play</button>
-          <input
-            type="number"
-            value={numInst}
-            onChange={(e) => setNumInst(Number(e.target.value))}
-          />
+          {loading && <p className="text-red-400">loading..</p>}
         </div>
       </main>
     </>
