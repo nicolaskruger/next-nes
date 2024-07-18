@@ -18,8 +18,9 @@ const startNes = () => createMushroomWord();
 export default function Decompile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [interval, setIntervalCode] = useState<NodeJS.Timeout>();
+
   const [nes, setNes] = useState(startNes());
-  const [numInst, setNumInst] = useState(1);
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(startNes(), 2);
   const { getTile, loading } = props;
@@ -61,15 +62,21 @@ export default function Decompile() {
   };
 
   const play = () => {
-    setInterval(() => {
+    if (interval) {
+      clearInterval(interval);
+      setIntervalCode(undefined);
+      return;
+    }
+    const intervalCode = setInterval(() => {
       let { nes: _nes, executeTime } = tick(nes);
       while (executeTime < 1000 / 50) {
         const _tick = tick(_nes);
         _nes = _tick.nes;
         executeTime += _tick.executeTime;
       }
-      setNes({ ..._nes, d: Math.random() } as unknown as Nes);
+      setNesDecompile(_nes);
     }, 1);
+    setIntervalCode(intervalCode);
   };
 
   return (
@@ -89,8 +96,8 @@ export default function Decompile() {
           <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
           <button onClick={next}>next</button>
           <button onClick={finish}>finish</button>
-          <button onClick={play}>play</button>
-          {loading && <p className="text-red-400">loading..</p>}
+          <button onClick={play}>{interval ? "stop" : "play"}</button>
+          {loading && <p className="text-red-800">loading..</p>}
         </div>
       </main>
     </>
