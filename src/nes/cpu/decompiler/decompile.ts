@@ -124,8 +124,43 @@ export const decompile = (program: number[]): Decompile => {
   return { instruction: dec, program: code.join("\n") };
 };
 
+export const decompileSize = (program: number[], size: number): Decompile => {
+  let code: string[] = [];
+  const dec: InstData[] = [];
+  let s = 0;
+
+  for (let i = 0; i < program.length && s < size; ) {
+    const { addr, instruction } = instructionDictionary[program[i]] || {
+      addr: function XXX(v) {},
+      instruction: function XXX(ins) {
+        return initNes();
+      },
+    };
+    const [size, func] = instSize[addr.name];
+
+    const inst = `${instruction.name} ${func(
+      ...program.slice(i + 1)
+    ).toUpperCase()}`.trim();
+
+    dec.push({
+      index: i,
+      opCode: dexToHex(program[i], 2, true),
+      inst,
+    });
+
+    code.push(inst);
+    i += size;
+    s++;
+  }
+
+  return { instruction: dec, program: code.join("\n") };
+};
+
 export const decompileNes = (nes: Nes): Decompile =>
   decompile(nes.bus.map((v) => v.data).slice(0x8000));
+
+export const decompileNesSize = (nes: Nes, size: number): Decompile =>
+  decompileSize(nes.bus.map((v) => v.data).slice(getPC(nes)), size);
 
 export const findCurrentInstruction = (
   nes: Nes,

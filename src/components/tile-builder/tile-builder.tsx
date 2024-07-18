@@ -8,7 +8,6 @@ import { RefObject, useEffect, useRef } from "react";
 type TileBuilderProps = {
   imgs: RefObject<HTMLImageElement>[];
   multi: number;
-  nes: Nes;
   canvas: RefObject<HTMLCanvasElement>;
   refresh: () => void;
 };
@@ -16,7 +15,6 @@ type TileBuilderProps = {
 export const PrerenderBuilder = ({
   imgs,
   multi,
-  nes,
   canvas,
   refresh,
 }: TileBuilderProps) => {
@@ -32,7 +30,7 @@ export const PrerenderBuilder = ({
         width={multi * 8}
         height={multi * 8}
       />
-      <div className="flex flex-wrap ">
+      <div className="flex flex-wrap hidden">
         {imgs.map((img, key) => (
           <img key={key} ref={img} />
         ))}

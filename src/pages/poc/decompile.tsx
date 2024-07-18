@@ -26,10 +26,7 @@ const startNes = () => createMushroomWord();
 export default function Decompile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const mult = useMult({ H: 1, W: 2 / 3 });
   const [nes, setNes] = useState(startNes());
-  const [prog, setProg] = useState<Dec>(decompileNes(nes));
-  const [currIns, setCurr] = useState(0);
   const [numInst, setNumInst] = useState(1);
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(startNes(), 2);
@@ -42,8 +39,8 @@ export default function Decompile() {
   }, []);
 
   const setNesDecompile = (nes: Nes) => {
-    setNes(nes);
-    setCurr(findCurrentInstruction(nes, prog));
+    const _nes = render(nes, getTile, 2, canvasRef);
+    setNes(_nes);
   };
 
   const next = () => {
@@ -69,7 +66,6 @@ export default function Decompile() {
     const _nes = await rom(nes, e?.target?.files?.[0] as File);
     setFileName(e?.target?.files?.[0].name as string);
     setNes(_nes);
-    setProg(decompileNes(_nes));
   };
 
   const play = () => {
@@ -81,7 +77,6 @@ export default function Decompile() {
         executeTime += _tick.executeTime;
       }
       setNes({ ..._nes, d: Math.random() } as unknown as Nes);
-      setCurr(findCurrentInstruction(_nes, prog));
     }, 1);
   };
 
@@ -91,12 +86,10 @@ export default function Decompile() {
       <main className="flex w-screen h-screen">
         <div className="w-1/3 flex-col flex">
           <div className="w-full h-2/3 bg-blue-500 overflow-y-scroll pl-3">
-            <Code currIns={currIns} dec={prog} />
-            {currIns}
+            <Code nes={nes} />
           </div>
           <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-            {/* <Pallets nes={nes} /> */}
-            <RenderTiles getTile={getTile} imgs={props.imgs} />
+            <RenderTiles imgs={props.imgs} />
           </div>
         </div>
         <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
