@@ -23,7 +23,7 @@ export default function Decompile() {
   const [nes, setNes] = useState(startNes());
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(startNes(), 2);
-  const { getTile, loading } = props;
+  const { getTile, loading, percent } = props;
   useEffect(() => {
     setNes((nes) => {
       const _nes = render(nes, getTile, 2, canvasRef); //30 ms
@@ -97,7 +97,9 @@ export default function Decompile() {
           <button onClick={next}>next</button>
           <button onClick={finish}>finish</button>
           <button onClick={play}>{interval ? "stop" : "play"}</button>
-          {loading && <p className="text-red-800">loading..</p>}
+          {loading && (
+            <p className="text-red-800">loading: {percent.toFixed(2)}%</p>
+          )}
         </div>
       </main>
     </>
