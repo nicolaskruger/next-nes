@@ -13,6 +13,8 @@ import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
+type NesRefresh = Nes & { refresh?: boolean };
+
 const startNes = () => createMushroomWord();
 
 export default function Decompile() {
@@ -20,10 +22,13 @@ export default function Decompile() {
 
   const [interval, setIntervalCode] = useState<NodeJS.Timeout>();
 
-  const [nes, setNes] = useState(startNes());
+  const [nes, setNes] = useState<Nes & { refresh?: boolean }>({
+    ...startNes(),
+    refresh: true,
+  });
   const [fileName, setFileName] = useState("");
-  const { refreshPallet, ...props } = usePrerender(startNes(), 2);
-  const { getTile, loading, percent } = props;
+  const { refreshPallet, ...props } = usePrerender(nes, 2);
+  const { getTile, loading, percent, refresh, canvas } = props;
   useEffect(() => {
     setNes((nes) => {
       const _nes = render(nes, getTile, 2, canvasRef); //30 ms
@@ -31,7 +36,7 @@ export default function Decompile() {
     });
   }, []);
 
-  const setNesDecompile = (nes: Nes) => {
+  const setNesDecompile = (nes: NesRefresh) => {
     const _nes = render(nes, getTile, 2, canvasRef);
     setNes(_nes);
   };
@@ -58,7 +63,7 @@ export default function Decompile() {
   const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
     const _nes = await rom(nes, e?.target?.files?.[0] as File);
     setFileName(e?.target?.files?.[0].name as string);
-    setNes(_nes);
+    setNesDecompile({ ..._nes, refresh: true });
   };
 
   const play = () => {
@@ -76,8 +81,17 @@ export default function Decompile() {
       }
       setNesDecompile(_nes);
     }, 1);
+    setNes((nes) => ({ ...nes, refresh: true }));
     setIntervalCode(intervalCode);
   };
+
+  useEffect(() => {
+    if (canvas && nes.refresh) {
+      refresh();
+      delete nes.refresh;
+      setNes(nes);
+    }
+  }, [nes.refresh]);
 
   return (
     <>
