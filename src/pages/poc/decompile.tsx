@@ -1,8 +1,8 @@
 import { Code } from "@/components/code/code";
 
 import { RenderTiles } from "@/components/render-tiles/render-tiles-img";
-import { PrerenderBuilder } from "@/components/tile-builder/tile-builder";
-import { usePrerender } from "@/hooks/tile/useTile";
+import { PrerenderBuilder } from "@/components/prerender-builder/prerender-builder";
+import { usePrerender } from "@/hooks/prerender/usePrerender";
 import { getPC } from "@/nes/cpu/cpu";
 
 import { createMushroomWord } from "@/nes/debug/background-creator";

@@ -1,5 +1,5 @@
-import { PrerenderBuilder } from "@/components/tile-builder/tile-builder";
-import { usePrerender } from "@/hooks/tile/useTile";
+import { PrerenderBuilder } from "@/components/prerender-builder/prerender-builder";
+import { usePrerender } from "@/hooks/prerender/usePrerender";
 import { createMushroomWord } from "@/nes/debug/background-creator";
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { Nes } from "@/nes/nes";
