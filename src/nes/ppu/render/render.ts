@@ -197,7 +197,7 @@ export const spriteHorizontalMirror = <T>(sprite: T[][]): T[][] =>
 export const spriteVerticalMirror = <T>(sprite: T[][]): T[][] =>
   sprite.map((spr) => spr.reverse());
 
-const getBgColor = (nes: Nes) => {
+export const getBgColor = (nes: Nes) => {
   const [value, _nes] = readVRam(0x3f00, nes);
   return [colorToHex(value), _nes] as [string, Nes];
 };

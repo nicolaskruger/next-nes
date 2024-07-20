@@ -1,9 +1,15 @@
 import { RefObject } from "react";
 import { Nes } from "../nes";
 import { getCanvasContext } from "./render";
-import { renderAttributeTable, renderNameTable } from "../ppu/render/render";
+import {
+  getBgColor,
+  renderAttributeTable,
+  renderNameTable,
+} from "../ppu/render/render";
 import { repeat } from "../helper/repeat";
 import { readSprInfo, SprInfo } from "../ppu/spr-ram/spr-ram";
+import { HEIGHT, WIDTH } from "@/constants/size";
+import { isShowBg, isShowSpr } from "../ppu/registers/registers";
 
 type GetImage = (tile: number, pallet: number) => RefObject<HTMLImageElement>;
 
@@ -65,13 +71,24 @@ const renderSprites = (
   }, nes);
 };
 
+export const renderBg = (nes: Nes, multi: number, canvas: CanvasRef) => {
+  const ctx = getCanvasContext(canvas);
+  const [bgColor] = getBgColor(nes);
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, WIDTH * multi, HEIGHT * multi);
+  return nes;
+};
+
 export const render = (
   nes: Nes,
   getImage: GetImage,
   multi: number,
   canvas: CanvasRef
 ): Nes => {
-  let _nes = renderSelectScreen(nes, 0, getImage, multi, canvas);
-  _nes = renderSprites(_nes, canvas, getImage, multi);
+  let _nes = renderBg(nes, multi, canvas);
+  const [showBg] = isShowBg(_nes);
+  if (showBg) _nes = renderSelectScreen(_nes, 0, getImage, multi, canvas);
+  const [showSpr] = isShowSpr(_nes);
+  if (showSpr) _nes = renderSprites(_nes, canvas, getImage, multi);
   return _nes;
 };

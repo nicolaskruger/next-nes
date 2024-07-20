@@ -80,10 +80,10 @@ export const isBgLeftMost8Pix = (nes: Nes): [boolean, Nes] =>
 export const isSprLeftMost8Pix = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2001, 2);
 
-export const isDisableBg = (nes: Nes): [boolean, Nes] =>
+export const isShowBg = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2001, 3);
 
-export const isDisableSpr = (nes: Nes): [boolean, Nes] =>
+export const isShowSpr = (nes: Nes): [boolean, Nes] =>
   isRegister(nes, 0x2001, 4);
 
 export const shouldIgnoreWritesToVRAM = (nes: Nes): [boolean, Nes] =>

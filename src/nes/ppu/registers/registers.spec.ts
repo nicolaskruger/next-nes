@@ -8,8 +8,8 @@ import {
   getPatternTableSprite,
   getSizeOfSprite,
   isBgLeftMost8Pix,
-  isDisableBg,
-  isDisableSpr,
+  isShowBg,
+  isShowSpr,
   isNMIOccur,
   isSprLeftMost8Pix,
   isMoreThan8SpritesOnScanLine,
@@ -149,11 +149,11 @@ describe("PPU registers", () => {
   });
 
   test("0x2001 bit 3 is disable background", () => {
-    testFlag(0x2001, 1 << 3, isDisableBg);
+    testFlag(0x2001, 1 << 3, isShowBg);
   });
 
   test("0x2001 bit 4 is disable sprite", () => {
-    testFlag(0x2001, 1 << 4, isDisableSpr);
+    testFlag(0x2001, 1 << 4, isShowSpr);
   });
 
   test("0x2002 bit 4 is should ignore write to VRAM", () => {

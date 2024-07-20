@@ -61,9 +61,16 @@ export default function Decompile() {
   };
 
   const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
-    const _nes = await rom(nes, e?.target?.files?.[0] as File);
-    setFileName(e?.target?.files?.[0].name as string);
-    setNesDecompile({ ..._nes, refresh: true });
+    const file = e?.target?.files?.[0];
+    if (file) {
+      try {
+        const _nes = await rom(nes, file);
+        setFileName(file.name as string);
+        setNesDecompile({ ..._nes, refresh: true });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   const play = () => {
