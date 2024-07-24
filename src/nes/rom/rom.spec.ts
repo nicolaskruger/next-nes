@@ -166,10 +166,13 @@ describe("ROM", () => {
     code.forEach(({ addr, instruction }, index) => {
       let [inst] = romCode.instruction[index].inst.split(/\s/);
       if (inst === "XXX") inst = "UND";
-      expect(instruction).toBe(inst);
-      expect(dexToHex(addr, 4, true)).toBe(
-        dexToHex(0x8000 + romCode.instruction[index].index, 4, true)
-      );
+      expect({
+        inst: instruction,
+        addr: dexToHex(addr, 4, true),
+      }).toStrictEqual({
+        inst,
+        addr: dexToHex(0x8000 + romCode.instruction[index].index, 4, true),
+      });
     });
   });
 });
