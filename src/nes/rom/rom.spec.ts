@@ -163,6 +163,7 @@ describe("ROM", () => {
     const code = nesTestCode();
     const nes = await initNesTestRom();
     const romCode = decompileNes(nes);
+    fs.writeFileSync("./roms/nestest.out.txt", romCode.program);
     code.forEach(({ addr, instruction }, index) => {
       let [inst] = romCode.instruction[index].inst.split(/\s/);
       if (inst === "XXX") inst = "UND";

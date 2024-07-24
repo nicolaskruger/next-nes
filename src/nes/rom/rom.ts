@@ -102,9 +102,13 @@ export const rom = async (nes: Nes, rom: File): Promise<Nes> => {
 
   let prgRom = getPrgRom(_nes);
 
-  prgRom = prgRom.map((_, i) =>
-    romBytes.slice(skip + i * KB16, skip + (i + 1) * KB16)
-  );
+  if (prgRom.length === 1) {
+    const _rom = romBytes.slice(skip, skip + KB16);
+    prgRom = [_rom, _rom];
+  } else
+    prgRom = prgRom.map((_, i) =>
+      romBytes.slice(skip + i * KB16, skip + (i + 1) * KB16)
+    );
 
   _nes = setPrgRom(_nes, prgRom);
 

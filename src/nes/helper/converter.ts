@@ -1,5 +1,5 @@
 const dexToHex = (value: number, digits: number, prefix: boolean) => {
-  const res = value.toString(16);
+  const res = (value | 0).toString(16);
   return `${prefix ? "0x" : ""}${"0".repeat(digits - res.length)}${res}`;
 };
 
