@@ -11,6 +11,7 @@ import { repeat } from "../helper/repeat";
 import { readRangeVRam, readVRam } from "../ppu/vram/vram";
 import {
   initDemoRom,
+  initNesTestRom,
   nesTestCode,
   tickUntil,
   tickUntilEndDemoRom,
@@ -18,6 +19,7 @@ import {
 } from "../debug/rom-debug";
 import { NMI } from "../cpu/instruction/instruction";
 import { readRangeSprRam } from "../ppu/spr-ram/spr-ram";
+import { decompileNes } from "../cpu/decompiler/decompile";
 
 describe("ROM", () => {
   test("nestest", async () => {
@@ -156,5 +158,14 @@ describe("ROM", () => {
     expect(code8003).toStrictEqual({ addr: 0x8003, instruction: "RTS" });
   });
 
-  test("test nestest.nes code", async () => {});
+  test("test nestest.nes code", async () => {
+    const code = nesTestCode();
+    const nes = await initNesTestRom();
+    const romCode = decompileNes(nes);
+    code.forEach(({ addr, instruction }, index) => {
+      const [inst] = romCode.instruction[index].inst.split(/\s/);
+      expect(instruction).toBe(inst);
+      expect(addr).toBe(0x8000 + romCode.instruction[index].index);
+    });
+  });
 });
