@@ -11,6 +11,7 @@ import { repeat } from "../helper/repeat";
 import { readRangeVRam, readVRam } from "../ppu/vram/vram";
 import {
   initDemoRom,
+  nesTestCode,
   tickUntil,
   tickUntilEndDemoRom,
   tickUntilTimes,
@@ -147,4 +148,13 @@ describe("ROM", () => {
       expect(readVRam(0x3f00 + i, nes)[0]).toBe(0xf);
     });
   });
+
+  test("test nestest.txt code", async () => {
+    const [code8000, code8003] = nesTestCode();
+
+    expect(code8000).toStrictEqual({ addr: 0x8000, instruction: "JMP" });
+    expect(code8003).toStrictEqual({ addr: 0x8003, instruction: "RTS" });
+  });
+
+  test("test nestest.nes code", async () => {});
 });

@@ -1,3 +1,4 @@
+import { getPC } from "@/nes/cpu/cpu";
 import {
   Decompile,
   decompileNes,
@@ -24,7 +25,7 @@ export const Code = ({ nes }: CodeProps) => {
             className="data-[curr=true]:text-red-500"
             key={i}
           >
-            {dexToHexFourDigitsPrefix(index + 0x8000)}: {opCode} {inst}
+            {dexToHexFourDigitsPrefix(getPC(nes) + index)}: {opCode} {inst}
           </li>
         );
       })}

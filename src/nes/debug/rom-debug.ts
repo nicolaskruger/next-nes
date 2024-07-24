@@ -3,6 +3,8 @@ import { getPC } from "../cpu/cpu";
 import { tick } from "../tick";
 import { Nes, initNes } from "../nes";
 import { rom } from "../rom/rom";
+import { split } from "postcss/lib/list";
+import { hexToDex } from "../helper/converter";
 
 export const tickUntilTimes = (addr: number, times: number, nes: Nes): Nes => {
   while (times) {
@@ -20,6 +22,39 @@ export const tickUntil = (addr: number, nes: Nes): Nes => {
 };
 
 export const tickUntilEndDemoRom = (nes: Nes) => tickUntil(0x805e, nes);
+
+export const initRom = async (path: string) => {
+  const romFile = fs.readFileSync(path);
+  let nes = initNes();
+  return await rom(nes, {
+    arrayBuffer: async () => romFile,
+    name: "demo.nes",
+  } as unknown as File);
+};
+
+export const initNesTestRom = async () => {
+  return initRom("./roms/nestest.nes");
+};
+
+type Code = {
+  addr: number;
+  instruction: string;
+};
+
+export const nesCode = (path: string): Code[] => {
+  const code = fs.readFileSync(path).toString();
+  return code
+    .split("\n")
+    .filter((line) => line)
+    .map<Code>((line) => {
+      console.log(line);
+      const regex = /00:([0-9A-F]{4}):.{11}(\S{3})/g;
+      const [_, addr, instruction] = regex.exec(line)!;
+      return { instruction, addr: hexToDex(addr) };
+    });
+};
+
+export const nesTestCode = (): Code[] => nesCode("./roms/nestest.txt");
 
 export const initDemoRom = async () => {
   const romFile = fs.readFileSync("./games/demo/demo.nes");
