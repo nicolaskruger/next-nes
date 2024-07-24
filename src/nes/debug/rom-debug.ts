@@ -47,7 +47,6 @@ export const nesCode = (path: string): Code[] => {
     .split("\n")
     .filter((line) => line)
     .map<Code>((line) => {
-      console.log(line);
       const regex = /00:([0-9A-F]{4}):.{11}(\S{3})/g;
       const [_, addr, instruction] = regex.exec(line)!;
       return { instruction, addr: hexToDex(addr) };

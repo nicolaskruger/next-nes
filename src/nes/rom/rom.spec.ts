@@ -20,6 +20,7 @@ import {
 import { NMI } from "../cpu/instruction/instruction";
 import { readRangeSprRam } from "../ppu/spr-ram/spr-ram";
 import { decompileNes } from "../cpu/decompiler/decompile";
+import { dexToHex } from "../helper/converter";
 
 describe("ROM", () => {
   test("nestest", async () => {
@@ -163,9 +164,12 @@ describe("ROM", () => {
     const nes = await initNesTestRom();
     const romCode = decompileNes(nes);
     code.forEach(({ addr, instruction }, index) => {
-      const [inst] = romCode.instruction[index].inst.split(/\s/);
+      let [inst] = romCode.instruction[index].inst.split(/\s/);
+      if (inst === "XXX") inst = "UND";
       expect(instruction).toBe(inst);
-      expect(addr).toBe(0x8000 + romCode.instruction[index].index);
+      expect(dexToHex(addr, 4, true)).toBe(
+        dexToHex(0x8000 + romCode.instruction[index].index, 4, true)
+      );
     });
   });
 });
