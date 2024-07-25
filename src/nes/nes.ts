@@ -4,6 +4,7 @@ import {
   Cpu,
   initCpu,
   setACC,
+  setBreakCommand,
   setCarryFlag,
   setCycles,
   setDecimalMode,
@@ -210,7 +211,15 @@ function nesBuilder(nes: Nes) {
     NMI: nmi(nes),
     toggleVBlack: () => nesBuilder(toggleVBlank(nes)),
     pushPCStack: (pc: number) => nesBuilder(pushPCStack(nes, pc)),
-    pullPCStack: () => nesBuilder(pullPCStack(nes)),
+    pullPCStack: () => {
+      let [PC, _nes] = pullPCStack(nes);
+      return nesBuilder(_nes).PC(PC);
+    },
+    pullPCStackNext: () => {
+      let [PC, _nes] = pullPCStack(nes);
+      return nesBuilder(_nes).PC(PC + 1);
+    },
+    setBreakCommand: (value: number) => nesBuilder(setBreakCommand(value, nes)),
   };
 }
 

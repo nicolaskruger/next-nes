@@ -613,7 +613,7 @@ describe("instruction test", () => {
 
     nes.cpu.STATUS = 1;
 
-    nes.cpu.PC = 2;
+    nes.cpu.PC = 0x1234;
 
     const _nes = BRK({
       nes,
@@ -624,11 +624,12 @@ describe("instruction test", () => {
     });
 
     expectNes(_nes)
-      .toSTK(0xfd)
-      .toBuss(0x01ff, 2)
-      .toBuss(0x01fe, 1)
-      .toPC(2)
+      .toSTK(0xfc)
+      .toBuss(0x01ff, 0x12)
+      .toBuss(0x01fe, 0x34)
+      .toBuss(0x01fd, 1)
       .toCycles(7)
+      .toPC(0x1234)
       .toStatus((1 << 4) | 1);
   });
 
@@ -1652,20 +1653,18 @@ describe("instruction test", () => {
     expectNes(nes).toStatus(STATUS).toPC(PC).toCycles(6);
   });
   test("RTS, return from subroutine. It pulls the PC from the stack", () => {
-    const nes = initNes();
+    let nes = initNes();
 
     const PC = 0x21;
 
-    nes.cpu.STK = 0xfe;
+    nes = pushPCStack(nes, PC);
 
-    nes.bus[0x01ff].data = PC;
-
-    const _nes = RTS({
+    nes = RTS({
       baseCycles: 6,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toPC(0x22).toCycles(6);
+    expectNes(nes).toPC(0x22).toCycles(6);
   });
 
   test("SBC, when ACC = 0xff, C = 1, M = 1  then C = 0, N = 0", () => {
@@ -2024,8 +2023,8 @@ describe("instruction test", () => {
   test("pull PC from stack", () => {
     let nes = initNes();
     nes = pushPCStack(nes, 0x1234);
-    nes = pullPCStack(nes);
+    const [PC] = pullPCStack(nes);
 
-    expectNes(nes).toPC(0x1234);
+    expect(PC).toBe(0x1234);
   });
 });

@@ -66,10 +66,10 @@ export const pushPCStack = (nes: Nes, pc: number): Nes => {
   return [high, low].reduce((acc, curr) => pushToStack(acc, curr), nes);
 };
 
-export const pullPCStack = (nes: Nes): Nes => {
+export const pullPCStack = (nes: Nes): [number, Nes] => {
   const [low, nesLow] = pullFromStack(nes);
   const [high, nesHigh] = pullFromStack(nesLow);
-  return setPC((high << 8) | low, nesHigh);
+  return [(high << 8) | low, nesHigh];
 };
 
 const ADC = ({ data, nes, ...cycles }: Instruction): Nes => {
@@ -234,14 +234,12 @@ const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
 };
 
 const BRK = ({ nes, baseCycles }: Instruction): Nes => {
-  let _nes = [nes.cpu.PC, nes.cpu.STATUS].reduce(
-    (acc, curr) => pushToStack(acc, curr),
-    nes
-  );
-
-  _nes = setBreakCommand(1, _nes);
-
-  return nesBuilder(_nes).cycles(baseCycles).build();
+  return nesBuilder(nes)
+    .pushPCStack(getPC(nes))
+    .pushToStack(getSTATUS(nes))
+    .setBreakCommand(1)
+    .cycles(baseCycles)
+    .build();
 };
 
 const BVC = (instruction: Instruction): Nes => {
@@ -570,12 +568,7 @@ const RTI = ({ nes, baseCycles }: Instruction): Nes => {
     .build();
 };
 const RTS = ({ nes, baseCycles }: Instruction): Nes => {
-  const [PC, _nes] = pullFromStack(nes);
-
-  return nesBuilder(_nes)
-    .PC(PC + 1)
-    .cycles(baseCycles)
-    .build();
+  return nesBuilder(nes).pullPCStackNext().cycles(baseCycles).build();
 };
 const SBC = ({ data, nes, ...cycles }: Instruction): Nes => {
   const dataSigned = minus8bitSigned(data);
