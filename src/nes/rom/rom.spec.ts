@@ -176,4 +176,15 @@ describe("ROM", () => {
       });
     });
   });
+
+  test("test nestest.nes until error", async () => {
+    let nes = await initNesTestRom();
+    try {
+      while (true) {
+        nes = tick(nes).nes;
+      }
+    } catch (error) {
+      console.log(nes);
+    }
+  });
 });

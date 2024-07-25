@@ -24,7 +24,6 @@ import {
 } from "../cpu";
 import { MASK_8 } from "@/nes/helper/mask";
 import { readBusNes, writeBusNes } from "@/nes/bus/bus";
-import { repeat } from "@/nes/helper/repeat";
 import { finishNMI, getNMIInfo, startNMI } from "../interrupt/interrupt";
 
 type Instruction = {
@@ -381,10 +380,10 @@ const JMP = ({ baseCycles, nes, data, addr }: Instruction): Nes =>
     .PC(addr as number)
     .build();
 
-const JSR = ({ nes, baseCycles, data }: Instruction): Nes =>
+const JSR = ({ nes, baseCycles, addr }: Instruction): Nes =>
   nesBuilder(nes)
     .pushToStack(nes.cpu.PC - 1)
-    .PC(data)
+    .PC(addr!)
     .cycles(baseCycles)
     .build();
 

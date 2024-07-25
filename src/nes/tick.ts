@@ -4,6 +4,7 @@ import {
   getInstructions,
   instructionDictionary,
 } from "./cpu/intructionDictionary/instructionDictionary";
+import { dexToHex } from "./helper/converter";
 import { Nes } from "./nes";
 import { vBlack } from "./ppu/v-blank/v-blank";
 
@@ -11,13 +12,24 @@ export const FREQUENCY = 1.66 * Math.pow(10, 6);
 export const PERIOD = 1 / FREQUENCY;
 export const PERIOD_MILI = PERIOD * 1000;
 
+let lastInstruction: string;
+let oldPc: number;
+
 export const tick = (nes: Nes) => {
   const start = performance.now();
   const PC = getPC(nes);
+  if (PC < 0x8000) {
+    console.log(lastInstruction, oldPc.toString(16));
+    throw Error(
+      `not allowed addr: ${dexToHex(oldPc, 4, true)} ints: ${lastInstruction} `
+    );
+  }
+  oldPc = PC;
   const [fetch, nesFetch] = readBusNes(PC, nes);
   let _nes = nesFetch;
   const { addr, instruction, baseCycles, offsetCycles } =
     getInstructions(fetch);
+  lastInstruction = instruction.name;
   const addrResult = addr(nes);
   _nes = instruction({
     baseCycles,

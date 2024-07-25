@@ -1,6 +1,7 @@
 import { initBanks } from "../banks/bank";
 import { Cpu } from "../cpu/cpu";
 import { Nes } from "../nes";
+import { initPpu, Ppu } from "../ppu/ppu";
 import { initScroll } from "../ppu/scroll/scroll";
 import { initVram } from "../ppu/vram/vram";
 import {
@@ -46,15 +47,16 @@ const initBusMirror = (): Bus => {
   return mirrorBuilder(bus, simpleWrite, simpleRead, 0, 1, 2);
 };
 
-const initCpu = (): Cpu => ({
-  ACC: 0,
-  PC: 0,
-  STATUS: 0,
-  STK: 0,
-  X: 0,
-  Y: 0,
-  cycles: 0,
-});
+const initCpu = (): Cpu =>
+  ({
+    ACC: 0,
+    PC: 0,
+    STATUS: 0,
+    STK: 0,
+    X: 0,
+    Y: 0,
+    cycles: 0,
+  } as Cpu);
 
 const initNes = (): Nes => ({
   banks: initBanks(),
@@ -64,7 +66,7 @@ const initNes = (): Nes => ({
     vram: initVram(),
     sprRam: [],
     scroll: initScroll(),
-  },
+  } as unknown as Ppu,
 });
 
 describe("BUS", () => {

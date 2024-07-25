@@ -1233,13 +1233,14 @@ describe("instruction test", () => {
 
     nes.cpu.PC = 3;
 
-    const data = 0x1234;
+    const addr = 0x1234;
 
     const _nes = JSR({
       baseCycles: 5,
       cross: true,
       offsetOnCross: 0,
-      data,
+      data: 0,
+      addr,
       nes,
     });
 
