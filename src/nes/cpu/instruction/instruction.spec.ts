@@ -2004,13 +2004,12 @@ describe("instruction test", () => {
 
   test("NMI, flag active", () => {
     let nes = initNes();
-    nes.cpu.PC = 0x8000;
+    nes.cpu.PC = 0x1234;
     nes = writeBusNes(0x2000, 1 << 7, nes);
     nes = writeBusNes(0xfffa, 0x12, nes);
     nes = writeBusNes(0xfffb, 0x34, nes);
     nes = NMI(nes);
-    expectNes(nes).toPC(0x3412);
-    expect(readBusNes(0x01ff, nes)[0]).toBe(0x8000);
+    expectNes(nes).toPC(0x3412).toBuss(0x01ff, 0x12).toBuss(0x01fe, 0x34);
   });
 
   test("push PC to stack", () => {

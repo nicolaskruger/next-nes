@@ -683,7 +683,7 @@ const NMI = (nes: Nes): Nes => {
     [0, nes00] as [number, Nes]
   );
   return nesBuilder(nesAddr)
-    .pushToStack(getPC(nesAddr))
+    .pushPCStack(getPC(nesAddr))
     .pushToStack(getSTATUS(nesAddr))
     .PC(addr)
     .build();
