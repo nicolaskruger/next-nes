@@ -394,7 +394,7 @@ const JMP = ({ baseCycles, nes, data, addr }: Instruction): Nes =>
 
 const JSR = ({ nes, baseCycles, addr }: Instruction): Nes =>
   nesBuilder(nes)
-    .pushToStack(nes.cpu.PC - 1)
+    .pushPCStack(nes.cpu.PC - 1)
     .PC(addr!)
     .cycles(baseCycles)
     .build();

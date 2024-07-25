@@ -1235,7 +1235,7 @@ describe("instruction test", () => {
   test("JSR", () => {
     const nes = initNes();
 
-    nes.cpu.PC = 3;
+    nes.cpu.PC = 0x1234;
 
     const addr = 0x1234;
 
@@ -1248,7 +1248,11 @@ describe("instruction test", () => {
       nes,
     });
 
-    expectNes(_nes).toCycles(5).toPC(0x1234).toBuss(0x01ff, 2);
+    expectNes(_nes)
+      .toCycles(5)
+      .toPC(0x1234)
+      .toBuss(0x01ff, 0x12)
+      .toBuss(0x01fe, 0x33);
   });
 
   test("LDA, load the ACC a zero number", () => {
