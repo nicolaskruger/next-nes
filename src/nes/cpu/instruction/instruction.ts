@@ -17,6 +17,7 @@ import {
   setCarryFlag,
   setNegativeFlag,
   setOverFlowFlag,
+  setPC,
   setSTK,
   setX,
   setY,
@@ -25,6 +26,7 @@ import {
 import { MASK_8 } from "@/nes/helper/mask";
 import { readBusNes, writeBusNes } from "@/nes/bus/bus";
 import { finishNMI, getNMIInfo, startNMI } from "../interrupt/interrupt";
+import { repeat } from "@/nes/helper/repeat";
 
 type Instruction = {
   nes: Nes;
@@ -62,6 +64,12 @@ export const pushPCStack = (nes: Nes, pc: number): Nes => {
   const high = (pc >> 8) & 0xff;
   const low = pc & 0xff;
   return [high, low].reduce((acc, curr) => pushToStack(acc, curr), nes);
+};
+
+export const pullPCStack = (nes: Nes): Nes => {
+  const [low, nesLow] = pullFromStack(nes);
+  const [high, nesHigh] = pullFromStack(nesLow);
+  return setPC((high << 8) | low, nesHigh);
 };
 
 const ADC = ({ data, nes, ...cycles }: Instruction): Nes => {

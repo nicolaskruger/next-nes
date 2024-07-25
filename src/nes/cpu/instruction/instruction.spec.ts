@@ -67,6 +67,7 @@ import {
   TYA,
   NMI,
   pushPCStack,
+  pullPCStack,
 } from "./instruction";
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
@@ -2019,5 +2020,13 @@ describe("instruction test", () => {
       .toSTK(0xff - 2)
       .toBuss(0x01ff, 0x12)
       .toBuss(0x01fe, 0x34);
+  });
+
+  test("pull PC from stack", () => {
+    let nes = initNes();
+    nes = pushPCStack(nes, 0x1234);
+    nes = pullPCStack(nes);
+
+    expectNes(nes).toPC(0x1234);
   });
 });
