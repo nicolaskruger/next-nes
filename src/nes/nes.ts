@@ -18,6 +18,8 @@ import {
   CalculateCycles,
   calculateCycles,
   NMI,
+  pullPCStack,
+  pushPCStack,
   pushToStack,
 } from "./cpu/instruction/instruction";
 import { Ppu, initPpu } from "./ppu/ppu";
@@ -207,6 +209,8 @@ function nesBuilder(nes: Nes) {
     vram: vram(nes),
     NMI: nmi(nes),
     toggleVBlack: () => nesBuilder(toggleVBlank(nes)),
+    pushPCStack: (pc: number) => nesBuilder(pushPCStack(nes, pc)),
+    pullPCStack: () => nesBuilder(pullPCStack(nes)),
   };
 }
 

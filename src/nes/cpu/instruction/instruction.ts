@@ -562,9 +562,12 @@ const ROR = ({ acc, ...instruction }: Instruction): Nes => {
 };
 const RTI = ({ nes, baseCycles }: Instruction): Nes => {
   const [STATUS, nesStatus] = pullFromStack(nes);
-  const [PC, nesPC] = pullFromStack(nesStatus);
 
-  return nesBuilder(nesPC).PC(PC).cycles(baseCycles).status(STATUS).build();
+  return nesBuilder(nesStatus)
+    .pullPCStack()
+    .cycles(baseCycles)
+    .status(STATUS)
+    .build();
 };
 const RTS = ({ nes, baseCycles }: Instruction): Nes => {
   const [PC, _nes] = pullFromStack(nes);

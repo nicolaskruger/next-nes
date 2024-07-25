@@ -68,6 +68,7 @@ import {
   NMI,
   pushPCStack,
   pullPCStack,
+  pushToStack,
 } from "./instruction";
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
@@ -1634,23 +1635,21 @@ describe("instruction test", () => {
   });
 
   test("RTI, return from interrupt take STATUS and PC from the stack", () => {
-    const nes = initNes();
+    let nes = initNes();
 
     const STATUS = 0x12;
 
     const PC = 0x1234;
 
-    nes.cpu.STK = 0xfd;
+    nes = pushPCStack(nes, PC);
+    nes = pushToStack(nes, STATUS);
 
-    nes.bus[0x01fe].data = STATUS;
-    nes.bus[0x01ff].data = PC;
-
-    const _nes = RTI({
+    nes = RTI({
       baseCycles: 6,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toStatus(STATUS).toPC(PC).toCycles(6);
+    expectNes(nes).toStatus(STATUS).toPC(PC).toCycles(6);
   });
   test("RTS, return from subroutine. It pulls the PC from the stack", () => {
     const nes = initNes();
