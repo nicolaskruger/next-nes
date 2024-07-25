@@ -6,7 +6,7 @@ import {
   writeBusNes,
 } from "@/nes/bus/bus";
 import { Nes } from "@/nes/nes";
-import { Cpu, getZeroFlag } from "../cpu";
+import { Cpu, getPC, getZeroFlag, setPC } from "../cpu";
 import {
   ASL,
   ADC,
@@ -66,6 +66,7 @@ import {
   TXS,
   TYA,
   NMI,
+  pushPCStack,
 } from "./instruction";
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
@@ -2007,5 +2008,16 @@ describe("instruction test", () => {
     nes = NMI(nes);
     expectNes(nes).toPC(0x3412);
     expect(readBusNes(0x01ff, nes)[0]).toBe(0x8000);
+  });
+
+  test("push PC to stack", () => {
+    let nes = initNes();
+    nes = setPC(0x1234, nes);
+    nes = pushPCStack(nes, getPC(nes));
+
+    expectNes(nes)
+      .toSTK(0xff - 2)
+      .toBuss(0x01ff, 0x12)
+      .toBuss(0x01fe, 0x34);
   });
 });

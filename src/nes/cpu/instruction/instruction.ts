@@ -58,6 +58,12 @@ export const calculateCycles = ({
   offsetOnCross,
 }: CalculateCycles) => baseCycles + (cross ? offsetOnCross : 0);
 
+export const pushPCStack = (nes: Nes, pc: number): Nes => {
+  const high = (pc >> 8) & 0xff;
+  const low = pc & 0xff;
+  return [high, low].reduce((acc, curr) => pushToStack(acc, curr), nes);
+};
+
 const ADC = ({ data, nes, ...cycles }: Instruction): Nes => {
   const { cpu } = nes;
   const CARRY_FLAG = getCarryFlag(nes);
