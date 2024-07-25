@@ -659,6 +659,8 @@ const TXS = ({ nes, baseCycles }: Instruction): Nes =>
 const TYA = ({ nes, baseCycles }: Instruction): Nes =>
   transferNumberToAccumulator(getY, nes, baseCycles);
 
+export const XXX = ({ nes }: Instruction): Nes => nes;
+
 const NMI = (nes: Nes): Nes => {
   const nmi = getNMIInfo(nes);
   let [active, nes00] = getNMIFlag(nes);

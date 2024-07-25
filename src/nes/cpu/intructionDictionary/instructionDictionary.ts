@@ -78,6 +78,7 @@ import {
   TXA,
   TXS,
   TYA,
+  XXX,
 } from "../instruction/instruction";
 import { Dictionary } from "@/nes/helper/dictionary";
 
@@ -995,6 +996,18 @@ const instructionDictionary: Dictionary<number, InstructionDictionary> = {
     addr: IMP,
     instruction: TYA,
   },
+};
+
+export const getInstructions = (opCode: number): InstructionDictionary => {
+  const instruction = instructionDictionary[opCode];
+  if (!instruction)
+    return {
+      baseCycles: 0,
+      offsetCycles: 0,
+      addr: IMP,
+      instruction: XXX,
+    };
+  return instruction;
 };
 
 export { instructionDictionary };

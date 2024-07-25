@@ -1,6 +1,9 @@
 import { readBusNes } from "./bus/bus";
 import { getCycles, getPC } from "./cpu/cpu";
-import { instructionDictionary } from "./cpu/intructionDictionary/instructionDictionary";
+import {
+  getInstructions,
+  instructionDictionary,
+} from "./cpu/intructionDictionary/instructionDictionary";
 import { Nes } from "./nes";
 import { vBlack } from "./ppu/v-blank/v-blank";
 
@@ -14,7 +17,7 @@ export const tick = (nes: Nes) => {
   const [fetch, nesFetch] = readBusNes(PC, nes);
   let _nes = nesFetch;
   const { addr, instruction, baseCycles, offsetCycles } =
-    instructionDictionary[fetch];
+    getInstructions(fetch);
   const addrResult = addr(nes);
   _nes = instruction({
     baseCycles,
