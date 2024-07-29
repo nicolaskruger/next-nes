@@ -12,6 +12,7 @@ import { render } from "@/nes/render/render-img-tile";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Pallets } from "@/components/pallets/pallets";
 
 type NesRefresh = Nes & { refresh?: boolean };
 
@@ -109,7 +110,8 @@ export default function Decompile() {
             <Code nes={nes} />
           </div>
           <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-            <RenderTiles imgs={props.imgs} />
+            {/* <RenderTiles imgs={props.imgs} /> */}
+            <Pallets nes={nes} />
           </div>
         </div>
         <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
