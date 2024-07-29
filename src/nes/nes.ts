@@ -27,12 +27,14 @@ import { Ppu, initPpu } from "./ppu/ppu";
 import { toggleVBlank } from "./ppu/registers/registers";
 import { Scroll, ScrollStatus, getScroll } from "./ppu/scroll/scroll";
 import { AddrVRamStatus, VRam } from "./ppu/vram/vram";
+import { Track } from "./track/track";
 
 type Nes = {
   cpu: Cpu;
   ppu: Ppu;
   bus: Bus;
   banks: Banks;
+  track?: Track;
 };
 
 const ACC = (nes: Nes) => (ACC: number) => {

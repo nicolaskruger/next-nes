@@ -39,4 +39,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ```bash
 cl65 --verbose --target nes -o demo.nes demo.s
+
+cl65 --verbose --target nes -o unisinos.nes unisinos.s
 ```

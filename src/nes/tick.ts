@@ -7,6 +7,7 @@ import {
 import { dexToHex } from "./helper/converter";
 import { Nes } from "./nes";
 import { vBlack } from "./ppu/v-blank/v-blank";
+import { pushTrack } from "./track/track";
 
 export const FREQUENCY = 1.66 * Math.pow(10, 6);
 export const PERIOD = 1 / FREQUENCY;
@@ -27,8 +28,9 @@ export const tick = (nes: Nes) => {
   oldPc = PC;
   const [fetch, nesFetch] = readBusNes(PC, nes);
   let _nes = nesFetch;
-  const { addr, instruction, baseCycles, offsetCycles } =
-    getInstructions(fetch);
+  const inst = getInstructions(fetch);
+  const { addr, instruction, baseCycles, offsetCycles } = inst;
+  pushTrack(nes, inst);
   lastInstruction = instruction.name;
   const addrResult = addr(nes);
   _nes = instruction({

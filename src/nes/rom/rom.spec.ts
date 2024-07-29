@@ -184,7 +184,15 @@ describe("ROM", () => {
         nes = tick(nes).nes;
       }
     } catch (error) {
-      console.log(nes);
+      nes;
+      console.log(error);
     }
+  });
+
+  test("test nestest.nes tick until", async () => {
+    let nes = await initNesTestRom();
+    nes = tickUntil(0xceed, nes);
+    nes = tick(nes).nes;
+    nes;
   });
 });
