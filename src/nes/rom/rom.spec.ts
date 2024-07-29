@@ -215,4 +215,10 @@ describe("ROM", () => {
     expect(pallet).toBe(0x1);
     expect(isShowSpr(nes)[0]).toBe(true);
   });
+
+  test("test unisinos toggle state", async () => {
+    let nes = await initUnisinosRom();
+    nes = tickConditional((nes) => nes.bus[0].data === 1, nes);
+    nes = tickConditional((nes) => nes.bus[0].data === 0, nes);
+  });
 });

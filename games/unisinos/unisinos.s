@@ -1,3 +1,5 @@
+anime_state = $00
+
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
   .byte $4E, $45, $53, $1A
@@ -76,7 +78,22 @@ enable_rendering:
   sta $2001
 
 forever:
+  jsr animate
   jmp forever
+
+animate:
+  lda anime_state
+  cmp #0
+  bne anime_two
+anime_one:
+  lda #0
+  jmp anime_end
+anime_two:
+  lda #1
+  jmp anime_end
+anime_end:
+  sta anime_state
+  rts
 
 nmi:
   ldx #$00 	; Set SPR-RAM address to 0
