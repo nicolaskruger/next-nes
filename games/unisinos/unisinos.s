@@ -1,4 +1,8 @@
-anime_state = $00
+anime_state   = $00
+player_x      = $01
+player_y      = $02
+sprite        = $03
+anime_counter = $04
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
@@ -51,6 +55,14 @@ clear_memory:
   inx
   bne clear_memory
 
+star_player:
+  lda #$e0
+  sta player_y
+  lda #$10
+  sta player_x
+  lda $05
+  sta sprite
+
 ;; second wait for vblank, PPU is ready after this
 vblankwait2:
   bit $2002
@@ -82,9 +94,14 @@ forever:
   jmp forever
 
 animate:
+  ldx anime_counter
+  inx
+  stx anime_counter
+  cpx #$ff
+  beq anime_end
   lda anime_state
   cmp #0
-  bne anime_two
+  beq anime_two
 anime_one:
   lda #0
   jmp anime_end
@@ -101,8 +118,18 @@ nmi:
 @loop:	lda unisinos, x 	; Load the hello message into SPR-RAM
   sta $2004
   inx
-  cpx #$2c
+  cpx #$28
   bne @loop
+render_player:
+  lda player_y
+  sta $2004
+  ldx anime_state
+  lda sprite_index, x
+  sta $2004
+  lda #$01
+  sta $2004
+  lda player_x
+  sta $2004
   rti
 
 unisinos:
@@ -116,7 +143,9 @@ unisinos:
   .byte $6c, $01, $00, $8f  ; n
   .byte $6c, $04, $00, $99  ; o
   .byte $6c, $03, $00, $a3  ; s
-  .byte $e0, $05, $01, $10  ; sprite one
+
+sprite_index:
+  .byte $05, $06
 
 palettes:
   ; Background Palette
