@@ -81,14 +81,14 @@ forever:
 nmi:
   ldx #$00 	; Set SPR-RAM address to 0
   stx $2003
-@loop:	lda hello, x 	; Load the hello message into SPR-RAM
+@loop:	lda unisinos, x 	; Load the hello message into SPR-RAM
   sta $2004
   inx
-  cpx #$28
+  cpx #$2c
   bne @loop
   rti
 
-hello:
+unisinos:
   .byte $00, $00, $00, $00 	; Why do I need these here?
   .byte $00, $00, $00, $00
   .byte $6c, $00, $00, $5d  ; u
@@ -99,6 +99,7 @@ hello:
   .byte $6c, $01, $00, $8f  ; n
   .byte $6c, $04, $00, $99  ; o
   .byte $6c, $03, $00, $a3  ; s
+  .byte $d0, $05, $01, $10  ; sprite one
 
 palettes:
   ; Background Palette
@@ -165,7 +166,7 @@ palettes:
   .byte %01111110
   .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-  .byte %11111111	; sprite one (0)
+  .byte %11111111	; sprite one (0) (05)
   .byte %00110000
   .byte %00101010
   .byte %00100000
