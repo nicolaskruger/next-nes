@@ -102,16 +102,16 @@ hello:
 
 palettes:
   ; Background Palette
-  .byte $0f, $00, $00, $00
-  .byte $0f, $00, $00, $00
-  .byte $0f, $00, $00, $00
-  .byte $0f, $00, $00, $00
+  .byte $00, $00, $00, $00
+  .byte $00, $00, $00, $00
+  .byte $00, $00, $00, $00
+  .byte $00, $00, $00, $00
 
   ; Sprite Palette
-  .byte $0f, $02, $00, $00
-  .byte $0f, $0f, $36, $02
-  .byte $0f, $00, $00, $00
-  .byte $0f, $00, $00, $00
+  .byte $00, $02, $00, $00
+  .byte $00, $0f, $36, $02
+  .byte $00, $00, $00, $00
+  .byte $00, $00, $00, $00
 
 ; Character memory
 .segment "CHARS"
