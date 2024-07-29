@@ -84,18 +84,21 @@ nmi:
 @loop:	lda hello, x 	; Load the hello message into SPR-RAM
   sta $2004
   inx
-  cpx #$1c
+  cpx #$28
   bne @loop
   rti
 
 hello:
   .byte $00, $00, $00, $00 	; Why do I need these here?
   .byte $00, $00, $00, $00
-  .byte $6c, $00, $00, $6c
-  .byte $6c, $01, $00, $76
-  .byte $6c, $02, $00, $80
-  .byte $6c, $02, $00, $8A
-  .byte $6c, $03, $00, $94
+  .byte $6c, $00, $00, $5d  ; u
+  .byte $6c, $01, $00, $67  ; n
+  .byte $6c, $02, $00, $71  ; i
+  .byte $6c, $03, $00, $7b  ; s
+  .byte $6c, $02, $00, $85  ; i
+  .byte $6c, $01, $00, $8f  ; n
+  .byte $6c, $04, $00, $99  ; o
+  .byte $6c, $03, $00, $a3  ; s
 
 palettes:
   ; Background Palette
@@ -132,14 +135,14 @@ palettes:
   .byte %11000011
   .byte $00, $00, $00, $00, $00, $00, $00, $00
 
-  .byte %11000000	; L (02)
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
+  .byte %00011000	; L (02)
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
   .byte $00, $00, $00, $00, $00, $00, $00, $00
 
   .byte %01111110	; S (03)
