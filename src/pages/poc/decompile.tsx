@@ -110,8 +110,8 @@ export default function Decompile() {
             <Code nes={nes} />
           </div>
           <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-            {/* <RenderTiles imgs={props.imgs} /> */}
-            <Pallets nes={nes} />
+            <RenderTiles imgs={props.imgs} index={5} />
+            {/* <Pallets nes={nes} /> */}
           </div>
         </div>
         <div className="w-2/3 bg-purple-500 flex items-center justify-center flex-col">
