@@ -99,7 +99,7 @@ unisinos:
   .byte $6c, $01, $00, $8f  ; n
   .byte $6c, $04, $00, $99  ; o
   .byte $6c, $03, $00, $a3  ; s
-  .byte $d0, $05, $01, $10  ; sprite one
+  .byte $e0, $05, $01, $10  ; sprite one
 
 palettes:
   ; Background Palette

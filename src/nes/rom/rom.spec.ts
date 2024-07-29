@@ -4,7 +4,11 @@ import { KB16, KB8, rom } from "./rom";
 import { readBusNes } from "../bus/bus";
 import { tick } from "../tick";
 import { getACC } from "../cpu/cpu";
-import { getAddrVRam } from "../ppu/registers/registers";
+import {
+  getAddrVRam,
+  isShowSpr,
+  isSprLeftMost8Pix,
+} from "../ppu/registers/registers";
 import { compileNes } from "../cpu/runner/runner";
 import { compile } from "../cpu/compiler/compiler";
 import { repeat } from "../helper/repeat";
@@ -12,13 +16,16 @@ import { readRangeVRam, readVRam } from "../ppu/vram/vram";
 import {
   initDemoRom,
   initNesTestRom,
+  initUnisinosRom,
   nesTestCode,
+  tickConditional,
+  tickFor,
   tickUntil,
   tickUntilEndDemoRom,
   tickUntilTimes,
 } from "../debug/rom-debug";
 import { NMI } from "../cpu/instruction/instruction";
-import { readRangeSprRam } from "../ppu/spr-ram/spr-ram";
+import { readRangeSprRam, readSprInfo } from "../ppu/spr-ram/spr-ram";
 import { decompileNes } from "../cpu/decompiler/decompile";
 import { dexToHex } from "../helper/converter";
 
@@ -194,5 +201,18 @@ describe("ROM", () => {
     nes = tickUntil(0xceed, nes);
     nes = tick(nes).nes;
     nes;
+  });
+
+  test.skip("test unisinos should render sprite", async () => {
+    let nes = await initUnisinosRom();
+    nes = tickFor(1000, nes);
+
+    const [{ y, x, tile, pallet }] = readSprInfo(10, nes);
+
+    expect(y).toBe(0xd0);
+    expect(x).toBe(0x10);
+    expect(tile).toBe(0x05);
+    expect(pallet).toBe(0x1);
+    expect(isShowSpr(nes)[0]).toBe(true);
   });
 });

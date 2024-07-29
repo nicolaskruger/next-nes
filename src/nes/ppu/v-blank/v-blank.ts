@@ -3,7 +3,7 @@ import { toggleVBlank } from "../registers/registers";
 import { NMI } from "@/nes/cpu/instruction/instruction";
 import { getCycles } from "@/nes/cpu/cpu";
 
-export const MAX_CYCLES = 10;
+export const MAX_CYCLES = 100;
 
 export type VBlank = {
   cycles: number;

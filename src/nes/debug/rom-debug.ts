@@ -36,6 +36,23 @@ export const initNesTestRom = async () => {
   return initRom("./roms/nestest.nes");
 };
 
+export const initUnisinosRom = async () => {
+  return initRom("./games/unisinos/unisinos.nes");
+};
+
+export const tickFor = (ms: number, nes: Nes): Nes => {
+  let start = performance.now();
+  while (performance.now() - start < ms) {
+    nes = tick(nes).nes;
+  }
+  return nes;
+};
+
+export const tickConditional = (condition: (nes: Nes) => boolean, nes: Nes) => {
+  while (condition(nes)) nes = tick(nes).nes;
+  return nes;
+};
+
 type Code = {
   addr: number;
   instruction: string;
