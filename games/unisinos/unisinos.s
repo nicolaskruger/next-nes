@@ -90,29 +90,32 @@ enable_rendering:
   sta $2001
 
 forever:
-  jsr animate
   jmp forever
 
 animate:
   ldx anime_counter
   inx
   stx anime_counter
-  cpx #$ff
-  beq anime_end
+  cpx #$10
+  bne anime_end
+  ldx #0
+  stx anime_counter
   lda anime_state
   cmp #0
   beq anime_two
 anime_one:
   lda #0
+  sta anime_state
   jmp anime_end
 anime_two:
   lda #1
+  sta anime_state
   jmp anime_end
 anime_end:
-  sta anime_state
   rts
 
 nmi:
+  jsr animate
   ldx #$00 	; Set SPR-RAM address to 0
   stx $2003
 @loop:	lda unisinos, x 	; Load the hello message into SPR-RAM
