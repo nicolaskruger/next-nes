@@ -45,6 +45,5 @@ export const tick = (nes: Nes) => {
   const totalTime = PERIOD_MILI * cycles;
   const delayTime = totalTime - executeTime;
 
-  _nes = vBlack(_nes);
   return { nes: _nes, executeTime, totalTime, delayTime, cycles };
 };

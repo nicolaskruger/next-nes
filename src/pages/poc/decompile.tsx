@@ -1,6 +1,3 @@
-import { Code } from "@/components/code/code";
-
-import { RenderTiles } from "@/components/render-tiles/render-tiles-img";
 import { PrerenderBuilder } from "@/components/prerender-builder/prerender-builder";
 import { usePrerender } from "@/hooks/prerender/usePrerender";
 import { getPC } from "@/nes/cpu/cpu";
@@ -12,7 +9,8 @@ import { render } from "@/nes/render/render-img-tile";
 import { rom } from "@/nes/rom/rom";
 import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Pallets } from "@/components/pallets/pallets";
+import { NMI } from "@/nes/cpu/instruction/instruction";
+import { getNMIInfo } from "@/nes/cpu/interrupt/interrupt";
 
 type NesRefresh = Nes & { refresh?: boolean };
 
@@ -21,33 +19,44 @@ const startNes = () => createMushroomWord();
 export default function Decompile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [interval, setIntervalCode] = useState<NodeJS.Timeout>();
+  const fps = useRef(0);
 
-  const [nes, setNes] = useState<Nes & { refresh?: boolean }>({
+  const timeOutCode = useRef<NodeJS.Timeout>();
+
+  const nes = useRef<Nes & { refresh?: boolean }>({
     ...startNes(),
     refresh: true,
   });
-  const [fileName, setFileName] = useState("");
-  const { refreshPallet, ...props } = usePrerender(nes, 2);
-  const { getTile, loading, percent, refresh, canvas } = props;
+
   useEffect(() => {
-    setNes((nes) => {
-      const _nes = render(nes, getTile, 2, canvasRef); //30 ms
-      return setRefreshPallet(_nes, refreshPallet);
-    });
+    const interval = setInterval(() => {
+      console.log({ fps: fps.current });
+      fps.current = 0;
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
-  const setNesDecompile = (nes: NesRefresh) => {
-    const _nes = render(nes, getTile, 2, canvasRef);
-    setNes(_nes);
+  const [fileName, setFileName] = useState("");
+  const { refreshPallet, ...props } = usePrerender(nes.current, 2);
+  const { getTile, loading, percent, refresh, canvas } = props;
+  useEffect(() => {
+    const _nes = render(nes.current, getTile, 2, canvasRef); //30 ms
+    nes.current = setRefreshPallet(_nes, refreshPallet);
+  }, []);
+
+  const setNesDecompile = (_nes: NesRefresh) => {
+    nes.current = render(_nes, getTile, 2, canvasRef);
   };
 
   const next = () => {
-    setNesDecompile(tick(nes).nes);
+    setNesDecompile(tick(nes.current).nes);
   };
   const finish = () => {
     let _nes = {
-      ...nes,
+      ...nes.current,
     };
 
     const end = () => {
@@ -65,7 +74,7 @@ export default function Decompile() {
     const file = e?.target?.files?.[0];
     if (file) {
       try {
-        const _nes = await rom(nes, file);
+        const _nes = await rom(nes.current, file);
         setFileName(file.name as string);
         setNesDecompile({ ..._nes, refresh: true });
       } catch (error) {
@@ -75,31 +84,39 @@ export default function Decompile() {
   };
 
   const play = () => {
-    if (interval) {
-      clearInterval(interval);
-      setIntervalCode(undefined);
-      return;
-    }
-    const intervalCode = setInterval(() => {
-      let { nes: _nes, executeTime } = tick(nes);
-      while (executeTime < 1000 / 50) {
+    const timeOut = () => {
+      const timeBox = 1000 / 60;
+      let { nes: _nes, executeTime } = tick(nes.current);
+      _nes = NMI(_nes);
+      const clock = () => {
         const _tick = tick(_nes);
         _nes = _tick.nes;
         executeTime += _tick.executeTime;
-      }
+      };
+      if (getNMIInfo(_nes).occur) while (getNMIInfo(_nes).occur) clock();
+      else while (executeTime < 1000 / 60) clock();
+      const renderStart = performance.now();
       setNesDecompile(_nes);
-    }, 1);
-    setNes((nes) => ({ ...nes, refresh: true }));
-    setIntervalCode(intervalCode);
+      executeTime += performance.now() - renderStart;
+      timeOutCode.current = setTimeout(timeOut, timeBox - executeTime);
+      fps.current++;
+    };
+    if (timeOutCode) {
+      clearTimeout(timeOutCode.current);
+      timeOutCode.current = undefined;
+    }
+
+    timeOutCode.current = setTimeout(timeOut, 0);
+
+    nes.current = { ...nes.current, refresh: true };
   };
 
   useEffect(() => {
-    if (canvas && nes.refresh) {
+    if (canvas && nes.current.refresh) {
       refresh();
-      delete nes.refresh;
-      setNes(nes);
+      delete nes.current.refresh;
     }
-  }, [nes.refresh]);
+  }, [nes.current]);
 
   return (
     <>
@@ -107,10 +124,10 @@ export default function Decompile() {
       <main className="flex w-screen h-screen">
         <div className="w-1/3 flex-col flex">
           <div className="w-full h-2/3 bg-blue-500 overflow-y-scroll pl-3">
-            <Code nes={nes} />
+            {/* <Code nes={nes} /> */}
           </div>
           <div className="w-full h-1/3 flex justify-center items-center bg-red-500 overflow-y-scroll">
-            <RenderTiles imgs={props.imgs} index={5} />
+            {/* <RenderTiles imgs={props.imgs} index={5} /> */}
             {/* <Pallets nes={nes} /> */}
           </div>
         </div>
@@ -119,7 +136,7 @@ export default function Decompile() {
           <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
           <button onClick={next}>next</button>
           <button onClick={finish}>finish</button>
-          <button onClick={play}>{interval ? "stop" : "play"}</button>
+          <button onClick={play}>{timeOutCode ? "stop" : "play"}</button>
           {loading && (
             <p className="text-red-800">loading: {percent.toFixed(2)}%</p>
           )}
