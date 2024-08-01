@@ -3,7 +3,7 @@ player_x      = $01
 player_y      = $02
 sprite        = $03
 anime_counter = $04
-
+pad_1         = $4016
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
   .byte $4E, $45, $53, $1A
@@ -114,8 +114,31 @@ anime_two:
 anime_end:
   rts
 
+move:
+  lda #1
+  sta pad_1
+  lda #0
+  sta pad_1
+  ldx #0
+  @loop_control: lda pad_1
+    inx
+    cpx #7
+    bne @loop_control
+  lda pad_1
+  and #%00000001
+  cmp #%00000001
+  bne move_end
+  move_right:
+    ldx player_x
+    inx 
+    stx player_x
+    jmp move_end
+  move_end:
+  rts
+
 nmi:
   jsr animate
+  jsr move
   ldx #$00 	; Set SPR-RAM address to 0
   stx $2003
 @loop:	lda unisinos, x 	; Load the hello message into SPR-RAM

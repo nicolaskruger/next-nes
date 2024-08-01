@@ -1,10 +1,5 @@
 import { getPC } from "@/nes/cpu/cpu";
-import {
-  Decompile,
-  decompileNes,
-  decompileNesSize,
-  findCurrentInstruction,
-} from "@/nes/cpu/decompiler/decompile";
+import { decompileNesSize } from "@/nes/cpu/decompiler/decompile";
 import { dexToHexFourDigitsPrefix } from "@/nes/helper/converter";
 import { Nes } from "@/nes/nes";
 
