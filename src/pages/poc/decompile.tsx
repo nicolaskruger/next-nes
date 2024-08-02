@@ -93,7 +93,7 @@ export default function Decompile() {
     const timeOut = () => {
       const timeBox = 1000 / 60;
       let { nes: _nes, executeTime } = tick(nes.current);
-      _nes = updatePad1({ right: true }, _nes);
+      _nes = updatePad1(control.current, _nes);
       _nes = NMI(_nes);
       const clock = () => {
         const _tick = tick(_nes);

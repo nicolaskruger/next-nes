@@ -5,7 +5,7 @@ const change = (v: boolean) => (v ? "true" : "false");
 export const ControlPlayground = () => {
   const { control, ...extra } = useControl();
 
-  const { a, b, down, left, right, up, start, select } = control;
+  const { a, b, down, left, right, up, start, select } = control.current;
 
   return (
     <main

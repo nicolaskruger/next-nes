@@ -1,5 +1,5 @@
 import { Dictionary } from "@/nes/helper/dictionary";
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, useRef, useState } from "react";
 
 type ControlGeneric<T> = {
   up: T;
@@ -36,7 +36,7 @@ const revertObject = (obj: Dictionary<string, string>) => {
 
 const useControl = () => {
   const reverseMap = revertObject(controlMap);
-  const [control, setControl] = useState<Control>({
+  const control = useRef<Control>({
     a: false,
     b: false,
     down: false,
@@ -49,13 +49,13 @@ const useControl = () => {
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     const key = reverseMap[e.key];
     if (!key) return;
-    setControl((cont) => ({ ...cont, [key]: true }));
+    control.current[key as keyof Control] = true;
   };
 
   const onKeyUp = (e: KeyboardEvent<HTMLElement>) => {
     const key = reverseMap[e.key];
     if (!key) return;
-    setControl((cont) => ({ ...cont, [key]: false }));
+    control.current[key as keyof Control] = false;
   };
 
   return { onKeyDown, onKeyUp, tabIndex: 0, control };
