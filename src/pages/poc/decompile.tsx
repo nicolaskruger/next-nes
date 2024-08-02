@@ -49,12 +49,12 @@ export default function Decompile() {
   const { refreshPallet, ...props } = usePrerender(nes.current, 2);
   const { getTile, loading, percent, refresh, canvas } = props;
   useEffect(() => {
-    const _nes = render(nes.current, getTile, 2, canvasRef); //30 ms
+    const _nes = render(nes.current, getTile, 2, canvasRef, canvas); //30 ms
     nes.current = setRefreshPallet(_nes, refreshPallet);
   }, []);
 
   const setNesDecompile = (_nes: NesRefresh) => {
-    nes.current = render(_nes, getTile, 2, canvasRef);
+    nes.current = render(_nes, getTile, 2, canvasRef, canvas);
   };
 
   const next = () => {
@@ -143,11 +143,10 @@ export default function Decompile() {
           <input type="file" name="rom" id="rom" onChange={handleChangeRom} />
           <button onClick={next}>next</button>
           <button onClick={finish}>finish</button>
-          <button onClick={play}>{timeOutCode ? "stop" : "play"}</button>
+          <button onClick={play}>play</button>
           {loading && (
             <p className="text-red-800">loading: {percent.toFixed(2)}%</p>
           )}
-          <p>right: {control.right ? "true" : "false"}</p>
         </div>
       </main>
     </>

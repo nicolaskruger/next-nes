@@ -1,6 +1,6 @@
 import { RefObject } from "react";
 import { Nes } from "../nes";
-import { getCanvasContext } from "./render";
+import { getCanvas, getCanvasContext } from "./render";
 import {
   getBgColor,
   renderAttributeTable,
@@ -57,16 +57,33 @@ const renderSprites = (
   nes: Nes,
   canvas: CanvasRef,
   getImage: GetImage,
-  multi: number
+  multi: number,
+  sprCanvas: CanvasRef
 ): Nes => {
   const ctx = getCanvasContext(canvas);
+
+  const sprCtx = getCanvasContext(sprCanvas);
 
   return repeat(64).reduce((acc, curr, index) => {
     const [sprInfo, _nes] = readSprInfo(index, acc);
 
-    const { tile, pallet, x, y } = formatSprInfo(sprInfo, multi);
+    const { tile, pallet, x, y, verticalMirror, horizontalMirror } =
+      formatSprInfo(sprInfo, multi);
 
-    ctx.drawImage(getImage(tile, pallet).current as HTMLImageElement, x, y);
+    const img = getImage(tile, pallet).current as HTMLImageElement;
+
+    if (verticalMirror || horizontalMirror) {
+      sprCtx.save();
+      sprCtx.scale(-1, 1);
+      sprCtx.drawImage(img, -img.width, 0);
+      const newImg = new Image();
+      newImg.src = sprCanvas.current?.toDataURL() || "";
+      sprCtx.restore();
+      ctx.drawImage(newImg, x, y);
+    } else {
+      ctx.drawImage(img, x, y);
+    }
+
     return _nes;
   }, nes);
 };
@@ -83,12 +100,13 @@ export const render = (
   nes: Nes,
   getImage: GetImage,
   multi: number,
-  canvas: CanvasRef
+  canvas: CanvasRef,
+  sprCanvas: CanvasRef
 ): Nes => {
   let _nes = renderBg(nes, multi, canvas);
   const [showBg] = isShowBg(_nes);
   if (showBg) _nes = renderSelectScreen(_nes, 0, getImage, multi, canvas);
   const [showSpr] = isShowSpr(_nes);
-  if (showSpr) _nes = renderSprites(_nes, canvas, getImage, multi);
+  if (showSpr) _nes = renderSprites(_nes, canvas, getImage, multi, sprCanvas);
   return _nes;
 };
