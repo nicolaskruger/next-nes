@@ -1,8 +1,9 @@
 anime_state   = $00
 player_x      = $01
 player_y      = $02
-sprite        = $03
-anime_counter = $04
+player_info   = $03
+sprite        = $04
+anime_counter = $05
 pad_1         = $4016
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
@@ -62,6 +63,9 @@ star_player:
   sta player_x
   lda $05
   sta sprite
+  lda #1
+  sta player_info
+
 
 ;; second wait for vblank, PPU is ready after this
 vblankwait2:
@@ -133,6 +137,8 @@ move:
     ldx player_x
     dex 
     stx player_x
+    lda #%01000001
+    sta player_info
     jmp move_end
   end_move_left:
   lda pad_1
@@ -143,6 +149,8 @@ move:
     ldx player_x
     inx 
     stx player_x
+    lda #1
+    sta player_info
     jmp move_end
   move_end:
   rts
@@ -163,7 +171,7 @@ render_player:
   ldx anime_state
   lda sprite_index, x
   sta $2004
-  lda #$01
+  lda player_info
   sta $2004
   lda player_x
   sta $2004
