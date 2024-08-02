@@ -54,8 +54,8 @@ export const readSprInfo = (index: number, nes: Nes): [SprInfo, Nes] => {
   const [[y, tile, info, x], _nes] = readRangeSprRam(index * 4, 4, nes);
   const pallet = info & 3;
   const bgPos: BgPos = (info >> 5) & 1 ? "back" : "front";
-  const horizontalMirror = Boolean((info >> 6) & 1);
-  const verticalMirror = Boolean((info >> 7) & 1);
+  const horizontalMirror = Boolean((info >> 7) & 1);
+  const verticalMirror = Boolean((info >> 6) & 1);
 
   const sprInfo: SprInfo = {
     y,

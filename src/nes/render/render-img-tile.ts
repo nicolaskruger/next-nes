@@ -67,22 +67,22 @@ const renderSprites = (
   return repeat(64).reduce((acc, curr, index) => {
     const [sprInfo, _nes] = readSprInfo(index, acc);
 
-    const { tile, pallet, x, y, verticalMirror, horizontalMirror } =
-      formatSprInfo(sprInfo, multi);
+    const { tile, pallet, x, y, verticalMirror } = formatSprInfo(
+      sprInfo,
+      multi
+    );
 
-    const img = getImage(tile, pallet).current as HTMLImageElement;
+    let img = getImage(tile, pallet).current as HTMLImageElement;
 
-    if (verticalMirror || horizontalMirror) {
+    if (verticalMirror) {
       sprCtx.save();
       sprCtx.scale(-1, 1);
       sprCtx.drawImage(img, -img.width, 0);
-      const newImg = new Image();
-      newImg.src = sprCanvas.current?.toDataURL() || "";
+      img = new Image();
+      img.src = sprCanvas.current?.toDataURL() || "";
       sprCtx.restore();
-      ctx.drawImage(newImg, x, y);
-    } else {
-      ctx.drawImage(img, x, y);
     }
+    ctx.drawImage(img, x, y);
 
     return _nes;
   }, nes);
