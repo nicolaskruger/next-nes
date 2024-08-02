@@ -122,8 +122,19 @@ move:
   ldx #0
   @loop_control: lda pad_1
     inx
-    cpx #7
+    cpx #6
     bne @loop_control
+  lda pad_1
+  and #%00000001
+  cmp #%00000001
+  beq move_left
+  jmp end_move_left
+  move_left:
+    ldx player_x
+    dex 
+    stx player_x
+    jmp move_end
+  end_move_left:
   lda pad_1
   and #%00000001
   cmp #%00000001

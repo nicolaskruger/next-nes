@@ -22,7 +22,7 @@ export default function Page() {
     setNes(_nes);
     clearInterval(interval);
     interval = setInterval(() => {
-      let nes0 = writePadOne(_nes, control);
+      let nes0 = writePadOne(_nes, control.current);
       const { nes: nes1, cycles } = tick(nes0);
       setNes((nes) => tick(nes).nes);
     }, 0);
