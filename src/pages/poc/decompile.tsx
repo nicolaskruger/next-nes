@@ -11,12 +11,18 @@ import { tick } from "@/nes/tick";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { NMI } from "@/nes/cpu/instruction/instruction";
 import { getNMIInfo } from "@/nes/cpu/interrupt/interrupt";
+import { useControl } from "@/hooks/control/control";
+import { updatePad1 } from "@/nes/control/control";
 
 type NesRefresh = Nes & { refresh?: boolean };
 
 const startNes = () => createMushroomWord();
 
 export default function Decompile() {
+  const { control, ...controlProps } = useControl();
+
+  const main = useRef<HTMLDivElement>(null);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const fps = useRef(0);
@@ -87,6 +93,7 @@ export default function Decompile() {
     const timeOut = () => {
       const timeBox = 1000 / 60;
       let { nes: _nes, executeTime } = tick(nes.current);
+      _nes = updatePad1({ right: true }, _nes);
       _nes = NMI(_nes);
       const clock = () => {
         const _tick = tick(_nes);
@@ -121,7 +128,7 @@ export default function Decompile() {
   return (
     <>
       <PrerenderBuilder {...props} />
-      <main className="flex w-screen h-screen">
+      <main ref={main} className="flex w-screen h-screen" {...controlProps}>
         <div className="w-1/3 flex-col flex">
           <div className="w-full h-2/3 bg-blue-500 overflow-y-scroll pl-3">
             {/* <Code nes={nes} /> */}
@@ -140,6 +147,7 @@ export default function Decompile() {
           {loading && (
             <p className="text-red-800">loading: {percent.toFixed(2)}%</p>
           )}
+          <p>right: {control.right ? "true" : "false"}</p>
         </div>
       </main>
     </>

@@ -1,5 +1,6 @@
 import { Banks, initBanks } from "./banks/bank";
 import { Bus, initBus, writeBusNes } from "./bus/bus";
+import { initControl, NesControl } from "./control/control";
 import {
   Cpu,
   initCpu,
@@ -34,6 +35,7 @@ type Nes = {
   ppu: Ppu;
   bus: Bus;
   banks: Banks;
+  control: NesControl;
   track?: Track;
 };
 
@@ -230,6 +232,7 @@ const initNes = (): Nes => ({
   cpu: initCpu(),
   ppu: initPpu(),
   banks: initBanks(),
+  control: initControl(),
 });
 
 export { nesBuilder, initNes };

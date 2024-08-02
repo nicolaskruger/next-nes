@@ -1,3 +1,4 @@
+import { readPad1, writePad1 } from "../control/control";
 import { repeat } from "../helper/repeat";
 import { Nes } from "../nes";
 import {
@@ -131,6 +132,7 @@ export const initBus = (): Bus => {
   for (let addr = 0x2000; addr <= 0x2007; addr++) {
     bus = mirror8BytesWrite(selectWrite(addr), selectRead(addr), addr, bus);
   }
+  bus[0x4016] = { data: 0, write: writePad1, read: readPad1 };
   bus[DMA] = {
     ...bus[DMA],
     write: wrapperNoAddrWrite(write4014DMA),
