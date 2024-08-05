@@ -1,6 +1,6 @@
 describe("some calc", () => {
   test("test", () => {
-    console.log((240 - 8).toString(16));
+    console.log(0x400 - 0x3c0);
   });
 
   test("rescenter", () => {

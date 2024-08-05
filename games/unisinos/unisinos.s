@@ -86,11 +86,40 @@ load_palettes:
   inx
   cpx #$20
   bne @loop
+load_name_table_0:
+  lda #$20
+  sta $2006
+  lda #$00
+  sta $2006
+  lda #7
+  ldx #0
+  ldy #0
+  @loop_y_name_0:
+  @loop_x_name_0: 
+    sta $2007
+    inx
+    cpx #32
+    bne @loop_x_name_0
+  iny
+  cpy #30
+  bne @loop_y_name_0
+load_atribut_table_0:
+  lda #$23
+  sta $2006
+  lda #$c0
+  sta $2006
+  ldx #0
+  lda #%01010101
+  @loop_atribute_table_0:
+    sta $2007
+    inx
+    cpx 64
+    bne @loop_atribute_table_0
 
 enable_rendering:
   lda #%10000000	; Enable NMI
   sta $2000
-  lda #%00010000	; Enable Sprites
+  lda #%00011110	; Enable Sprites
   sta $2001
 
 forever:
@@ -195,7 +224,7 @@ sprite_index:
 palettes:
   ; Background Palette
   .byte $00, $00, $00, $00
-  .byte $00, $00, $00, $00
+  .byte $00, $0d, $08, $00
   .byte $00, $00, $00, $00
   .byte $00, $00, $00, $00
 
@@ -292,3 +321,22 @@ palettes:
   .byte %00100001
   .byte %00000000
   .byte %00000000
+
+  .byte %00010001	; brick (0) (07)
+  .byte %00010001
+  .byte %11111111
+  .byte %01000100
+  .byte %01000100
+  .byte %11111111
+  .byte %10001000
+  .byte %10001000
+
+  .byte %11101110	; brick (1)
+  .byte %11101110
+  .byte %00000000
+  .byte %10111011
+  .byte %10111011
+  .byte %00000000
+  .byte %01110111
+  .byte %01110111
+
