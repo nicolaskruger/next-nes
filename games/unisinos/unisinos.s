@@ -104,7 +104,7 @@ load_name_table_0:
     cpx #32
     bne @loop_x_name_0
   iny
-  cpy #20
+  cpy #29
   beq @ldy_ground
     jmp @end_toogle_tile
     @ldy_ground:
@@ -141,7 +141,7 @@ load_name_table_1:
     cpx #32
     bne @loop_x_name_1
   iny
-  cpy #20
+  cpy #29
   beq @ldy_ground_1
     jmp @end_toogle_tile_1
     @ldy_ground_1:

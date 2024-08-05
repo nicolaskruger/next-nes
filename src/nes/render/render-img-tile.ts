@@ -3,6 +3,7 @@ import { Nes } from "../nes";
 import { getCanvas, getCanvasContext } from "./render";
 import {
   getBgColor,
+  NameTableReturn,
   renderAttributeTable,
   renderNameTable,
 } from "../ppu/render/render";
@@ -10,36 +11,70 @@ import { repeat } from "../helper/repeat";
 import { readSprInfo, SprInfo } from "../ppu/spr-ram/spr-ram";
 import { HEIGHT, WIDTH } from "@/constants/size";
 import { isShowBg, isShowSpr } from "../ppu/registers/registers";
+import { readNameTable } from "../ppu/vram/vram";
+import { getScrollX, getScrollY } from "../ppu/scroll/scroll";
 
 type GetImage = (tile: number, pallet: number) => RefObject<HTMLImageElement>;
 
 type CanvasRef = RefObject<HTMLCanvasElement>;
 
-const renderSelectScreen = (
+const getAll = (
+  nes: Nes,
+  get: (nes: Nes, index: number) => NameTableReturn
+) => {
+  let [nameTable0, nes0] = get(nes, 0);
+  let [nameTable1, nes1] = get(nes0, 1);
+  let [nameTable2, nes2] = get(nes1, 1);
+  let [nameTable3, nes3] = get(nes2, 1);
+
+  nameTable0 = nameTable0.map((name, i) => [...name, ...nameTable1[i]]);
+  nameTable2 = nameTable2.map((name, i) => [...name, ...nameTable3[i]]);
+  nameTable0 = [...nameTable0, ...nameTable2];
+
+  return [nameTable0, nes3] as const;
+};
+
+const getAllNameTable = (nes: Nes) => {
+  return getAll(nes, renderNameTable);
+};
+
+const getAllAtributeTable = (nes: Nes) => getAll(nes, renderAttributeTable);
+
+const renderAllSelectScreen = (
   nes: Nes,
   index: number,
   getImage: GetImage,
   multi: number,
   canvas: CanvasRef
 ): Nes => {
-  const [nameTable, nesNameTable] = renderNameTable(nes, index);
-  const [attributeTable, nesAttributeTable] = renderAttributeTable(
-    nesNameTable,
-    index
-  );
+  const [nameTable, nesNameTable] = getAllNameTable(nes);
+  const [attributeTable, nesAttributeTable] = getAllAtributeTable(nesNameTable);
 
   const attributeTableBgIndex = (index: number) => 0x3f00 + 4 * index;
 
   const ctx = getCanvasContext(canvas);
 
-  for (let y = 0; y < nameTable.length; y++)
-    for (let x = 0; x < nameTable[y].length; x++) {
+  const _x = getScrollX(nesAttributeTable);
+  const _y = getScrollY(nesAttributeTable);
+
+  console.log({
+    _x,
+    _y,
+  });
+
+  const start = (x: number) => Math.floor(x / 8);
+
+  const end = (x: number, length: number) =>
+    length + start(x) + (x % 8 !== 0 ? 1 : 0);
+
+  for (let y = start(_y); y < end(_y, 30); y++)
+    for (let x = start(_x); x < end(_x, 32); x++) {
       const tileIndex = nameTable[y][x] * 0x10;
       const palletIndex = attributeTableBgIndex(attributeTable[y][x]);
       ctx.drawImage(
         getImage(tileIndex, palletIndex).current as HTMLImageElement,
-        8 * multi * x,
-        8 * multi * y
+        8 * multi * x - _x * multi,
+        8 * multi * y - _y * multi
       );
     }
   return nesAttributeTable;
@@ -121,7 +156,7 @@ export const render = (
   let _nes = renderBg(nes, multi, canvas);
   if (clearTile.current === undefined) clearCtx(sprCanvas, multi, clearTile);
   const [showBg] = isShowBg(_nes);
-  if (showBg) _nes = renderSelectScreen(_nes, 0, getImage, multi, canvas);
+  if (showBg) _nes = renderAllSelectScreen(_nes, 0, getImage, multi, canvas);
   const [showSpr] = isShowSpr(_nes);
   if (showSpr)
     _nes = renderSprites(
