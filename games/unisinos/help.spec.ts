@@ -1,6 +1,7 @@
 describe("some calc", () => {
   test("test", () => {
     console.log(0x400 - 0x3c0);
+    console.log((32 * 30) / (64 * 4));
   });
 
   test("rescenter", () => {

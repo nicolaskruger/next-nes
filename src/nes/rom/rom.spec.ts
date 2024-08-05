@@ -221,4 +221,54 @@ describe("ROM", () => {
     nes = tickConditional((nes) => nes.bus[0].data === 1, nes);
     nes = tickConditional((nes) => nes.bus[0].data === 0, nes);
   });
+
+  test("test unisinos write tile", async () => {
+    let nes = await initUnisinosRom();
+    nes = tickFor(1000, nes);
+    nes.ppu.vram.bus
+      .slice(0x2000, 0x23c0)
+      .map(({ data }) => data)
+      .forEach((v, i) => {
+        if (i / 32 <= 28) {
+          expect(v).toBe(8);
+        } else {
+          expect(v).toBe(7);
+        }
+      });
+  });
+  test("test unisinos change bit", async () => {
+    let nes = await initUnisinosRom();
+    nes = tickConditional((nes) => nes.ppu.vram.addr !== 0x2000, nes);
+    expect(nes.ppu.vram.addr).toBe(0x2000);
+    nes = tickConditional((nes) => nes.cpu.Y !== 28, nes);
+    expect(nes.cpu.ACC).toBe(8);
+    expect(nes.cpu.Y).toBe(28);
+    nes = tick(nes).nes; // cpy
+    nes = tick(nes).nes; // beq
+    nes = tick(nes).nes; // lda
+    expect(nes.cpu.ACC).toBe(7);
+
+    nes = tickConditional((nes) => nes.cpu.Y !== 29, nes);
+
+    console.log(nes.ppu.vram.addr.toString(16));
+    console.log(
+      nes.ppu.vram.bus.slice(0x2000 + 32 * 29, 0x23c0).map(({ data }) => data)
+    );
+    expect(nes.cpu.Y).toBe(29);
+    nes = tick(nes).nes; // cpy
+    nes = tick(nes).nes; // beq
+    nes = tick(nes).nes; // jmp
+    expect(nes.cpu.ACC).toBe(7);
+  });
+
+  test("test addr unisinos", () => {
+    async () => {
+      let nes = await initUnisinosRom();
+      repeat(0x3c0).forEach((_, i) => {
+        nes = tickConditional((nes) => nes.ppu.vram.addr !== 0x2000 + i, nes);
+      });
+
+      console.log(nes.cpu.X);
+    };
+  });
 });

@@ -91,16 +91,23 @@ load_name_table_0:
   sta $2006
   lda #$00
   sta $2006
-  lda #7
+  lda #8
   ldx #0
   ldy #0
   @loop_y_name_0:
+  ldx #0
   @loop_x_name_0: 
     sta $2007
     inx
     cpx #32
     bne @loop_x_name_0
   iny
+  cpy #29
+  beq @ldy_ground
+    jmp @end_toogle_tile
+    @ldy_ground:
+    lda #7
+  @end_toogle_tile:
   cpy #30
   bne @loop_y_name_0
 load_atribut_table_0:
@@ -339,4 +346,7 @@ palettes:
   .byte %00000000
   .byte %01110111
   .byte %01110111
+
+  .byte $00, $00, $00, $00, $00, $00, $00, $00 ; empty (08)
+  .byte $00, $00, $00, $00, $00, $00, $00, $00
 
