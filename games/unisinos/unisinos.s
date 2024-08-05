@@ -4,7 +4,9 @@ player_y      = $02
 player_info   = $03
 sprite        = $04
 anime_counter = $05
+scroll_x      = $06
 pad_1         = $4016
+
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
   .byte $4E, $45, $53, $1A
@@ -102,7 +104,7 @@ load_name_table_0:
     cpx #32
     bne @loop_x_name_0
   iny
-  cpy #29
+  cpy #20
   beq @ldy_ground
     jmp @end_toogle_tile
     @ldy_ground:
@@ -122,6 +124,43 @@ load_atribut_table_0:
     inx
     cpx 64
     bne @loop_atribute_table_0
+
+load_name_table_1:
+  lda #$24
+  sta $2006
+  lda #$00
+  sta $2006
+  lda #8
+  ldx #0
+  ldy #0
+  @loop_y_name_1:
+  ldx #0
+  @loop_x_name_1: 
+    sta $2007
+    inx
+    cpx #32
+    bne @loop_x_name_1
+  iny
+  cpy #20
+  beq @ldy_ground_1
+    jmp @end_toogle_tile_1
+    @ldy_ground_1:
+    lda #7
+  @end_toogle_tile_1:
+  cpy #30
+  bne @loop_y_name_1
+load_atribut_table_1:
+  lda #$27
+  sta $2006
+  lda #$c0
+  sta $2006
+  ldx #0
+  lda #%01010101
+  @loop_atribute_table_1:
+    sta $2007
+    inx
+    cpx 64
+    bne @loop_atribute_table_1
 
 enable_rendering:
   lda #%10000000	; Enable NMI
@@ -191,9 +230,19 @@ move:
   move_end:
   rts
 
+scroll:
+  ldx scroll_x
+  inx
+  stx $2005
+  stx scroll_x
+  ldx #0
+  stx $2005
+  rts
+
 nmi:
   jsr animate
   jsr move
+  jsr scroll
   ldx #$00 	; Set SPR-RAM address to 0
   stx $2003
 @loop:	lda unisinos, x 	; Load the hello message into SPR-RAM
