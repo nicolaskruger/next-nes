@@ -47,14 +47,14 @@ export default function Decompile() {
 
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(nes.current, 2);
-  const { getTile, loading, percent, refresh, canvas } = props;
+  const { getTile, loading, percent, refresh, canvas, clearTile } = props;
   useEffect(() => {
-    const _nes = render(nes.current, getTile, 2, canvasRef, canvas); //30 ms
+    const _nes = render(nes.current, getTile, 2, canvasRef, canvas, clearTile); //30 ms
     nes.current = setRefreshPallet(_nes, refreshPallet);
   }, []);
 
   const setNesDecompile = (_nes: NesRefresh) => {
-    nes.current = render(_nes, getTile, 2, canvasRef, canvas);
+    nes.current = render(_nes, getTile, 2, canvasRef, canvas, clearTile);
   };
 
   const next = () => {

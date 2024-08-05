@@ -2,7 +2,7 @@ import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
 import { repeat } from "@/nes/helper/repeat";
 import { Nes } from "@/nes/nes";
 import { renderTile } from "@/nes/ppu/render/render";
-import { render } from "@/nes/render/render";
+import { makeInvisibleTile, render } from "@/nes/render/render";
 import { createRef, RefObject, useRef, useState } from "react";
 
 const size = (8 * 0x2000) / 0x10;
@@ -23,6 +23,8 @@ export const usePrerender = (nes: Nes, multi: number) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
   const [loading, setLoading] = useState(true);
+  const clearTile = useRef<ImageData>();
+
   let refreshList: Refresh[] = [];
   let refreshInterval: NodeJS.Timeout | null = null;
   const [imgs, setImgs] = useState(
@@ -53,7 +55,9 @@ export const usePrerender = (nes: Nes, multi: number) => {
       rList.forEach(({ imgIndex, palletIndex, tileIndex }) => {
         const tile = renderTile(nes, tileIndex, palletIndex)[0];
         render(multiplyMatrix(tile, multi), canvas);
+        makeInvisibleTile(canvas, multi);
         imgs[imgIndex]!.current!.src = canvas.current?.toDataURL() as string;
+        imgs[imgIndex]!.current?.dataset;
       });
       refreshList = refreshList.slice(REFRESH_SIZE);
       setImgs([...imgs]);
@@ -98,5 +102,6 @@ export const usePrerender = (nes: Nes, multi: number) => {
     refreshPallet,
     loading,
     percent,
+    clearTile,
   };
 };

@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 import { Nes } from "../nes";
 import { getCanvas, getCanvasContext } from "./render";
 import {
@@ -53,12 +53,25 @@ const formatSprInfo = (sprInfo: SprInfo, multi: number) => {
   return sprInfo;
 };
 
+const clearCtx = (
+  canvas: CanvasRef,
+  multi: number,
+  clearTile: MutableRefObject<ImageData | undefined>
+) => {
+  const img = getCanvasContext(canvas).getImageData(0, 0, 8 * multi, 8 * multi);
+  img.data.forEach((_, i, arr) => {
+    if (i % 4 === 3) arr[i] = 0;
+  });
+  clearTile.current = img;
+};
+
 const renderSprites = (
   nes: Nes,
   canvas: CanvasRef,
   getImage: GetImage,
   multi: number,
-  sprCanvas: CanvasRef
+  sprCanvas: CanvasRef,
+  clearTile: MutableRefObject<ImageData>
 ): Nes => {
   const ctx = getCanvasContext(canvas);
 
@@ -75,6 +88,7 @@ const renderSprites = (
     let img = getImage(tile, pallet).current as HTMLImageElement;
 
     if (verticalMirror) {
+      sprCtx.putImageData(clearTile.current, 0, 0);
       sprCtx.save();
       sprCtx.scale(-1, 1);
       sprCtx.drawImage(img, -img.width, 0);
@@ -101,12 +115,22 @@ export const render = (
   getImage: GetImage,
   multi: number,
   canvas: CanvasRef,
-  sprCanvas: CanvasRef
+  sprCanvas: CanvasRef,
+  clearTile: MutableRefObject<ImageData | undefined>
 ): Nes => {
   let _nes = renderBg(nes, multi, canvas);
+  if (clearTile.current === undefined) clearCtx(sprCanvas, multi, clearTile);
   const [showBg] = isShowBg(_nes);
   if (showBg) _nes = renderSelectScreen(_nes, 0, getImage, multi, canvas);
   const [showSpr] = isShowSpr(_nes);
-  if (showSpr) _nes = renderSprites(_nes, canvas, getImage, multi, sprCanvas);
+  if (showSpr)
+    _nes = renderSprites(
+      _nes,
+      canvas,
+      getImage,
+      multi,
+      sprCanvas,
+      clearTile as MutableRefObject<ImageData>
+    );
   return _nes;
 };

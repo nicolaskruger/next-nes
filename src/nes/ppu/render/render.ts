@@ -103,6 +103,8 @@ export const getColors = (index: number, nes: Nes): [string[], Nes] => {
   return [colors, nes];
 };
 
+export const INVISIBLE_TILE = "#123456";
+
 export const renderTile = (
   nes: Nes,
   tileIndex: number,
@@ -111,7 +113,10 @@ export const renderTile = (
   const [tile, nesTile] = getTile(tileIndex, nes);
   const [colors, nesColors] = getColors(palletIndex, nesTile);
 
-  return [tile.map((line) => line.map((v) => colors[v])), nesColors];
+  return [
+    tile.map((line) => line.map((v) => (v === 0 ? INVISIBLE_TILE : colors[v]))),
+    nesColors,
+  ];
 };
 
 export const initMatrix = <T>(

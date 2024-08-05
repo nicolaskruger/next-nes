@@ -1,6 +1,7 @@
 import { dexToHexSixDigitsPrefixHash } from "@/nes/helper/converter";
 
-const rgb = (r: number, g: number, b: number) => (r << 16) | (g << 8) | b;
+export const rgb = (r: number, g: number, b: number) =>
+  (r << 16) | (g << 8) | b;
 
 export const COLOR_PALLET: number[] = [
   rgb(0x75, 0x75, 0x75),
