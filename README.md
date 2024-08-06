@@ -1,41 +1,62 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next NES :space_invader:
 
-## Getting Started
+Esse é o meu projeto de conclusão do curso de engenharia da computação pela `Unisinos`, é um emulador de nintendo que roda nos navegadores.
 
-First, run the development server:
+## tecnologias :wrench:
+
+- [React.js](https://react.dev/)
+- [Next.js](https://nextjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
+- [Jest](https://jestjs.io/pt-BR/)
+
+## requisitos
+
+- [node](https://nodejs.org/pt)
+
+## começando
+
+Para inicializar o projeto basta rodar um dos seguintes comandos
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
+# ou
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+e abrir o navegador no [http://localhost:3000](http://localhost:3000)
+escolher uma `rom` existe duas roms de teste no `/games/demo.nes` e `/games/unisinos.nes` após abrir as rom ele vai começar a carregar os tiles, isso deixa o jogo lento
+mas após o carregamento completo o jogo rodas em `60 fps`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- :white_check_mark: todos os opcodes legais
+- :white_check_mark: todos os espelhamentos de memória
+- :white_check_mark: NROM, no mapper
+- :white_check_mark: cpu
+- :white_check_mark: ppu
+- :white_check_mark: espelhamento vertical ppu
+- :white_check_mark: espelhamento horizontal ppu
+- :white_check_mark: tela única ppu
+- :white_check_mark: 4 telas ppu
+- :white_check_mark: decompiler
+- :white_check_mark: compilador
+- :white_check_mark: NMI
+- :white_check_mark: registradores de controle ppu
+- :white_check_mark: scroll
+- :white_check_mark: 60 fps
+- :white_check_mark: pad 1
+- :white_check_mark: espelhamento de sprite vertical
+- :white_square_button: pad 2
+- :white_square_button: opcodes ilegais
+- :white_square_button: espelhamento de sprite horizontal
+- :white_square_button: sprite atrás do background
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
-## create rom
+## comando para gerar roms
 
 ```bash
 cl65 --verbose --target nes -o demo.nes demo.s
