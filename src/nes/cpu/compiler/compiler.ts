@@ -82,7 +82,7 @@ const stringToAddrArray: StringAddrType[] = [
 ];
 
 const findGroup = (regex: RegExp, value: string) => {
-  return value.matchAll(regex).next().value[1] as string;
+  return value.matchAll(regex).next().value?.[1] || "";
 };
 
 const parseHex = (value: string) => {

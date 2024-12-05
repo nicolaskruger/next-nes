@@ -15,14 +15,14 @@ export const tick = (nes: Nes) => {
   const [fetch, nesFetch] = readBusNes(PC, nes);
   let _nes = nesFetch;
   const inst = getInstructions(fetch);
-  const { addr, instruction, baseCycles, offsetCycles } = inst;
+  const { addr, instruction } = inst;
   pushTrack(nes, inst);
   lastInstruction = instruction.name;
   const addrResult = addr(nes);
   _nes = instruction({
-    baseCycles,
+    baseCycles: 0,
     ...addrResult,
-    offsetOnCross: offsetCycles,
+    offsetOnCross: 0,
   });
 
   return _nes;
