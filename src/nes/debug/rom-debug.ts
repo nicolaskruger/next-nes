@@ -9,14 +9,14 @@ import { hexToDex } from "../helper/converter";
 export const tickUntilTimes = (addr: number, times: number, nes: Nes): Nes => {
   while (times) {
     if (getPC(nes) === addr) --times;
-    nes = tick(nes).nes;
+    nes = tick(nes);
   }
   return nes;
 };
 
 export const tickUntil = (addr: number, nes: Nes): Nes => {
   while (getPC(nes) !== addr) {
-    nes = tick(nes).nes;
+    nes = tick(nes);
   }
   return nes;
 };
@@ -43,13 +43,13 @@ export const initUnisinosRom = async () => {
 export const tickFor = (ms: number, nes: Nes): Nes => {
   let start = performance.now();
   while (performance.now() - start < ms) {
-    nes = tick(nes).nes;
+    nes = tick(nes);
   }
   return nes;
 };
 
 export const tickConditional = (condition: (nes: Nes) => boolean, nes: Nes) => {
-  while (condition(nes)) nes = tick(nes).nes;
+  while (condition(nes)) nes = tick(nes);
   return nes;
 };
 

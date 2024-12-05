@@ -111,7 +111,7 @@ describe("ROM", () => {
 
     try {
       while (nes.cpu.PC !== 0x805e) {
-        nes = tick(nes).nes;
+        nes = tick(nes);
       }
     } catch (e) {
       console.log(nes);
@@ -142,18 +142,18 @@ describe("ROM", () => {
 
     nes = compileNes(compile(program), nes);
 
-    nes = tick(nes).nes; // lda #53
+    nes = tick(nes); // lda #53
     expect(getACC(nes)).toBe(63);
-    nes = tick(nes).nes; // sta $2006
-    nes = tick(nes).nes; // lda #0
+    nes = tick(nes); // sta $2006
+    nes = tick(nes); // lda #0
     expect(getACC(nes)).toBe(0);
-    nes = tick(nes).nes; // sta $2006
+    nes = tick(nes); // sta $2006
     expect(getAddrVRam(nes)).toBe(0x3f00);
-    nes = tick(nes).nes; // lda #15
+    nes = tick(nes); // lda #15
     expect(getACC(nes)).toBe(0x0f);
 
     repeat(6).forEach((_, i) => {
-      nes = tick(nes).nes; // sta $2007
+      nes = tick(nes); // sta $2007
       expect(getAddrVRam(nes)).toBe(0x3f01 + i);
       expect(readVRam(0x3f00 + i, nes)[0]).toBe(0xf);
     });
@@ -188,7 +188,7 @@ describe("ROM", () => {
     let nes = await initNesTestRom();
     try {
       while (true) {
-        nes = tick(nes).nes;
+        nes = tick(nes);
       }
     } catch (error) {
       nes;
@@ -199,7 +199,7 @@ describe("ROM", () => {
   test("test nestest.nes tick until", async () => {
     let nes = await initNesTestRom();
     nes = tickUntil(0xceed, nes);
-    nes = tick(nes).nes;
+    nes = tick(nes);
     nes;
   });
 
@@ -243,9 +243,9 @@ describe("ROM", () => {
     nes = tickConditional((nes) => nes.cpu.Y !== 28, nes);
     expect(nes.cpu.ACC).toBe(8);
     expect(nes.cpu.Y).toBe(28);
-    nes = tick(nes).nes; // cpy
-    nes = tick(nes).nes; // beq
-    nes = tick(nes).nes; // lda
+    nes = tick(nes); // cpy
+    nes = tick(nes); // beq
+    nes = tick(nes); // lda
     expect(nes.cpu.ACC).toBe(7);
 
     nes = tickConditional((nes) => nes.cpu.Y !== 29, nes);
@@ -255,9 +255,9 @@ describe("ROM", () => {
       nes.ppu.vram.bus.slice(0x2000 + 32 * 29, 0x23c0).map(({ data }) => data)
     );
     expect(nes.cpu.Y).toBe(29);
-    nes = tick(nes).nes; // cpy
-    nes = tick(nes).nes; // beq
-    nes = tick(nes).nes; // jmp
+    nes = tick(nes); // cpy
+    nes = tick(nes); // beq
+    nes = tick(nes); // jmp
     expect(nes.cpu.ACC).toBe(7);
   });
 

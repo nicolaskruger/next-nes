@@ -82,21 +82,21 @@ export default function Decompile() {
   const play = () => {
     setStart((v) => !v);
     const timeOut = () => {
+      const start = performance.now();
       const timeBox = 1000 / 60;
-      let { nes: _nes, executeTime } = tick(nes.current);
+      let _nes = tick(nes.current);
       _nes = updatePad1(control.current, _nes);
       _nes = NMI(_nes);
       const clock = () => {
-        const _tick = tick(_nes);
-        _nes = _tick.nes;
-        executeTime += _tick.executeTime;
+        _nes = tick(_nes);
       };
       if (getNMIInfo(_nes).occur) while (getNMIInfo(_nes).occur) clock();
-      else while (executeTime < 1000 / 60) clock();
-      const renderStart = performance.now();
+      else while (performance.now() - start < 1000 / 60) clock();
       setNesDecompile(_nes);
-      executeTime += performance.now() - renderStart;
-      timeOutCode.current = setTimeout(timeOut, timeBox - executeTime);
+      timeOutCode.current = setTimeout(
+        timeOut,
+        timeBox - (start - performance.now())
+      );
       fps.current++;
     };
     if (timeOutCode.current) {
