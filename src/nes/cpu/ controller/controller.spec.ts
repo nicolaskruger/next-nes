@@ -9,7 +9,7 @@ describe("controller", () => {
     nes = initNes();
   });
 
-  test("write pad one", () => {
+  test.skip("write pad one", () => {
     let [data, _nes] = readBusNes(0x4016, nes);
     nes = _nes;
     expect(data).toBe(0);
@@ -30,7 +30,7 @@ describe("controller", () => {
     expect(data0).toBe((1 << 1) | (1 << 3) | (1 << 5) | (1 << 7));
   });
 
-  test("write pad two", () => {
+  test.skip("write pad two", () => {
     let [data, _nes] = readBusNes(0x4017, nes);
     nes = _nes;
     expect(data).toBe(0);

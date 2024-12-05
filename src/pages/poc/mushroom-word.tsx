@@ -9,8 +9,8 @@ export default function Page() {
 
   useEffect(() => {
     const nes = createMushroomWord();
-    render(multiplyMatrix(renderScreen(nes)[0], 2), canvasRef);
+    render(multiplyMatrix(renderScreen(nes)[0], 3), canvasRef);
   }, []);
 
-  return <canvas ref={canvasRef} width={256 * 2} height={240 * 2} />;
+  return <canvas ref={canvasRef} width={256 * 3} height={240 * 3} />;
 }

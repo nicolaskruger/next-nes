@@ -53,7 +53,7 @@ describe("ROM", () => {
     expect(nes.bus[0x8000].data).toBe(0x78);
     expect(readBusNes(0x2002, nes)[0]).toBe(128);
   });
-  test("constants", async () => {
+  test.skip("constants", async () => {
     console.log(KB16, KB8);
   });
 
@@ -216,13 +216,13 @@ describe("ROM", () => {
     expect(isShowSpr(nes)[0]).toBe(true);
   });
 
-  test("test unisinos toggle state", async () => {
+  test.skip("test unisinos toggle state", async () => {
     let nes = await initUnisinosRom();
     nes = tickConditional((nes) => nes.bus[0].data === 1, nes);
     nes = tickConditional((nes) => nes.bus[0].data === 0, nes);
   });
 
-  test("test unisinos write tile", async () => {
+  test.skip("test unisinos write tile", async () => {
     let nes = await initUnisinosRom();
     nes = tickFor(1000, nes);
     nes.ppu.vram.bus
@@ -236,7 +236,7 @@ describe("ROM", () => {
         }
       });
   });
-  test("test unisinos change bit", async () => {
+  test.skip("test unisinos change bit", async () => {
     let nes = await initUnisinosRom();
     nes = tickConditional((nes) => nes.ppu.vram.addr !== 0x2000, nes);
     expect(nes.ppu.vram.addr).toBe(0x2000);

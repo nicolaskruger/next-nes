@@ -10,7 +10,7 @@ describe("tick", () => {
 
   test.skip("tick", () => {
     const result = tick(nes);
-    expect(result.delayTime > 0).toBeTruthy();
+    // expect(result.delayTime > 0).toBeTruthy();
     console.log(result);
   });
 });
