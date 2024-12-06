@@ -36,7 +36,6 @@ export default function Decompile() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log({ fps: fps.current });
       fps.current = 0;
     }, 1000);
 

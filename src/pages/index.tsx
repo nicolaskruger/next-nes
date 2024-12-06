@@ -5,6 +5,7 @@ import { updatePad1 } from "@/nes/control/control";
 import { NMI } from "@/nes/cpu/instruction/instruction";
 import { getNMIInfo } from "@/nes/cpu/interrupt/interrupt";
 import { createMushroomWord } from "@/nes/debug/background-creator";
+import { load } from "@/nes/load/load";
 import { Nes } from "@/nes/nes";
 import { setRefreshPallet } from "@/nes/ppu/refresh/refresh";
 import { render } from "@/nes/render/render-img-tile";
@@ -25,8 +26,6 @@ export default function Decompile() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const fps = useRef(0);
-
   const timeOutCode = useRef<NodeJS.Timeout>();
 
   const [start, setStart] = useState(true);
@@ -35,17 +34,6 @@ export default function Decompile() {
     ...startNes(),
     refresh: true,
   });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log({ fps: fps.current });
-      fps.current = 0;
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(nes.current, multi);
@@ -81,30 +69,33 @@ export default function Decompile() {
 
   const play = () => {
     setStart((v) => !v);
-    const timeOut = () => {
-      const start = performance.now();
-      const timeBox = 1000 / 60;
-      let _nes = tick(nes.current);
-      _nes = updatePad1(control.current, _nes);
-      _nes = NMI(_nes);
-      const clock = () => {
-        _nes = tick(_nes);
+    try {
+      nes.current = load(nes.current);
+      const timeOut = () => {
+        const start = performance.now();
+        const timeBox = 1000 / 60;
+        let _nes = tick(nes.current);
+        _nes = updatePad1(control.current, _nes);
+        _nes = NMI(_nes);
+        const clock = () => {
+          _nes = tick(_nes);
+        };
+        while (getNMIInfo(_nes).occur) clock();
+        setNesDecompile(_nes);
+        timeOutCode.current = setTimeout(
+          timeOut,
+          timeBox - (start - performance.now())
+        );
       };
-      if (getNMIInfo(_nes).occur) while (getNMIInfo(_nes).occur) clock();
-      else while (performance.now() - start < 1000 / 60) clock();
-      setNesDecompile(_nes);
-      timeOutCode.current = setTimeout(
-        timeOut,
-        timeBox - (start - performance.now())
-      );
-      fps.current++;
-    };
-    if (timeOutCode.current) {
-      clearTimeout(timeOutCode.current);
-      timeOutCode.current = undefined;
-    } else {
-      timeOutCode.current = setTimeout(timeOut, 0);
-      nes.current = { ...nes.current, refresh: true };
+      if (timeOutCode.current) {
+        clearTimeout(timeOutCode.current);
+        timeOutCode.current = undefined;
+      } else {
+        timeOutCode.current = setTimeout(timeOut, 0);
+        nes.current = { ...nes.current, refresh: true };
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

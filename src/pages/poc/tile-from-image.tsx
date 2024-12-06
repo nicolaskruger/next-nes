@@ -20,7 +20,6 @@ export default function Page() {
       //   const _nes = nes;
       //   render(multiplyMatrix(renderScreen(nes)[0], 2), canvasRef); 2000ms
       const finish = performance.now();
-      console.log(finish - start);
       return _nes;
     });
   }, []);

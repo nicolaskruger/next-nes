@@ -10,7 +10,6 @@ export const PERIOD_MILI = PERIOD * 1000;
 export const tick = (nes: Nes) => {
   const PC = getPC(nes);
   const [opcode, _nes] = readBusNes(PC, nes);
-  const inst = getInstructions(opcode);
-  const { addr, instruction } = inst;
+  const { addr, instruction } = getInstructions(opcode);
   return instruction(addr(_nes));
 };

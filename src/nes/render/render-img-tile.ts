@@ -57,11 +57,6 @@ const renderAllSelectScreen = (
   const _x = getScrollX(nesAttributeTable);
   const _y = getScrollY(nesAttributeTable);
 
-  console.log({
-    _x,
-    _y,
-  });
-
   const start = (x: number) => Math.floor(x / 8);
 
   const end = (x: number, length: number) =>
