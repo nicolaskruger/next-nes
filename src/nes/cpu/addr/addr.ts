@@ -17,7 +17,6 @@ const IMP = (nes: Nes): Addr => ({
 const ACC = (nes: Nes): Addr => ({
   nes: setPC(nes.cpu.PC + 1, nes),
   data: nes.cpu.ACC,
-  cross: false,
   acc: true,
 });
 

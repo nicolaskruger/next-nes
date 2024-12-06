@@ -81,9 +81,8 @@ describe("test addressing mode", () => {
 
     nes.cpu.ACC = 1;
 
-    const { cross, data, nes: newNes, acc } = ACC(nes);
+    const { data, nes: newNes, acc } = ACC(nes);
 
-    expect(cross).toBeFalsy();
     expect(newNes.cpu.PC).toBe(1);
     expect(data).toBe(1);
     expect(acc).toBe(true);
