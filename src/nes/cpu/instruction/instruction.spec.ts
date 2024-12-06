@@ -73,7 +73,6 @@ import {
 import { initPpu } from "@/nes/ppu/ppu";
 import { initBanks } from "@/nes/banks/bank";
 import { repeat } from "@/nes/helper/repeat";
-import { write } from "fs";
 import { initInterrupt } from "../interrupt/interrupt";
 
 const initBus = (): Bus =>
