@@ -37,21 +37,14 @@ export default function Decompile() {
 
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(nes.current, multi);
-  const { getTile, loading, percent, refresh, canvas, clearTile } = props;
+  const { getTile, refresh, loading, percent, clearTile } = props;
   useEffect(() => {
-    const _nes = render(
-      nes.current,
-      getTile,
-      multi,
-      canvasRef,
-      canvas,
-      clearTile
-    ); //30 ms
+    const _nes = render(nes.current, getTile, multi, canvasRef, clearTile); //30 ms
     nes.current = setRefreshPallet(_nes, refreshPallet);
   }, []);
 
   const setNesDecompile = (_nes: NesRefresh) => {
-    nes.current = render(_nes, getTile, multi, canvasRef, canvas, clearTile);
+    nes.current = render(_nes, getTile, multi, canvasRef, clearTile);
   };
 
   const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -98,17 +91,14 @@ export default function Decompile() {
       console.log(error);
     }
   };
-
   useEffect(() => {
-    if (canvas && nes.current.refresh) {
+    if (nes.current.refresh) {
       refresh();
       delete nes.current.refresh;
     }
   }, [nes.current]);
-
   return (
     <>
-      <PrerenderBuilder {...props} />
       <main
         ref={main}
         className="flex items-center justify-center flex-col w-screen h-screen"

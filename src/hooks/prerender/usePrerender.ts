@@ -3,7 +3,7 @@ import { repeat } from "@/nes/helper/repeat";
 import { Nes } from "@/nes/nes";
 import { renderTile } from "@/nes/ppu/render/render";
 import { makeInvisibleTile, render } from "@/nes/render/render";
-import { createRef, RefObject, useRef, useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 
 const size = (8 * 0x2000) / 0x10;
 
@@ -20,19 +20,24 @@ const REFRESH: Refresh[] = repeat(size).map((_, i) => ({
 }));
 
 export const usePrerender = (nes: Nes, multi: number) => {
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const canvas = useRef<HTMLCanvasElement>({} as HTMLCanvasElement);
   const [percent, setPercent] = useState(0);
   const [loading, setLoading] = useState(true);
   const clearTile = useRef<ImageData>();
+  const imgs = useRef<HTMLImageElement[]>([]);
+
+  useEffect(() => {
+    canvas.current = document.createElement("canvas");
+    imgs.current = repeat(size).map((_) => new Image());
+  }, []);
 
   let refreshList: Refresh[] = [];
   let refreshInterval: NodeJS.Timeout | null = null;
-  const [imgs, setImgs] = useState(
-    repeat(size).map((_) => createRef<HTMLImageElement>())
-  );
 
   const getTile = (tile: number, pallet: number) =>
-    imgs[8 * Math.floor(tile / 0x10) + Math.floor((pallet - 0x3f00) / 4)];
+    imgs.current[
+      8 * Math.floor(tile / 0x10) + Math.floor((pallet - 0x3f00) / 4)
+    ];
 
   const compRefresh = (a: Refresh, b: Refresh) =>
     Object.keys(a).every(
@@ -56,12 +61,14 @@ export const usePrerender = (nes: Nes, multi: number) => {
         const tile = renderTile(nes, tileIndex, palletIndex)[0];
         render(multiplyMatrix(tile, multi), canvas);
         makeInvisibleTile(canvas, multi);
-        imgs[imgIndex]!.current!.src = canvas.current?.toDataURL() as string;
-        imgs[imgIndex]!.current?.dataset;
+        imgs.current[imgIndex].src = canvas.current?.toDataURL() as string;
+        imgs.current[imgIndex].dataset;
       });
       refreshList = refreshList.slice(REFRESH_SIZE);
-      setImgs([...imgs]);
-      setPercent((100 * (imgs.length - refreshList.length)) / imgs.length);
+      imgs.current = [...imgs.current];
+      setPercent(
+        (100 * (imgs.current.length - refreshList.length)) / imgs.current.length
+      );
     }, 1);
   };
 
@@ -82,7 +89,7 @@ export const usePrerender = (nes: Nes, multi: number) => {
     setLoading(true);
     setPercent(0);
     const index = Math.floor((address - 0x3f00) / 4);
-    imgs.forEach((imgs, i) => {
+    imgs.current.forEach((imgs, i) => {
       if (i % 8 === index)
         pushRefreshList({
           imgIndex: i,
@@ -98,7 +105,6 @@ export const usePrerender = (nes: Nes, multi: number) => {
     refresh,
     multi,
     nes,
-    canvas,
     refreshPallet,
     loading,
     percent,

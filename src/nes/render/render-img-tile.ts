@@ -14,7 +14,7 @@ import { isShowBg, isShowSpr } from "../ppu/registers/registers";
 import { readNameTable } from "../ppu/vram/vram";
 import { getScrollX, getScrollY } from "../ppu/scroll/scroll";
 
-type GetImage = (tile: number, pallet: number) => RefObject<HTMLImageElement>;
+type GetImage = (tile: number, pallet: number) => HTMLImageElement;
 
 type CanvasRef = RefObject<HTMLCanvasElement>;
 
@@ -66,8 +66,9 @@ const renderAllSelectScreen = (
     for (let x = start(_x); x < end(_x, 32); x++) {
       const tileIndex = nameTable[y][x] * 0x10;
       const palletIndex = attributeTableBgIndex(attributeTable[y][x]);
+
       ctx.drawImage(
-        getImage(tileIndex, palletIndex).current as HTMLImageElement,
+        getImage(tileIndex, palletIndex) as HTMLImageElement,
         8 * multi * x - _x * multi,
         8 * multi * y - _y * multi
       );
@@ -84,11 +85,11 @@ const formatSprInfo = (sprInfo: SprInfo, multi: number) => {
 };
 
 const clearCtx = (
-  canvas: CanvasRef,
+  canvas: HTMLCanvasElement,
   multi: number,
   clearTile: MutableRefObject<ImageData | undefined>
 ) => {
-  const img = getCanvasContext(canvas).getImageData(0, 0, 8 * multi, 8 * multi);
+  const img = canvas.getContext("2d")!.getImageData(0, 0, 8 * multi, 8 * multi);
   img.data.forEach((_, i, arr) => {
     if (i % 4 === 3) arr[i] = 0;
   });
@@ -100,12 +101,12 @@ const renderSprites = (
   canvas: CanvasRef,
   getImage: GetImage,
   multi: number,
-  sprCanvas: CanvasRef,
+  sprCanvas: HTMLCanvasElement,
   clearTile: MutableRefObject<ImageData>
 ): Nes => {
   const ctx = getCanvasContext(canvas);
 
-  const sprCtx = getCanvasContext(sprCanvas);
+  const sprCtx = sprCanvas.getContext("2d")!;
 
   return repeat(64).reduce((acc, curr, index) => {
     const [sprInfo, _nes] = readSprInfo(index, acc);
@@ -115,7 +116,7 @@ const renderSprites = (
       multi
     );
 
-    let img = getImage(tile, pallet).current as HTMLImageElement;
+    let img = getImage(tile, pallet) as HTMLImageElement;
 
     if (verticalMirror) {
       sprCtx.putImageData(clearTile.current, 0, 0);
@@ -123,7 +124,7 @@ const renderSprites = (
       sprCtx.scale(-1, 1);
       sprCtx.drawImage(img, -img.width, 0);
       img = new Image();
-      img.src = sprCanvas.current?.toDataURL() || "";
+      img.src = sprCanvas?.toDataURL() || "";
       sprCtx.restore();
     }
     ctx.drawImage(img, x, y);
@@ -145,10 +146,10 @@ export const render = (
   getImage: GetImage,
   multi: number,
   canvas: CanvasRef,
-  sprCanvas: CanvasRef,
   clearTile: MutableRefObject<ImageData | undefined>
 ): Nes => {
   let _nes = renderBg(nes, multi, canvas);
+  const sprCanvas = document.createElement("canvas");
   if (clearTile.current === undefined) clearCtx(sprCanvas, multi, clearTile);
   const [showBg] = isShowBg(_nes);
   if (showBg) _nes = renderAllSelectScreen(_nes, 0, getImage, multi, canvas);
