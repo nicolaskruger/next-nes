@@ -112,9 +112,7 @@ describe("test addressing mode", () => {
 
     nes.bus[addr].data = 5;
 
-    const { cross, data, nes: newNes, addr: _addr } = ZERO_PAGE(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr: _addr } = ZERO_PAGE(nes);
 
     expect(data).toBe(5);
 
@@ -134,9 +132,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x8f].data = 5;
 
-    const { cross, data, nes: newNes, addr } = ZERO_PAGE_X(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ZERO_PAGE_X(nes);
 
     expect(data).toBe(5);
 
@@ -155,9 +151,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x7f].data = 5;
 
-    const { cross, data, nes: newNes, addr } = ZERO_PAGE_X(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes, addr } = ZERO_PAGE_X(nes);
 
     expect(data).toBe(5);
 
@@ -176,9 +170,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x8f].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE_X(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes } = ZERO_PAGE_X(nes);
 
     expect(data).toBe(5);
 
@@ -195,9 +187,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x7f].data = 5;
 
-    const { cross, data, nes: newNes } = ZERO_PAGE_X(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes } = ZERO_PAGE_X(nes);
 
     expect(data).toBe(5);
 
@@ -215,9 +205,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x8f].data = 5;
 
-    const { cross, data, nes: newNes, addr } = ZERO_PAGE_Y(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ZERO_PAGE_Y(nes);
 
     expect(data).toBe(5);
 
@@ -236,9 +224,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x7f].data = 5;
 
-    const { cross, data, nes: newNes, addr } = ZERO_PAGE_Y(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes, addr } = ZERO_PAGE_Y(nes);
 
     expect(data).toBe(5);
 
@@ -251,9 +237,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x1].data = 0x05;
 
-    const { cross, data, nes: newNes, addr } = RELATIVE(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = RELATIVE(nes);
 
     expect(data).toBe(5);
 
@@ -267,9 +251,7 @@ describe("test addressing mode", () => {
 
     nes.bus[0x1].data = 0xff;
 
-    const { cross, data, nes: newNes, addr } = RELATIVE(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = RELATIVE(nes);
 
     expect(data).toBe(-1);
 
@@ -298,10 +280,9 @@ describe("test addressing mode", () => {
       .reduce((acc, curr) => [...acc, ...curr], []);
 
     for (let i = 0; i < 128; i++) {
-      const { cross, data, nes: newNes } = RELATIVE(nes);
+      const { data, nes: newNes } = RELATIVE(nes);
 
       nes = newNes;
-      expect(cross).toBe(false);
 
       expect(data).toBe(-1 - i);
 
@@ -326,9 +307,7 @@ describe("test addressing mode", () => {
       data: 0x43,
     };
 
-    const { cross, data, nes: newNes, addr } = ABS(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ABS(nes);
 
     expect(data).toBe(0x43);
 
@@ -356,9 +335,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.X = 0x04;
 
-    const { cross, data, nes: newNes, addr } = ABSX(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ABSX(nes);
 
     expect(data).toBe(0x77);
 
@@ -385,9 +362,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.X = 0x04;
 
-    const { cross, data, nes: newNes, addr } = ABSX_ADDR(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ABSX_ADDR(nes);
 
     expect(data).toBe(0x0);
 
@@ -414,9 +389,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.X = 0xff;
 
-    const { cross, data, nes: newNes, addr } = ABSX(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes, addr } = ABSX(nes);
 
     expect(data).toBe(0x77);
 
@@ -443,9 +416,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.X = 0xff;
 
-    const { cross, data, nes: newNes, addr } = ABSX_ADDR(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes, addr } = ABSX_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -473,9 +444,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.Y = 0x04;
 
-    const { cross, data, nes: newNes, addr } = ABSY(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ABSY(nes);
 
     expect(data).toBe(0x77);
 
@@ -502,9 +471,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.Y = 0xff;
 
-    const { cross, data, nes: newNes, addr } = ABSY(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes, addr } = ABSY(nes);
 
     expect(data).toBe(0x77);
 
@@ -532,9 +499,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.Y = 0x04;
 
-    const { cross, data, nes: newNes, addr } = ABSY_ADDR(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = ABSY_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -561,9 +526,7 @@ describe("test addressing mode", () => {
 
     nes.cpu.Y = 0xff;
 
-    const { cross, data, nes: newNes, addr } = ABSY_ADDR(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes, addr } = ABSY_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -593,9 +556,8 @@ describe("test addressing mode", () => {
       data: 0x34,
     };
 
-    const { cross, data, nes: newNes } = INDIRECT(nes);
+    const { data, nes: newNes } = INDIRECT(nes);
 
-    expect(cross).toBe(true);
     expect(data).toBe(0x34ff);
     expect(newNes.cpu.PC).toBe(3);
   });
@@ -621,9 +583,8 @@ describe("test addressing mode", () => {
       data: 0x43,
     };
 
-    const { cross, data, nes: newNes } = INDIRECT(nes);
+    const { data, nes: newNes } = INDIRECT(nes);
 
-    expect(cross).toBe(false);
     expect(data).toBe(0x4321);
     expect(newNes.cpu.PC).toBe(3);
   });
@@ -650,9 +611,7 @@ describe("test addressing mode", () => {
       data: 0x12,
     };
 
-    const { cross, data, nes: newNes } = INDEXED_INDIRECT(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes } = INDEXED_INDIRECT(nes);
 
     expect(data).toBe(0x12);
 
@@ -681,9 +640,7 @@ describe("test addressing mode", () => {
       data: 0x12,
     };
 
-    const { cross, data, nes: newNes } = INDEXED_INDIRECT(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes } = INDEXED_INDIRECT(nes);
 
     expect(data).toBe(0x12);
 
@@ -712,9 +669,7 @@ describe("test addressing mode", () => {
       data: 0x12,
     };
 
-    const { cross, data, nes: newNes } = INDEXED_INDIRECT_ADDR(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes } = INDEXED_INDIRECT_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -743,9 +698,7 @@ describe("test addressing mode", () => {
       data: 0x12,
     };
 
-    const { cross, data, nes: newNes } = INDEXED_INDIRECT_ADDR(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes } = INDEXED_INDIRECT_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -774,9 +727,7 @@ describe("test addressing mode", () => {
       data: 0x2,
     };
 
-    const { cross, data, nes: newNes } = INDIRECT_INDEXED(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes } = INDIRECT_INDEXED(nes);
 
     expect(data).toBe(0x2);
 
@@ -805,9 +756,7 @@ describe("test addressing mode", () => {
       data: 0x2,
     };
 
-    const { cross, data, nes: newNes } = INDIRECT_INDEXED(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes } = INDIRECT_INDEXED(nes);
 
     expect(data).toBe(0x2);
 
@@ -836,9 +785,7 @@ describe("test addressing mode", () => {
       data: 0x2,
     };
 
-    const { cross, data, nes: newNes } = INDIRECT_INDEXED_ADDR(nes);
-
-    expect(cross).toBe(true);
+    const { data, nes: newNes } = INDIRECT_INDEXED_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -867,9 +814,7 @@ describe("test addressing mode", () => {
       data: 0x2,
     };
 
-    const { cross, data, nes: newNes } = INDIRECT_INDEXED_ADDR(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes } = INDIRECT_INDEXED_ADDR(nes);
 
     expect(data).toBe(0);
 
@@ -882,10 +827,10 @@ describe("test addressing mode", () => {
     _nes = writeBusNes(0x01, 0x34, _nes);
     _nes = writeBusNes(0x02, 0x12, _nes);
 
-    const { cross, data, nes: newNes, addr } = ABS_ADDR(_nes);
+    const { data, nes: newNes, addr } = ABS_ADDR(_nes);
 
     expect(getPC(newNes)).toBe(3);
-    expect(cross).toBeFalsy();
+
     expect(data).toBe(0);
     expect(addr).toBe(0x1234);
   });
