@@ -17,8 +17,6 @@ import {
   setY,
 } from "./cpu/cpu";
 import {
-  CalculateCycles,
-  calculateCycles,
   NMI,
   pullPCStack,
   pushPCStack,
@@ -88,12 +86,6 @@ const pushStack = (nes: Nes) => (data: number) => {
   const _nes = pushToStack(nes, data);
 
   return nesBuilder(_nes);
-};
-
-const calcCycles = (nes: Nes) => (cyclesData: CalculateCycles) => {
-  const cycles = calculateCycles(cyclesData);
-
-  return nesBuilder(nes).cycles(cycles);
 };
 
 const status = (nes: Nes) => (status: number) => {
@@ -193,7 +185,6 @@ function nesBuilder(nes: Nes) {
     interruptDisable: interruptDisable(nes),
     overFlow: overFlow(nes),
     pushToStack: pushStack(nes),
-    calcCycles: calcCycles(nes),
     customSet: customSet(nes),
     status: status(nes),
     Y: Y(nes),

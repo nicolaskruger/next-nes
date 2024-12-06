@@ -33,11 +33,6 @@ type Instruction = {
   addr?: number;
 };
 
-export type CalculateCycles = Pick<
-  Instruction,
-  "baseCycles" | "cross" | "offsetOnCross"
->;
-
 const is8bitsNegative = (value: number) => ((value >> 7) & 1) === 1;
 
 export const make8bitSigned = (value: number) => {
@@ -48,12 +43,6 @@ export const make8bitSigned = (value: number) => {
 const minus8bitSigned = (value: number) => {
   return -make8bitSigned(value) & 0xff;
 };
-
-export const calculateCycles = ({
-  baseCycles,
-  cross,
-  offsetOnCross,
-}: CalculateCycles) => baseCycles + (cross ? offsetOnCross : 0);
 
 export const pushPCStack = (nes: Nes, pc: number): Nes => {
   const high = (pc >> 8) & 0xff;
