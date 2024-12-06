@@ -70,9 +70,8 @@ describe("test addressing mode", () => {
   test("Implicit test", () => {
     const nes: Nes = initNes();
 
-    const { cross, data, nes: newNes } = IMP(nes);
+    const { data, nes: newNes } = IMP(nes);
 
-    expect(cross).toBeFalsy();
     expect(newNes.cpu.PC).toBe(1);
     expect(data).toBe(0);
   });

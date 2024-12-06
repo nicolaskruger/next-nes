@@ -5,7 +5,6 @@ import { setPC } from "../cpu";
 export type Addr = {
   acc?: boolean;
   addr?: number;
-  cross: boolean;
   data: number;
   nes: Nes;
 };
@@ -13,7 +12,6 @@ export type Addr = {
 const IMP = (nes: Nes): Addr => ({
   nes: setPC(nes.cpu.PC + 1, nes),
   data: 0,
-  cross: false,
 });
 
 const ACC = (nes: Nes): Addr => ({
