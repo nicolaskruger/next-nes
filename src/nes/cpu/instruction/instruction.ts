@@ -13,11 +13,9 @@ import {
   getY,
   getZeroFlag,
   setACC,
-  setBreakCommand,
   setCarryFlag,
   setNegativeFlag,
   setOverFlowFlag,
-  setPC,
   setSTK,
   setX,
   setY,
@@ -31,9 +29,6 @@ import { repeat } from "@/nes/helper/repeat";
 type Instruction = {
   nes: Nes;
   data: number;
-  baseCycles: number;
-  cross: boolean;
-  offsetOnCross: number;
   acc?: boolean;
   addr?: number;
 };
@@ -72,7 +67,7 @@ export const pullPCStack = (nes: Nes): [number, Nes] => {
   return [(high << 8) | low, nesHigh];
 };
 
-const ADC = ({ data, nes, ...cycles }: Instruction): Nes => {
+const ADC = ({ data, nes }: Instruction): Nes => {
   const { cpu } = nes;
   const CARRY_FLAG = getCarryFlag(nes);
   const { ACC } = cpu;
@@ -84,12 +79,11 @@ const ADC = ({ data, nes, ...cycles }: Instruction): Nes => {
     .overFlow()
     .negative()
     .nesBuilder()
-    .calcCycles(cycles)
     .ACC(result & MASK_8)
     .build();
 };
 
-const AND = ({ nes, data, ...cycles }: Instruction): Nes => {
+const AND = ({ nes, data }: Instruction): Nes => {
   const { cpu } = nes;
   const { ACC } = cpu;
 
@@ -99,38 +93,31 @@ const AND = ({ nes, data, ...cycles }: Instruction): Nes => {
     .zero()
     .negative()
     .nesBuilder()
-    .calcCycles(cycles)
     .ACC(result)
     .build();
 };
 
-const ASL_RESULT_CYCLES = (
-  data: number,
-  cycles: CalculateCycles,
-  nes: Nes
-): [result: number, totalCycles: number, nes: Nes] => {
+const ASL_RESULT_CYCLES = (data: number, nes: Nes) => {
   const result = data << 1;
 
   const _nes = flagBuilder({ result }, nes).carry().zero().negative().build();
 
-  const totalCycle = calculateCycles({ ...cycles });
-
-  return [result & MASK_8, totalCycle, _nes];
+  return [result & MASK_8, _nes] as const;
 };
 
-const ASL_ACC = ({ data, nes, ...cycles }: Instruction): Nes => {
-  const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
+const ASL_ACC = ({ data, nes }: Instruction): Nes => {
+  const [result, _nes] = ASL_RESULT_CYCLES(data, nes);
 
-  return nesBuilder(_nes).ACC(result).cycles(totalCycle).build();
+  return nesBuilder(_nes).ACC(result).build();
 };
 
-const ASL_MEMORY = ({ data, nes, addr, ...cycles }: Instruction): Nes => {
+const ASL_MEMORY = ({ data, nes, addr }: Instruction): Nes => {
   if (addr === undefined)
     throw new Error("this instruction needs memory addr.");
 
-  const [result, totalCycle, _nes] = ASL_RESULT_CYCLES(data, cycles, nes);
+  const [result, _nes] = ASL_RESULT_CYCLES(data, nes);
 
-  return nesBuilder(_nes).buss(addr, result).cycles(totalCycle).build();
+  return nesBuilder(_nes).buss(addr, result).build();
 };
 
 const ASL = (instruction: Instruction): Nes => {
@@ -146,12 +133,12 @@ const ASL = (instruction: Instruction): Nes => {
 const branch = (
   getFlag: (nes: Nes) => number,
   verify: (flag: number) => boolean,
-  { nes, data, baseCycles }: Instruction
+  { nes, data }: Instruction
 ): Nes => {
   const flag = getFlag(nes);
 
   if (verify(flag)) {
-    return nesBuilder(nes).cycles(baseCycles).build();
+    return nes;
   }
 
   let extraCycles = 1;
@@ -162,10 +149,7 @@ const branch = (
 
   if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
 
-  return nesBuilder(nes)
-    .PC(PC)
-    .cycles(baseCycles + extraCycles)
-    .build();
+  return nesBuilder(nes).PC(PC).build();
 };
 
 const clearFlag = (value: number) => !!value;
@@ -183,7 +167,7 @@ const BEQ = (instruction: Instruction): Nes => {
   return branch(getZeroFlag, setFlag, instruction);
 };
 
-const BIT = ({ nes, data, baseCycles }: Instruction): Nes => {
+const BIT = ({ nes, data }: Instruction): Nes => {
   const result = data & nes.cpu.ACC;
 
   return flagBuilder({ result }, nes)
@@ -200,7 +184,6 @@ const BIT = ({ nes, data, baseCycles }: Instruction): Nes => {
       flag: ({ result }) => (data >> 7) & 1,
     })
     .nesBuilder()
-    .cycles(baseCycles)
     .build();
 };
 
@@ -233,12 +216,11 @@ const pullFromStack = (nes: Nes): [value: number, nes: Nes] => {
   return [value, setSTK(STK, _nes)];
 };
 
-const BRK = ({ nes, baseCycles }: Instruction): Nes => {
+const BRK = ({ nes }: Instruction): Nes => {
   return nesBuilder(nes)
     .pushPCStack(getPC(nes))
     .pushToStack(getSTATUS(nes))
     .setBreakCommand(1)
-    .cycles(baseCycles)
     .build();
 };
 
@@ -250,17 +232,15 @@ const BVS = (instruction: Instruction): Nes => {
   return branch(getOverFlowFlag, setFlag, instruction);
 };
 
-const CLC = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).carryFlag(0).cycles(baseCycles).build();
+const CLC = ({ nes }: Instruction): Nes => nesBuilder(nes).carryFlag(0).build();
 
-const CLD = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).decimalMode(0).cycles(baseCycles).build();
+const CLD = ({ nes }: Instruction): Nes =>
+  nesBuilder(nes).decimalMode(0).build();
 
-const CLI = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).interruptDisable(0).cycles(baseCycles).build();
+const CLI = ({ nes }: Instruction): Nes =>
+  nesBuilder(nes).interruptDisable(0).build();
 
-const CLV = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).overFlow(0).cycles(baseCycles).build();
+const CLV = ({ nes }: Instruction): Nes => nesBuilder(nes).overFlow(0).build();
 
 const compare = (value: number, { data, nes, ...cycles }: Instruction): Nes => {
   const signedValue = make8bitSigned(value);
@@ -283,7 +263,7 @@ const compare = (value: number, { data, nes, ...cycles }: Instruction): Nes => {
     return curr.set(curr.verify ? 1 : 0, acc);
   }, nes);
 
-  return nesBuilder(_nes).calcCycles(cycles).build();
+  return nesBuilder(_nes).build();
 };
 const CMP = (instruction: Instruction): Nes => {
   return compare(instruction.nes.cpu.ACC, instruction);
@@ -296,7 +276,7 @@ const CPY = (instruction: Instruction): Nes => {
 };
 
 const DEC = (instruction: Instruction): Nes => {
-  const { nes, addr, baseCycles } = instruction;
+  const { nes, addr } = instruction;
 
   if (addr === undefined) throw new Error("instruction DEC needs addr");
 
@@ -309,7 +289,6 @@ const DEC = (instruction: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .buss(addr, result)
-    .cycles(baseCycles)
     .build();
 };
 
@@ -317,19 +296,14 @@ const operate = (
   operation: "increment" | "decrement",
   get: (nes: Nes) => number,
   set: (value: number, nes: Nes) => Nes,
-  { nes, baseCycles }: Instruction
+  { nes }: Instruction
 ): Nes => {
   const operator = operation === "increment" ? 1 : -1;
 
   const result = (get(nes) + operator) & MASK_8;
 
   const _nes: Nes = set(result, nes);
-  return flagBuilder({ result }, _nes)
-    .zero()
-    .negative()
-    .nesBuilder()
-    .cycles(baseCycles)
-    .build();
+  return flagBuilder({ result }, _nes).zero().negative().nesBuilder().build();
 };
 
 const decrement = (
@@ -350,7 +324,7 @@ const DEX = (instruction: Instruction): Nes =>
 const DEY = (instruction: Instruction): Nes =>
   decrement(getY, setY, instruction);
 
-const EOR = ({ data, nes, ...cycles }: Instruction): Nes => {
+const EOR = ({ data, nes }: Instruction): Nes => {
   const result = data ^ nes.cpu.ACC;
 
   return flagBuilder({ result }, nes)
@@ -358,12 +332,11 @@ const EOR = ({ data, nes, ...cycles }: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .ACC(result)
-    .calcCycles(cycles)
     .build();
 };
 
 const INC = (instruction: Instruction): Nes => {
-  const { nes, addr, baseCycles } = instruction;
+  const { nes, addr } = instruction;
 
   if (addr === undefined) throw new Error("instruction INC must have addr");
 
@@ -376,7 +349,6 @@ const INC = (instruction: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .buss(addr, result)
-    .cycles(baseCycles)
     .build();
 };
 
@@ -386,29 +358,26 @@ const INX = (instruction: Instruction): Nes =>
 const INY = (instruction: Instruction): Nes =>
   increment(getY, setY, instruction);
 
-const JMP = ({ baseCycles, nes, data, addr }: Instruction): Nes =>
+const JMP = ({ nes, addr }: Instruction): Nes =>
   nesBuilder(nes)
-    .cycles(baseCycles)
     .PC(addr as number)
     .build();
 
-const JSR = ({ nes, baseCycles, addr }: Instruction): Nes =>
+const JSR = ({ nes, addr }: Instruction): Nes =>
   nesBuilder(nes)
     .pushPCStack(nes.cpu.PC - 1)
     .PC(addr!)
-    .cycles(baseCycles)
     .build();
 
 const load = (
   set: (result: number, nes: Nes) => Nes,
-  { nes, data: result, ...cycles }: Instruction
+  { nes, data: result }: Instruction
 ): Nes =>
   flagBuilder({ result }, nes)
     .zero()
     .negative()
     .nesBuilder()
     .customSet(result, set)
-    .calcCycles(cycles)
     .build();
 
 const LDA = (instruction: Instruction): Nes => load(setACC, instruction);
@@ -428,18 +397,18 @@ const LSR_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   return [result, _nes];
 };
 
-const LSR_ACC = ({ data, nes, baseCycles }: Instruction): Nes => {
+const LSR_ACC = ({ data, nes }: Instruction): Nes => {
   const [result, _nes] = LSR_RESULT(data, nes);
 
-  return nesBuilder(_nes).ACC(result).cycles(baseCycles).build();
+  return nesBuilder(_nes).ACC(result).build();
 };
 
-const LSR_MEMORY = ({ data, nes, baseCycles, addr }: Instruction): Nes => {
+const LSR_MEMORY = ({ data, nes, addr }: Instruction): Nes => {
   if (addr === undefined) throw new Error("addr can't be undefined on LSR");
 
   const [result, _nes] = LSR_RESULT(data, nes);
 
-  return nesBuilder(_nes).buss(addr, result).cycles(baseCycles).build();
+  return nesBuilder(_nes).buss(addr, result).build();
 };
 
 const LSR = (instruction: Instruction): Nes => {
@@ -450,10 +419,9 @@ const LSR = (instruction: Instruction): Nes => {
   }
 };
 
-const NOP = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).cycles(baseCycles).build();
+const NOP = ({ nes }: Instruction): Nes => nes;
 
-const ORA = ({ nes, data, ...cycles }: Instruction): Nes => {
+const ORA = ({ nes, data }: Instruction): Nes => {
   const result = getACC(nes) | data;
 
   return flagBuilder({ result }, nes)
@@ -461,19 +429,18 @@ const ORA = ({ nes, data, ...cycles }: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .ACC(result)
-    .calcCycles(cycles)
     .build();
 };
-const PHA = ({ nes, baseCycles }: Instruction): Nes => {
+const PHA = ({ nes }: Instruction): Nes => {
   const ACC = getACC(nes);
 
-  return nesBuilder(nes).pushToStack(ACC).cycles(baseCycles).build();
+  return nesBuilder(nes).pushToStack(ACC).build();
 };
-const PHP = ({ nes, baseCycles }: Instruction): Nes => {
+const PHP = ({ nes }: Instruction): Nes => {
   const STATUS = getSTATUS(nes);
-  return nesBuilder(nes).pushToStack(STATUS).cycles(baseCycles).build();
+  return nesBuilder(nes).pushToStack(STATUS).build();
 };
-const PLA = ({ nes, baseCycles }: Instruction): Nes => {
+const PLA = ({ nes }: Instruction): Nes => {
   const [result, _nes] = pullFromStack(nes);
 
   return flagBuilder({ result }, _nes)
@@ -481,12 +448,12 @@ const PLA = ({ nes, baseCycles }: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .ACC(result)
-    .cycles(baseCycles)
+
     .build();
 };
-const PLP = ({ nes, baseCycles }: Instruction): Nes => {
+const PLP = ({ nes }: Instruction): Nes => {
   const [STATUS, _nes] = pullFromStack(nes);
-  return nesBuilder(_nes).status(STATUS).cycles(baseCycles).build();
+  return nesBuilder(_nes).status(STATUS).build();
 };
 
 const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
@@ -499,21 +466,21 @@ const ROL_RESULT = (data: number, nes: Nes): [result: number, nes: Nes] => {
   return [result & MASK_8, _nes];
 };
 
-const ROL_ACC = ({ data, nes, baseCycles }: Instruction): Nes => {
+const ROL_ACC = ({ data, nes }: Instruction): Nes => {
   const [result, _nes] = ROL_RESULT(data, nes);
 
   return nesBuilder(_nes)
     .ACC(result & MASK_8)
-    .cycles(baseCycles)
+
     .build();
 };
 
-const ROL_MEMORY = ({ data, nes, baseCycles, addr }: Instruction): Nes => {
+const ROL_MEMORY = ({ data, nes, addr }: Instruction): Nes => {
   if (addr === undefined) throw new Error("ROL must have addr.");
 
   const [result, _nes] = ROL_RESULT(data, nes);
 
-  return nesBuilder(_nes).buss(addr, result).cycles(baseCycles).build();
+  return nesBuilder(_nes).buss(addr, result).build();
 };
 
 const ROL = (instruction: Instruction): Nes => {
@@ -540,37 +507,37 @@ const ROR_RESULT = (data: number, nes: Nes): [result: number, _nes: Nes] => {
   return [result, _nes];
 };
 
-const ROR_ACC = ({ data, nes, baseCycles }: Instruction): Nes => {
+const ROR_ACC = ({ data, nes }: Instruction): Nes => {
   const [result, _nes] = ROR_RESULT(data, nes);
 
-  return nesBuilder(_nes).ACC(result).cycles(baseCycles).build();
+  return nesBuilder(_nes).ACC(result).build();
 };
 
-const ROR_MEMORY = ({ data, nes, baseCycles, addr }: Instruction): Nes => {
+const ROR_MEMORY = ({ data, nes, addr }: Instruction): Nes => {
   if (addr === undefined) throw new Error("ROR memory need a addr");
 
   const [result, _nes] = ROL_RESULT(data, nes);
 
-  return nesBuilder(_nes).buss(addr, result).cycles(baseCycles).build();
+  return nesBuilder(_nes).buss(addr, result).build();
 };
 
 const ROR = ({ acc, ...instruction }: Instruction): Nes => {
   if (acc) return ROR_ACC(instruction);
   else return ROR_MEMORY(instruction);
 };
-const RTI = ({ nes, baseCycles }: Instruction): Nes => {
+const RTI = ({ nes }: Instruction): Nes => {
   const [STATUS, nesStatus] = pullFromStack(nes);
 
   return nesBuilder(nesStatus)
     .pullPCStack()
-    .cycles(baseCycles)
+
     .status(STATUS)
     .build();
 };
-const RTS = ({ nes, baseCycles }: Instruction): Nes => {
-  return nesBuilder(nes).pullPCStackNext().cycles(baseCycles).build();
+const RTS = ({ nes }: Instruction): Nes => {
+  return nesBuilder(nes).pullPCStackNext().build();
 };
-const SBC = ({ data, nes, ...cycles }: Instruction): Nes => {
+const SBC = ({ data, nes }: Instruction): Nes => {
   const dataSigned = minus8bitSigned(data);
   const carrySigned = minus8bitSigned(~getCarryFlag(nes) & 1);
   const ACC = getACC(nes);
@@ -582,43 +549,36 @@ const SBC = ({ data, nes, ...cycles }: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .ACC(result & MASK_8)
-    .calcCycles(cycles)
     .build();
 };
-const SEC = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).carryFlag(1).cycles(baseCycles).build();
+const SEC = ({ nes }: Instruction): Nes => nesBuilder(nes).carryFlag(1).build();
 
-const SED = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).decimalMode(1).cycles(baseCycles).build();
+const SED = ({ nes }: Instruction): Nes =>
+  nesBuilder(nes).decimalMode(1).build();
 
-const SEI = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).interruptDisable(1).cycles(baseCycles).build();
+const SEI = ({ nes }: Instruction): Nes =>
+  nesBuilder(nes).interruptDisable(1).build();
 
-const STA = ({ addr, nes, baseCycles }: Instruction): Nes => {
+const STA = ({ addr, nes }: Instruction): Nes => {
   if (addr === undefined) throw new Error("addr must be defined for STA");
-  return nesBuilder(nes).buss(addr, getACC(nes)).cycles(baseCycles).build();
+  return nesBuilder(nes).buss(addr, getACC(nes)).build();
 };
 
-const STX = ({ addr, nes, baseCycles }: Instruction): Nes => {
+const STX = ({ addr, nes }: Instruction): Nes => {
   if (addr === undefined) throw new Error("STX needs addr");
-  return nesBuilder(nes).buss(addr, getX(nes)).cycles(baseCycles).build();
+  return nesBuilder(nes).buss(addr, getX(nes)).build();
 };
 
-const STY = ({ addr, nes, baseCycles }: Instruction): Nes => {
+const STY = ({ addr, nes }: Instruction): Nes => {
   if (addr === undefined) throw new Error("STY needs addr");
-  return nesBuilder(nes).buss(addr, getY(nes)).cycles(baseCycles).build();
+  return nesBuilder(nes).buss(addr, getY(nes)).build();
 };
 
 const transferAccumulatorNumber = ({
   nes,
-  baseCycles,
 }: Instruction): [number, ReturnType<typeof nesBuilder>] => {
   const result = getACC(nes);
-  const nesB = flagBuilder({ result }, nes)
-    .negative()
-    .zero()
-    .nesBuilder()
-    .cycles(baseCycles);
+  const nesB = flagBuilder({ result }, nes).negative().zero().nesBuilder();
   return [result, nesB];
 };
 
@@ -632,7 +592,7 @@ const TAY = (instruction: Instruction): Nes => {
   return nesB.Y(result).build();
 };
 
-const TSX = ({ nes, baseCycles }: Instruction): Nes => {
+const TSX = ({ nes }: Instruction): Nes => {
   const result = getSTK(nes);
 
   return flagBuilder({ result }, nes)
@@ -640,15 +600,11 @@ const TSX = ({ nes, baseCycles }: Instruction): Nes => {
     .negative()
     .nesBuilder()
     .X(result)
-    .cycles(baseCycles)
+
     .build();
 };
 
-const transferNumberToAccumulator = (
-  get: (nes: Nes) => number,
-  nes: Nes,
-  cycles: number
-) => {
+const transferNumberToAccumulator = (get: (nes: Nes) => number, nes: Nes) => {
   const result = get(nes);
 
   return flagBuilder({ result }, nes)
@@ -656,17 +612,16 @@ const transferNumberToAccumulator = (
     .negative()
     .nesBuilder()
     .ACC(result)
-    .cycles(cycles)
     .build();
 };
 
-const TXA = ({ baseCycles, nes }: Instruction): Nes => {
-  return transferNumberToAccumulator(getX, nes, baseCycles);
+const TXA = ({ nes }: Instruction): Nes => {
+  return transferNumberToAccumulator(getX, nes);
 };
-const TXS = ({ nes, baseCycles }: Instruction): Nes =>
-  nesBuilder(nes).cycles(baseCycles).X(getSTK(nes)).build();
-const TYA = ({ nes, baseCycles }: Instruction): Nes =>
-  transferNumberToAccumulator(getY, nes, baseCycles);
+const TXS = ({ nes }: Instruction): Nes =>
+  nesBuilder(nes).X(getSTK(nes)).build();
+const TYA = ({ nes }: Instruction): Nes =>
+  transferNumberToAccumulator(getY, nes);
 
 export const XXX = ({ nes }: Instruction): Nes => nes;
 

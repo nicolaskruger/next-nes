@@ -184,15 +184,11 @@ describe("instruction test", () => {
     const _nes = ADC({
       data: 0x01,
       nes,
-      baseCycles: 2,
-      cross: true,
-      offsetOnCross: 2,
     });
 
     expectNes(_nes)
       .toACC(0x00)
-      .toStatus((1 << 1) | 1)
-      .toCycles(4);
+      .toStatus((1 << 1) | 1);
   });
   test("ADC,  when negative flag is set", () => {
     const nes = initNes();
@@ -201,14 +197,11 @@ describe("instruction test", () => {
     const _nes = ADC({
       data: 0x00,
       nes,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 2,
     });
 
     expectNes(_nes)
       .toStatus(1 << 6)
-      .toCycles(2)
+
       .toACC(0xff);
   });
   test("ADC, when overflow is set", () => {
@@ -219,13 +212,9 @@ describe("instruction test", () => {
     const _nes = ADC({
       data,
       nes,
-      baseCycles: 1,
-      cross: false,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(1)
       .toACC(128)
       .toStatus((1 << 6) | (1 << 5));
   });
@@ -238,17 +227,13 @@ describe("instruction test", () => {
     const data = 0xff;
 
     const _nes = AND({
-      baseCycles: 1,
-      cross: true,
-      offsetOnCross: 2,
       nes,
       data,
     });
 
     expectNes(_nes)
       .toACC(0x00)
-      .toStatus(1 << 1)
-      .toCycles(3);
+      .toStatus(1 << 1);
   });
 
   test("AND, when result is negative", () => {
@@ -259,15 +244,11 @@ describe("instruction test", () => {
     const data = 0xa0;
 
     const _nes = AND({
-      baseCycles: 1,
-      cross: true,
-      offsetOnCross: 2,
       nes,
       data,
     });
 
     expectNes(_nes)
-      .toCycles(3)
       .toACC(0xa0)
       .toStatus(1 << 6);
   });
@@ -282,16 +263,13 @@ describe("instruction test", () => {
     nes.bus[addr].data = data;
 
     const _nes = ASL({
-      baseCycles: 1,
-      cross: true,
       data,
       nes,
-      offsetOnCross: 1,
+
       addr,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toBuss(addr, 0)
       .toStatus((1 << 1) | 1);
   });
@@ -306,16 +284,13 @@ describe("instruction test", () => {
     nes.bus[addr].data = data;
 
     const _nes = ASL({
-      baseCycles: 1,
-      cross: true,
       data,
       nes,
-      offsetOnCross: 1,
+
       addr,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toStatus(1 << 6)
       .toBuss(addr, 1 << 7);
   });
@@ -325,16 +300,13 @@ describe("instruction test", () => {
     const data = 0x80;
 
     const _nes = ASL({
-      baseCycles: 1,
-      cross: true,
       data,
       nes,
-      offsetOnCross: 1,
+
       acc: true,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toStatus((1 << 1) | 1)
       .toACC(0x00);
   });
@@ -344,16 +316,13 @@ describe("instruction test", () => {
     const data = 0x40;
 
     const _nes = ASL({
-      baseCycles: 1,
-      cross: true,
       data,
       nes,
-      offsetOnCross: 1,
+
       acc: true,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toACC(0x80)
       .toStatus(1 << 6);
   });
@@ -364,14 +333,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1;
 
     const _nes = BCC({
-      baseCycles: 2,
-      cross: false,
       data: 2,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0).toCycles(2);
+    expectNes(_nes).toPC(0);
   });
 
   test("BCC, branch occur and got to another page", () => {
@@ -381,14 +347,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 0;
 
     const _nes = BCC({
-      baseCycles: 2,
-      cross: false,
       data: 2,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0x101).toCycles(5);
+    expectNes(_nes).toPC(0x101);
   });
 
   test("BCS, branch not occur", () => {
@@ -397,14 +360,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 0;
 
     const _nes = BCS({
-      baseCycles: 2,
-      cross: false,
       data: 2,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0).toCycles(2);
+    expectNes(_nes).toPC(0);
   });
 
   test("BCS, branch occur and got to another page", () => {
@@ -414,14 +374,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1;
 
     const _nes = BCS({
-      baseCycles: 2,
-      cross: false,
       data: 2,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0x101).toCycles(5);
+    expectNes(_nes).toPC(0x101);
   });
 
   test("BEQ, branch not occur", () => {
@@ -430,14 +387,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 0;
 
     const _nes = BEQ({
-      baseCycles: 2,
-      cross: false,
       data: 2,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0).toCycles(2);
+    expectNes(_nes).toPC(0);
   });
 
   test("BEQ, branch occur and got to another page", () => {
@@ -447,14 +401,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1 << 1;
 
     const _nes = BEQ({
-      baseCycles: 2,
-      cross: false,
       data: 2,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0x101).toCycles(5);
+    expectNes(_nes).toPC(0x101);
   });
 
   test("BIT, when the bit 6 and bit 7 are set", () => {
@@ -463,15 +414,11 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0xff;
 
     const _nes = BIT({
-      baseCycles: 3,
-      cross: false,
       data: (1 << 7) | (1 << 6),
       nes,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(3)
       .toStatus((1 << 6) | (1 << 5))
       .toACC(0xff);
   });
@@ -481,14 +428,11 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0xff;
 
     const _nes = BIT({
-      baseCycles: 3,
-      cross: false,
       data: 0,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(3).toStatus(1);
+    expectNes(_nes).toStatus(1);
   });
 
   test("BMI, should not increment the PC niter add additional cycles when negative flag is clear", () => {
@@ -498,12 +442,9 @@ describe("instruction test", () => {
     const _nes = BMI({
       nes,
       data: 0x0f,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(2).toPC(0);
+    expectNes(_nes).toPC(0);
   });
 
   test("BMI, should increment the PC and add additional cycles when negative flag is set", () => {
@@ -516,12 +457,9 @@ describe("instruction test", () => {
     const _nes = BMI({
       nes,
       data: 0x0f,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(5).toPC(0x0200);
+    expectNes(_nes).toPC(0x0200);
   });
 
   test("BNE, should not increment the PC nether add additional cycles when zero flag is set", () => {
@@ -532,12 +470,9 @@ describe("instruction test", () => {
     const _nes = BNE({
       nes,
       data: 0x0f,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(2).toPC(0);
+    expectNes(_nes).toPC(0);
   });
 
   test("BNE, should increment the PC and add additional cycles when zero flag is clear and cross to a new page", () => {
@@ -550,12 +485,9 @@ describe("instruction test", () => {
     const _nes = BNE({
       nes,
       data: 0x0f,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(5).toPC(0x0200);
+    expectNes(_nes).toPC(0x0200);
   });
   test("BPL, should not increment the PC nether add additional cycles when negative flag is set", () => {
     const nes = initNes();
@@ -565,12 +497,9 @@ describe("instruction test", () => {
     const _nes = BPL({
       nes,
       data: 0x0f,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toPC(0).toCycles(2);
+    expectNes(_nes).toPC(0);
   });
 
   test("BPL, should increment the PC and add additional cycles when negative flag is clear", () => {
@@ -583,12 +512,9 @@ describe("instruction test", () => {
     const _nes = BPL({
       nes,
       data: 0x0f,
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(5).toPC(0x200);
+    expectNes(_nes).toPC(0x200);
   });
 
   test("BRK, should throw an error when STK overflow", () => {
@@ -600,9 +526,6 @@ describe("instruction test", () => {
       BRK({
         nes,
         data: 0,
-        baseCycles: 7,
-        cross: false,
-        offsetOnCross: 0,
       });
     }).toThrow("stack overflow");
   });
@@ -618,9 +541,6 @@ describe("instruction test", () => {
     const _nes = BRK({
       nes,
       data: 0,
-      baseCycles: 7,
-      cross: false,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
@@ -628,7 +548,7 @@ describe("instruction test", () => {
       .toBuss(0x01ff, 0x12)
       .toBuss(0x01fe, 0x34)
       .toBuss(0x01fd, 1)
-      .toCycles(7)
+
       .toPC(0x1234)
       .toStatus((1 << 4) | 1);
   });
@@ -642,13 +562,11 @@ describe("instruction test", () => {
 
     const _nes = BVC({
       nes,
-      cross: false,
-      baseCycles: 2,
+
       data: 0xff,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(2).toPC(0);
+    expectNes(_nes).toPC(0);
   });
   test("BVC, should branch when overflow is clear", () => {
     const nes = initNes();
@@ -659,13 +577,11 @@ describe("instruction test", () => {
 
     const _nes = BVC({
       nes,
-      cross: false,
-      baseCycles: 2,
+
       data: 0x0f,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(5).toPC(0x0200);
+    expectNes(_nes).toPC(0x0200);
   });
 
   test("BVS, should not branch if overflow is clear", () => {
@@ -677,13 +593,11 @@ describe("instruction test", () => {
 
     const _nes = BVS({
       nes,
-      cross: false,
-      baseCycles: 2,
+
       data: 0xff,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(2).toPC(0);
+    expectNes(_nes).toPC(0);
   });
   test("BVS, should branch when overflow is set", () => {
     const nes = initNes();
@@ -694,13 +608,11 @@ describe("instruction test", () => {
 
     const _nes = BVS({
       nes,
-      cross: false,
-      baseCycles: 2,
+
       data: 0x0f,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(5).toPC(0x0200);
+    expectNes(_nes).toPC(0x0200);
   });
 
   test("CLC, should clear the carry flag", () => {
@@ -709,14 +621,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1;
 
     const _nes = CLC({
-      baseCycles: 2,
-      cross: false,
       data: 0,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(2).toStatus(0);
+    expectNes(_nes).toStatus(0);
   });
 
   test("CLD, should clear decimal mode", () => {
@@ -725,14 +634,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1 << 3;
 
     const _nes = CLD({
-      baseCycles: 2,
-      cross: false,
       data: 0,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toStatus(0).toCycles(2);
+    expectNes(_nes).toStatus(0);
   });
 
   test("CLI, should clear interrupt disable", () => {
@@ -741,14 +647,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1 << 2;
 
     const _nes = CLI({
-      baseCycles: 2,
-      cross: false,
       data: 0,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toStatus(0).toCycles(2);
+    expectNes(_nes).toStatus(0);
   });
 
   test("CLV, should clear overflow", () => {
@@ -757,14 +660,11 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 1 << 5;
 
     const _nes = CLV({
-      baseCycles: 2,
-      cross: false,
       data: 0,
       nes,
-      offsetOnCross: 0,
     });
 
-    expectNes(_nes).toCycles(2).toStatus(0);
+    expectNes(_nes).toStatus(0);
   });
 
   test("CMP, should set carry flag if ACC >== memory", () => {
@@ -774,13 +674,10 @@ describe("instruction test", () => {
     const data = 0x0e;
 
     const _nes = CMP({
-      baseCycles: 3,
-      cross: true,
-      offsetOnCross: 2,
       data,
       nes,
     });
-    expectNes(_nes).toCycles(5).toStatus(1);
+    expectNes(_nes).toStatus(1);
   });
   test("CMP, should set zero flag if ACC === memory", () => {
     const nes = initNes();
@@ -789,16 +686,11 @@ describe("instruction test", () => {
     const data = 0x0f;
 
     const _nes = CMP({
-      baseCycles: 3,
-      cross: true,
-      offsetOnCross: 2,
       data,
       nes,
     });
 
-    expectNes(_nes)
-      .toStatus((1 << 1) | 1)
-      .toCycles(5);
+    expectNes(_nes).toStatus((1 << 1) | 1);
   });
   test("CMP, should negative flag if the result was negative", () => {
     const nes = initNes();
@@ -807,16 +699,11 @@ describe("instruction test", () => {
     const data = 0x0f;
 
     const _nes = CMP({
-      baseCycles: 3,
-      cross: true,
-      offsetOnCross: 2,
       data,
       nes,
     });
 
-    expectNes(_nes)
-      .toStatus(1 << 6)
-      .toCycles(5);
+    expectNes(_nes).toStatus(1 << 6);
   });
 
   test("CPX, should set carry flag if X >= memory", () => {
@@ -824,14 +711,11 @@ describe("instruction test", () => {
     nes.cpu.X = 0x0e;
     const data = 0x0d;
     const _nes = CPX({
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
-    expectNes(_nes).toCycles(2).toStatus(1);
+    expectNes(_nes).toStatus(1);
   });
 
   test("CPX, should set zero flag if X === memory", () => {
@@ -839,16 +723,11 @@ describe("instruction test", () => {
     nes.cpu.X = 0x0e;
     const data = 0x0e;
     const _nes = CPX({
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
-    expectNes(_nes)
-      .toCycles(2)
-      .toStatus((1 << 1) | 1);
+    expectNes(_nes).toStatus((1 << 1) | 1);
   });
 
   test("CPX, should set negative flag if the result was negative", () => {
@@ -856,16 +735,11 @@ describe("instruction test", () => {
     nes.cpu.X = 0xfe;
     const data = 0x0e;
     const _nes = CPX({
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
-    expectNes(_nes)
-      .toStatus(1 << 6)
-      .toCycles(2);
+    expectNes(_nes).toStatus(1 << 6);
   });
 
   test("CPY, should set carry flag when Y >= memory", () => {
@@ -875,14 +749,11 @@ describe("instruction test", () => {
     const data = 0x0e;
 
     const _nes = CPY({
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
-    expectNes(_nes).toCycles(2).toStatus(1);
+    expectNes(_nes).toStatus(1);
   });
 
   test("CPY, should set zero flag when Y == memory", () => {
@@ -892,16 +763,11 @@ describe("instruction test", () => {
     const data = 0xfe;
 
     const _nes = CPY({
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
-    expectNes(_nes)
-      .toCycles(2)
-      .toStatus((1 << 1) | 1);
+    expectNes(_nes).toStatus((1 << 1) | 1);
   });
 
   test("CPY, should set negative flag when the result was negative", () => {
@@ -911,16 +777,11 @@ describe("instruction test", () => {
     const data = 0x0e;
 
     const _nes = CPY({
-      baseCycles: 2,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
-    expectNes(_nes)
-      .toStatus(1 << 6)
-      .toCycles(2);
+    expectNes(_nes).toStatus(1 << 6);
   });
   test("DEC, should decrement memory and ser zero flag when memory = 1", () => {
     const nes = initNes();
@@ -930,16 +791,12 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = DEC({
-      baseCycles: 5,
-      cross: false,
       data,
       addr: 0,
       nes,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 1)
       .toBuss(0, 0);
   });
@@ -952,16 +809,13 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = DEC({
-      baseCycles: 5,
-      cross: false,
       data,
       nes,
-      offsetOnCross: 0,
+
       addr: 0,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 6)
       .toBuss(0, 0xff);
   });
@@ -973,15 +827,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = DEX({
-      baseCycles: 2,
-      cross: false,
       data,
       nes,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toX(0)
       .toStatus(1 << 1);
   });
@@ -994,15 +844,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = DEX({
-      baseCycles: 2,
-      cross: false,
       data,
       nes,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toX(0xff)
       .toStatus(1 << 6);
   });
@@ -1015,15 +861,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = DEY({
-      baseCycles: 2,
-      cross: false,
       data,
       nes,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toY(0)
       .toStatus(1 << 1);
   });
@@ -1036,15 +878,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = DEY({
-      baseCycles: 2,
-      cross: false,
       data,
       nes,
-      offsetOnCross: 0,
     });
 
     expectNes(_nes)
-      .toCycles(2)
       .toY(0xff)
       .toStatus(1 << 6);
   });
@@ -1056,15 +894,11 @@ describe("instruction test", () => {
     const data = 0xff;
 
     const _nes = EOR({
-      baseCycles: 4,
-      cross: true,
       data,
       nes,
-      offsetOnCross: 1,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toACC(0)
       .toStatus(1 << 1);
   });
@@ -1075,15 +909,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = EOR({
-      baseCycles: 4,
-      cross: true,
       data,
       nes,
-      offsetOnCross: 1,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toACC(0xff)
       .toStatus(1 << 6);
   });
@@ -1096,16 +926,12 @@ describe("instruction test", () => {
     const data = 0x01;
 
     const nes = INC({
-      baseCycles: 5,
-      cross: true,
-      offsetOnCross: 0,
       data,
       nes: _nes,
       addr: 0x01,
     });
 
     expectNes(nes)
-      .toCycles(5)
       .toStatus(1 << 1)
       .toBuss(0x01, 0);
   });
@@ -1117,16 +943,12 @@ describe("instruction test", () => {
     const data = 0x01;
 
     const _nes = INC({
-      baseCycles: 5,
-      cross: true,
-      offsetOnCross: 0,
       data,
       nes,
       addr: 0x01,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 6)
       .toBuss(0x01, 0x80);
   });
@@ -1139,15 +961,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = INX({
-      baseCycles: 5,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 1)
       .toX(0);
   });
@@ -1160,15 +978,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = INX({
-      baseCycles: 5,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 6)
       .toX(0x80);
   });
@@ -1181,15 +995,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = INY({
-      baseCycles: 5,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 1)
       .toY(0);
   });
@@ -1202,15 +1012,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = INY({
-      baseCycles: 5,
-      cross: false,
-      offsetOnCross: 0,
       data,
       nes,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 6)
       .toY(0x80);
   });
@@ -1221,15 +1027,12 @@ describe("instruction test", () => {
     const data = 0x1234;
 
     const _nes = JMP({
-      baseCycles: 5,
-      cross: true,
-      offsetOnCross: 0,
       data,
       addr: data,
       nes,
     });
 
-    expectNes(_nes).toPC(0x1234).toCycles(5);
+    expectNes(_nes).toPC(0x1234);
   });
 
   test("JSR", () => {
@@ -1240,19 +1043,12 @@ describe("instruction test", () => {
     const addr = 0x1234;
 
     const _nes = JSR({
-      baseCycles: 5,
-      cross: true,
-      offsetOnCross: 0,
       data: 0,
       addr,
       nes,
     });
 
-    expectNes(_nes)
-      .toCycles(5)
-      .toPC(0x1234)
-      .toBuss(0x01ff, 0x12)
-      .toBuss(0x01fe, 0x33);
+    expectNes(_nes).toPC(0x1234).toBuss(0x01ff, 0x12).toBuss(0x01fe, 0x33);
   });
 
   test("LDA, load the ACC a zero number", () => {
@@ -1263,15 +1059,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = LDA({
-      baseCycles: 6,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
     expectNes(_nes)
-      .toCycles(7)
       .toStatus(1 << 1)
       .toACC(0);
   });
@@ -1284,16 +1076,13 @@ describe("instruction test", () => {
     const data = 0x80;
 
     const _nes = LDA({
-      baseCycles: 6,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
     expectNes(_nes)
       .toStatus(1 << 6)
-      .toCycles(7)
+
       .toACC(0x80);
   });
 
@@ -1305,15 +1094,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = LDX({
-      baseCycles: 4,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 1)
       .toX(0x00);
   });
@@ -1326,15 +1111,11 @@ describe("instruction test", () => {
     const data = 0x80;
 
     const _nes = LDX({
-      baseCycles: 4,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 6)
       .toX(0x80);
   });
@@ -1347,15 +1128,11 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = LDY({
-      baseCycles: 4,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 1)
       .toY(0x00);
   });
@@ -1368,15 +1145,11 @@ describe("instruction test", () => {
     const data = 0x80;
 
     const _nes = LDY({
-      baseCycles: 4,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
     expectNes(_nes)
-      .toCycles(5)
       .toStatus(1 << 6)
       .toY(0x80);
   });
@@ -1387,16 +1160,13 @@ describe("instruction test", () => {
     const data = 0x01;
 
     const _nes = LSR({
-      baseCycles: 6,
       data,
-      cross: false,
-      offsetOnCross: 0,
+
       nes,
       acc: true,
     });
 
     expectNes(_nes)
-      .toCycles(6)
       .toStatus((1 << 1) | 1)
       .toACC(0);
   });
@@ -1407,29 +1177,25 @@ describe("instruction test", () => {
     const data = 0x02;
 
     const _nes = LSR({
-      baseCycles: 6,
       data,
-      cross: false,
-      offsetOnCross: 0,
+
       nes,
       addr: 0x00,
     });
 
-    expectNes(_nes).toCycles(6).toStatus(0).toBuss(0x00, 0x01);
+    expectNes(_nes).toStatus(0).toBuss(0x00, 0x01);
   });
 
   test("NOP", () => {
     const nes = initNes();
 
     const _nes = NOP({
-      baseCycles: 6,
       data: 0,
-      cross: false,
-      offsetOnCross: 0,
+
       nes,
     });
 
-    expectNes(_nes).toCycles(6);
+    expectNes(_nes);
   });
 
   test("ORA, when zero flag", () => {
@@ -1438,15 +1204,12 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0;
 
     const _nes = ORA({
-      baseCycles: 5,
       data: 0x00,
-      cross: true,
-      offsetOnCross: 1,
+
       nes,
     });
 
     expectNes(_nes)
-      .toCycles(6)
       .toACC(0)
       .toStatus(1 << 1);
   });
@@ -1457,15 +1220,12 @@ describe("instruction test", () => {
     nes.cpu.ACC = 1 << 7;
 
     const _nes = ORA({
-      baseCycles: 5,
       data: 1 << 6,
-      cross: true,
-      offsetOnCross: 1,
+
       nes,
     });
 
     expectNes(_nes)
-      .toCycles(6)
       .toACC((1 << 7) | (1 << 6))
       .toStatus(1 << 6);
   });
@@ -1476,15 +1236,10 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0x12;
 
     const _nes = PHA({
-      baseCycles: 3,
       nes,
     } as Instruction);
 
-    expectNes(_nes)
-      .toCycles(3)
-      .toSTK(0xfe)
-      .toBuss(0x01ff, 0x12)
-      .toBuss(0x01fe, 0);
+    expectNes(_nes).toSTK(0xfe).toBuss(0x01ff, 0x12).toBuss(0x01fe, 0);
   });
 
   test("PHP, Push Processor Status", () => {
@@ -1493,11 +1248,10 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 0x12;
 
     const _nes = PHP({
-      baseCycles: 3,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(3).toSTK(0xfe).toBuss(0x01ff, 0x12);
+    expectNes(_nes).toSTK(0xfe).toBuss(0x01ff, 0x12);
   });
 
   test("PLA, pull accumulator a zero value", () => {
@@ -1508,12 +1262,10 @@ describe("instruction test", () => {
     nes.bus[0x01ff].data = 0x00;
 
     const _nes = PLA({
-      baseCycles: 4,
       nes,
     } as Instruction);
 
     expectNes(_nes)
-      .toCycles(4)
       .toACC(0)
       .toSTK(0xff)
       .toStatus(1 << 1);
@@ -1526,12 +1278,10 @@ describe("instruction test", () => {
     nes.bus[0x01ff].data = 0xf0;
 
     const _nes = PLA({
-      baseCycles: 4,
       nes,
     } as Instruction);
 
     expectNes(_nes)
-      .toCycles(4)
       .toSTK(0xff)
       .toACC(0xf0)
       .toStatus(1 << 6);
@@ -1544,11 +1294,10 @@ describe("instruction test", () => {
     nes.bus[0x01ff].data = 0x12;
 
     const _nes = PLP({
-      baseCycles: 4,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(4).toStatus(0x12).toSTK(0xff);
+    expectNes(_nes).toStatus(0x12).toSTK(0xff);
   });
 
   test("ROL, rotate left the accumulator when value is 1000-0000 binary carry flag is set", () => {
@@ -1557,13 +1306,12 @@ describe("instruction test", () => {
     const data = 1 << 7;
 
     const _nes = ROL({
-      baseCycles: 2,
       nes,
       data,
       acc: true,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toACC(1).toStatus(1);
+    expectNes(_nes).toACC(1).toStatus(1);
   });
   test("ROL, rotate left the memory when value is 0100-0000 binary negative flag is set", () => {
     const nes = initNes();
@@ -1571,14 +1319,12 @@ describe("instruction test", () => {
     const data = 1 << 6;
 
     const _nes = ROL({
-      baseCycles: 2,
       nes,
       data,
       addr: 0x0000,
     } as Instruction);
 
     expectNes(_nes)
-      .toCycles(2)
       .toBuss(0x0000, 1 << 7)
       .toStatus(1 << 6);
   });
@@ -1589,14 +1335,12 @@ describe("instruction test", () => {
     const data = 0;
 
     const _nes = ROL({
-      baseCycles: 2,
       nes,
       data,
       acc: true,
     } as Instruction);
 
     expectNes(_nes)
-      .toCycles(2)
       .toACC(0)
       .toStatus(1 << 1);
   });
@@ -1607,14 +1351,12 @@ describe("instruction test", () => {
     const data = 0x01;
 
     const _nes = ROR({
-      baseCycles: 2,
       nes,
       data,
       acc: true,
     } as Instruction);
 
     expectNes(_nes)
-      .toCycles(2)
       .toACC(1 << 7)
       .toStatus((1 << 6) | 1);
   });
@@ -1627,14 +1369,12 @@ describe("instruction test", () => {
     const data = 0x00;
 
     const _nes = ROR({
-      baseCycles: 2,
       nes,
       data,
       addr: 0x00,
     } as Instruction);
 
     expectNes(_nes)
-      .toCycles(2)
       .toBuss(0, 0)
       .toStatus(1 << 1);
   });
@@ -1650,11 +1390,10 @@ describe("instruction test", () => {
     nes = pushToStack(nes, STATUS);
 
     nes = RTI({
-      baseCycles: 6,
       nes,
     } as Instruction);
 
-    expectNes(nes).toStatus(STATUS).toPC(PC).toCycles(6);
+    expectNes(nes).toStatus(STATUS).toPC(PC);
   });
   test("RTS, return from subroutine. It pulls the PC from the stack", () => {
     let nes = initNes();
@@ -1664,11 +1403,10 @@ describe("instruction test", () => {
     nes = pushPCStack(nes, PC);
 
     nes = RTS({
-      baseCycles: 6,
       nes,
     } as Instruction);
 
-    expectNes(nes).toPC(0x22).toCycles(6);
+    expectNes(nes).toPC(0x22);
   });
 
   test("SBC, when ACC = 0xff, C = 1, M = 1  then C = 0, N = 0", () => {
@@ -1680,14 +1418,11 @@ describe("instruction test", () => {
     const data = 1;
 
     const _nes = SBC({
-      baseCycles: 3,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
-    expectNes(_nes).toACC(0xfe).toEncodeStatus("czidbvN").toCycles(4);
+    expectNes(_nes).toACC(0xfe).toEncodeStatus("czidbvN");
   });
 
   test("SBC, when ACC = 0x01, C = 0, M = 0  then Z = 1", () => {
@@ -1698,14 +1433,11 @@ describe("instruction test", () => {
     const data = 0;
 
     const _nes = SBC({
-      baseCycles: 3,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
-    expectNes(_nes).toACC(0x0).toEncodeStatus("cZidbvn").toCycles(4);
+    expectNes(_nes).toACC(0x0).toEncodeStatus("cZidbvn");
   });
 
   test("SBC, when ACC = 64, C = -64, M = 0  then V = 1, C = 1, N = 1", () => {
@@ -1718,47 +1450,41 @@ describe("instruction test", () => {
     const data = -64 & 0xff;
 
     const _nes = SBC({
-      baseCycles: 3,
-      cross: true,
-      offsetOnCross: 1,
       nes,
       data,
     });
 
-    expectNes(_nes).toACC(128).toEncodeStatus("CzidbVN").toCycles(4);
+    expectNes(_nes).toACC(128).toEncodeStatus("CzidbVN");
   });
 
   test("SEC, set carry flag", () => {
     const nes = initNes();
 
     const _nes = SEC({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toEncodeStatus("Czidbvn");
+    expectNes(_nes).toEncodeStatus("Czidbvn");
   });
 
   test("SED, set decimal flag", () => {
     const nes = initNes();
 
     const _nes = SED({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toEncodeStatus("cziDbvn");
+    expectNes(_nes).toEncodeStatus("cziDbvn");
   });
 
   test("SEI, set interrupt disable", () => {
     const nes = initNes();
 
     const _nes = SEI({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toEncodeStatus("czIdbvn");
+    expectNes(_nes).toEncodeStatus("czIdbvn");
   });
 
   test("STA, store accumulator", () => {
@@ -1771,12 +1497,11 @@ describe("instruction test", () => {
     nes.cpu.ACC = 0x34;
 
     const _nes = STA({
-      baseCycles: 5,
       nes,
       addr,
     } as Instruction);
 
-    expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
+    expectNes(_nes).toBuss(addr, 0x34);
   });
   test("STX, store X Register", () => {
     const nes = initNes();
@@ -1788,12 +1513,11 @@ describe("instruction test", () => {
     nes.cpu.X = 0x34;
 
     const _nes = STX({
-      baseCycles: 5,
       nes,
       addr,
     } as Instruction);
 
-    expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
+    expectNes(_nes).toBuss(addr, 0x34);
   });
 
   test("STY, store Y Register", () => {
@@ -1806,12 +1530,11 @@ describe("instruction test", () => {
     nes.cpu.Y = 0x34;
 
     const _nes = STY({
-      baseCycles: 5,
       nes,
       addr,
     } as Instruction);
 
-    expectNes(_nes).toCycles(5).toBuss(addr, 0x34);
+    expectNes(_nes).toBuss(addr, 0x34);
   });
 
   test("TAX, when ACC = 0, then Z is set", () => {
@@ -1821,11 +1544,10 @@ describe("instruction test", () => {
     nes.cpu.X = 0x12;
 
     const _nes = TAX({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toX(0).toEncodeStatus("cZidbvn");
+    expectNes(_nes).toX(0).toEncodeStatus("cZidbvn");
   });
   test("TAX, when ACC = 0x80, then Z is set", () => {
     const nes = initNes();
@@ -1834,11 +1556,10 @@ describe("instruction test", () => {
     nes.cpu.X = 0x00;
 
     const _nes = TAX({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toX(0x80).toEncodeStatus("czidbvN");
+    expectNes(_nes).toX(0x80).toEncodeStatus("czidbvN");
   });
 
   test("TAY, when ACC = 0, then Z is set", () => {
@@ -1848,11 +1569,10 @@ describe("instruction test", () => {
     nes.cpu.Y = 0x12;
 
     const _nes = TAY({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toX(0).toEncodeStatus("cZidbvn");
+    expectNes(_nes).toX(0).toEncodeStatus("cZidbvn");
   });
   test("TAY, when ACC = 0x80, then Z is set", () => {
     const nes = initNes();
@@ -1861,11 +1581,10 @@ describe("instruction test", () => {
     nes.cpu.Y = 0x00;
 
     const _nes = TAY({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toY(0x80).toEncodeStatus("czidbvN");
+    expectNes(_nes).toY(0x80).toEncodeStatus("czidbvN");
   });
   test("TSX, transfer X to Stack, when stack is a negative number", () => {
     const nes = initNes();
@@ -1873,11 +1592,10 @@ describe("instruction test", () => {
     nes.cpu.STK = 0x80;
 
     const _nes = TSX({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toX(0x80).toEncodeStatus("czidbvN");
+    expectNes(_nes).toX(0x80).toEncodeStatus("czidbvN");
   });
   test("TSX, transfer X to Stack, when stack is a zero", () => {
     const nes = initNes();
@@ -1885,11 +1603,10 @@ describe("instruction test", () => {
     nes.cpu.STK = 0x00;
 
     const _nes = TSX({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toX(0x00).toEncodeStatus("cZidbvn");
+    expectNes(_nes).toX(0x00).toEncodeStatus("cZidbvn");
   });
 
   test("TXA, transfer X to Accumulator a negative number", () => {
@@ -1898,11 +1615,10 @@ describe("instruction test", () => {
     nes.cpu.X = 0x80;
 
     const _nes = TXA({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toACC(0x80).toEncodeStatus("czidbvN");
+    expectNes(_nes).toACC(0x80).toEncodeStatus("czidbvN");
   });
 
   test("TXA, transfer X to Accumulator a zero number", () => {
@@ -1911,11 +1627,10 @@ describe("instruction test", () => {
     nes.cpu.X = 0x00;
 
     const _nes = TXA({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toACC(0x00).toEncodeStatus("cZidbvn");
+    expectNes(_nes).toACC(0x00).toEncodeStatus("cZidbvn");
   });
 
   test("TXS, transfer x to stack pointer", () => {
@@ -1924,11 +1639,10 @@ describe("instruction test", () => {
     nes.cpu.STK = 0xff;
 
     const _nes = TXS({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toX(0xff);
+    expectNes(_nes).toX(0xff);
   });
 
   test("TYA, transfer Y to ACC a negative number", () => {
@@ -1937,11 +1651,10 @@ describe("instruction test", () => {
     nes.cpu.Y = 0x80;
 
     const _nes = TYA({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toACC(0x80).toEncodeStatus("czidbvN");
+    expectNes(_nes).toACC(0x80).toEncodeStatus("czidbvN");
   });
 
   test("TYA, transfer Y to ACC a zero number", () => {
@@ -1950,11 +1663,10 @@ describe("instruction test", () => {
     nes.cpu.Y = 0x00;
 
     const _nes = TYA({
-      baseCycles: 2,
       nes,
     } as Instruction);
 
-    expectNes(_nes).toCycles(2).toACC(0x00).toEncodeStatus("cZidbvn");
+    expectNes(_nes).toACC(0x00).toEncodeStatus("cZidbvn");
   });
   test("should not affect the status", () => {
     let nes = initNes();
@@ -1962,11 +1674,9 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 7;
 
     nes = INX({
-      baseCycles: 0,
-      cross: false,
       data: 0,
       nes,
-      offsetOnCross: 0,
+
       acc: false,
       addr: 0,
     });
@@ -1982,11 +1692,9 @@ describe("instruction test", () => {
     nes.cpu.STATUS = 7;
     repeat(256).reduce((acc, curr) => {
       return INX({
-        baseCycles: 0,
-        cross: false,
         data: 0,
         nes: acc,
-        offsetOnCross: 0,
+
         acc: false,
         addr: 0,
       });
