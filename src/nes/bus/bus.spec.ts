@@ -55,7 +55,6 @@ const initCpu = (): Cpu =>
     STK: 0,
     X: 0,
     Y: 0,
-    cycles: 0,
   } as Cpu);
 
 const initNes = (): Nes => ({

@@ -7,7 +7,6 @@ import {
   setACC,
   setBreakCommand,
   setCarryFlag,
-  setCycles,
   setDecimalMode,
   setInterruptDisable,
   setOverFlowFlag,
@@ -23,7 +22,6 @@ import {
   pushToStack,
 } from "./cpu/instruction/instruction";
 import { Ppu, initPpu } from "./ppu/ppu";
-import { toggleVBlank } from "./ppu/registers/registers";
 import { Scroll, ScrollStatus, getScroll } from "./ppu/scroll/scroll";
 import { AddrVRamStatus, VRam } from "./ppu/vram/vram";
 import { Track } from "./track/track";
@@ -39,12 +37,6 @@ type Nes = {
 
 const ACC = (nes: Nes) => (ACC: number) => {
   const _nes = setACC(ACC, nes);
-
-  return nesBuilder(_nes);
-};
-
-const cycles = (nes: Nes) => (cycles: number) => {
-  const _nes = setCycles(cycles, nes);
 
   return nesBuilder(_nes);
 };
@@ -177,7 +169,6 @@ const nmi = (nes: Nes) => () => nesBuilder(NMI(nes));
 function nesBuilder(nes: Nes) {
   return {
     ACC: ACC(nes),
-    cycles: cycles(nes),
     buss: buss(nes),
     PC: PC(nes),
     carryFlag: carryFlag(nes),

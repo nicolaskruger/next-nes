@@ -21,7 +21,6 @@ const initBusRunner = (): Bus =>
 
 const initCpuRunner = (): Cpu => ({
   ACC: 0,
-  cycles: 0,
   PC: 0x8000,
   STATUS: 0,
   STK: 0xff,

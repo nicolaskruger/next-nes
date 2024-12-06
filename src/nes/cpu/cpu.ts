@@ -9,7 +9,6 @@ type Cpu = {
   X: number;
   Y: number;
   STATUS: number;
-  cycles: number;
   interrupt: Interrupt;
 };
 
@@ -47,7 +46,6 @@ const setY = (value: number, nes: Nes) => setCpu("Y", value, nes);
 const setPC = (value: number, nes: Nes) => setCpu("PC", value, nes);
 const setSTK = (value: number, nes: Nes) => setCpu("STK", value, nes);
 const setSTATUS = (value: number, nes: Nes) => setCpu("STATUS", value, nes);
-const setCycles = (value: number, nes: Nes) => setCpu("cycles", value, nes);
 
 const getCpu = (key: keyof Omit<Cpu, "interrupt">, nes: Nes): number =>
   nes.cpu[key];
@@ -193,8 +191,6 @@ function flagBuilder(result: FlagResult, nes: Nes) {
   };
 }
 
-export const getCycles = (nes: Nes) => nes.cpu.cycles;
-
 const initCpu = (): Cpu => ({
   ACC: 0,
   PC: 0x8000,
@@ -202,7 +198,6 @@ const initCpu = (): Cpu => ({
   STK: 0xff,
   X: 0,
   Y: 0,
-  cycles: 0,
   interrupt: initInterrupt(),
 });
 
@@ -236,7 +231,6 @@ export {
   getX,
   getY,
   getSTATUS,
-  setCycles,
   NEGATIVE,
   CARRY,
   OVERFLOW,
