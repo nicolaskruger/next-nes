@@ -29,7 +29,6 @@ const IMM = (nes: Nes): Addr => {
   return {
     nes: setPC(PC, nesData),
     data,
-    cross: false,
     addr: addr,
   };
 };

@@ -93,9 +93,7 @@ describe("test addressing mode", () => {
 
     expect(nes.cpu.PC).toBe(0);
 
-    const { cross, data, nes: newNes, addr } = IMM(nes);
-
-    expect(cross).toBe(false);
+    const { data, nes: newNes, addr } = IMM(nes);
 
     expect(data).toBe(1);
 
