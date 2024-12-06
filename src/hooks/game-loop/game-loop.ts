@@ -12,8 +12,7 @@ export const useGameLoop = (_nes: Nes) => {
   useEffect(() => {
     const interval = setInterval(() => {
       let nes0 = writePadOne(nes, control);
-      const { nes: nes1, cycles } = tick(nes0);
-      setNes(nes1);
+      setNes(tick(nes0));
     }, 0);
     return () => {
       clearInterval(interval);

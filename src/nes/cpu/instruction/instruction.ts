@@ -130,13 +130,9 @@ const branch = (
     return nes;
   }
 
-  let extraCycles = 1;
-
   const { cpu } = nes;
 
   const PC = cpu.PC + data;
-
-  if (PC >> 8 !== cpu.PC >> 8) extraCycles += 2;
 
   return nesBuilder(nes).PC(PC).build();
 };
@@ -231,7 +227,7 @@ const CLI = ({ nes }: Instruction): Nes =>
 
 const CLV = ({ nes }: Instruction): Nes => nesBuilder(nes).overFlow(0).build();
 
-const compare = (value: number, { data, nes, ...cycles }: Instruction): Nes => {
+const compare = (value: number, { data, nes }: Instruction): Nes => {
   const signedValue = make8bitSigned(value);
   const signedData = make8bitSigned(data);
 

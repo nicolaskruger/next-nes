@@ -204,7 +204,6 @@ function nesBuilder(nes: Nes) {
     firstReadPpu: firstReadPpu(nes),
     vram: vram(nes),
     NMI: nmi(nes),
-    toggleVBlack: () => nesBuilder(toggleVBlank(nes)),
     pushPCStack: (pc: number) => nesBuilder(pushPCStack(nes, pc)),
     pullPCStack: () => {
       let [PC, _nes] = pullPCStack(nes);

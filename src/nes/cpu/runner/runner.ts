@@ -56,14 +56,8 @@ const run = async (program: string): Promise<Nes> => {
     const PC = getPC(nes);
     const [fetch, nesFetch] = readBusNes(PC, nes);
     nes = nesFetch;
-    const { addr, instruction, baseCycles, offsetCycles } =
-      instructionDictionary[fetch];
-    const addrResult = addr(nes);
-    nes = instruction({
-      baseCycles,
-      ...addrResult,
-      offsetOnCross: offsetCycles,
-    });
+    const { addr, instruction } = instructionDictionary[fetch];
+    nes = instruction(addr(nes));
   }
   return nes;
 };
