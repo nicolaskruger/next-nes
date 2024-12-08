@@ -37,14 +37,21 @@ export default function Decompile() {
 
   const [fileName, setFileName] = useState("");
   const { refreshPallet, ...props } = usePrerender(nes.current, multi);
-  const { getTile, refresh, loading, percent, clearTile } = props;
+  const { getTile, refresh, clearTile, getSprite } = props;
   useEffect(() => {
-    const _nes = render(nes.current, getTile, multi, canvasRef, clearTile); //30 ms
+    const _nes = render(
+      nes.current,
+      getTile,
+      multi,
+      canvasRef,
+      clearTile,
+      getSprite
+    ); //30 ms
     nes.current = setRefreshPallet(_nes, refreshPallet);
   }, []);
 
   const setNesDecompile = (_nes: NesRefresh) => {
-    nes.current = render(_nes, getTile, multi, canvasRef, clearTile);
+    nes.current = render(_nes, getTile, multi, canvasRef, clearTile, getSprite);
   };
 
   const handleChangeRom = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -118,9 +125,6 @@ export default function Decompile() {
           onChange={handleChangeRom}
         />
         <button onClick={play}>{start ? "play" : "stop"}</button>
-        {loading && (
-          <p className="text-red-800">loading: {percent.toFixed(2)}%</p>
-        )}
       </main>
     </>
   );

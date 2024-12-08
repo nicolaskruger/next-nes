@@ -13,6 +13,7 @@ import { HEIGHT, WIDTH } from "@/constants/size";
 import { isShowBg, isShowSpr } from "../ppu/registers/registers";
 import { readNameTable } from "../ppu/vram/vram";
 import { getScrollX, getScrollY } from "../ppu/scroll/scroll";
+import { GetSprite } from "@/hooks/prerender/usePrerender";
 
 type GetImage = (tile: number, pallet: number) => HTMLImageElement;
 
@@ -102,7 +103,8 @@ const renderSprites = (
   getImage: GetImage,
   multi: number,
   sprCanvas: HTMLCanvasElement,
-  clearTile: MutableRefObject<ImageData>
+  clearTile: MutableRefObject<ImageData>,
+  getSprite: GetSprite
 ): Nes => {
   const ctx = getCanvasContext(canvas);
 
@@ -111,22 +113,10 @@ const renderSprites = (
   return repeat(64).reduce((acc, curr, index) => {
     const [sprInfo, _nes] = readSprInfo(index, acc);
 
-    const { tile, pallet, x, y, verticalMirror } = formatSprInfo(
-      sprInfo,
-      multi
-    );
+    const { x, y, ...sprite } = formatSprInfo(sprInfo, multi);
 
-    let img = getImage(tile, pallet) as HTMLImageElement;
+    const img = getSprite(sprite);
 
-    if (verticalMirror) {
-      sprCtx.putImageData(clearTile.current, 0, 0);
-      sprCtx.save();
-      sprCtx.scale(-1, 1);
-      sprCtx.drawImage(img, -img.width, 0);
-      img = new Image();
-      img.src = sprCanvas?.toDataURL() || "";
-      sprCtx.restore();
-    }
     ctx.drawImage(img, x, y);
 
     return _nes;
@@ -146,7 +136,8 @@ export const render = (
   getImage: GetImage,
   multi: number,
   canvas: CanvasRef,
-  clearTile: MutableRefObject<ImageData | undefined>
+  clearTile: MutableRefObject<ImageData | undefined>,
+  getSprite: GetSprite
 ): Nes => {
   let _nes = renderBg(nes, multi, canvas);
   const sprCanvas = document.createElement("canvas");
@@ -161,7 +152,8 @@ export const render = (
       getImage,
       multi,
       sprCanvas,
-      clearTile as MutableRefObject<ImageData>
+      clearTile as MutableRefObject<ImageData>,
+      getSprite
     );
   return _nes;
 };
