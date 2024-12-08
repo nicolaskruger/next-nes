@@ -1,13 +1,9 @@
 import { multiplyMatrix } from "@/nes/helper/multiply-matrix";
-import { repeat } from "@/nes/helper/repeat";
 import { Nes } from "@/nes/nes";
 import { renderTile } from "@/nes/ppu/render/render";
 import { SprInfo } from "@/nes/ppu/spr-ram/spr-ram";
 import { makeInvisibleTile, render } from "@/nes/render/render";
-import { Result } from "postcss";
 import { useEffect, useRef, useState } from "react";
-
-const size = (8 * 0x2000) / 0x10;
 
 type Dictionary<T extends string | symbol | number, U> = {
   [K in T]: U;
@@ -20,7 +16,6 @@ export type GetSprite = (
 export const usePrerender = (nes: Nes, multi: number) => {
   const canvas = useRef<HTMLCanvasElement>({} as HTMLCanvasElement);
   const blankImg = useRef<ImageData>();
-  const imgs = useRef<(HTMLImageElement | undefined)[]>([]);
   const sprites = useRef<Dictionary<string, HTMLImageElement>>({});
 
   useEffect(() => {
@@ -38,29 +33,17 @@ export const usePrerender = (nes: Nes, multi: number) => {
       });
       blankImg.current = img;
     };
-    const startImgs = () => {
-      imgs.current = repeat(size).map((_) => undefined);
-    };
 
-    [startCanvas, startBlankImg, startImgs].forEach((callback) => callback());
+    [startCanvas, startBlankImg].forEach((callback) => callback());
   }, []);
 
   const getTile = (tile: number, pallet: number) => {
-    const index =
-      8 * Math.floor(tile / 0x10) + Math.floor((pallet - 0x3f00) / 4);
-    if (imgs.current[index]) {
-      return imgs.current[index];
-    }
-    const renderedTile = renderTile(
-      nes,
-      Math.floor(index / 8),
-      0x3f00 + 0x4 * (index % 8)
-    )[0];
-    render(multiplyMatrix(renderedTile, multi), canvas);
-    makeInvisibleTile(canvas, multi);
-    imgs.current[index] = new Image();
-    imgs.current[index]!.src = canvas.current?.toDataURL() as string;
-    return imgs.current[index];
+    return getSprite({
+      tile,
+      pallet,
+      verticalMirror: false,
+      horizontalMirror: false,
+    });
   };
 
   const mirror = (tile: string[][], vertical: boolean, horizontal: boolean) => {
@@ -96,24 +79,16 @@ export const usePrerender = (nes: Nes, multi: number) => {
   };
 
   const refresh = () => {
-    imgs.current = repeat(size).map((_) => undefined);
     Object.keys(sprites.current).forEach((key) => {
       delete sprites.current[key];
     });
   };
 
-  const refreshPallet = (address: number) => {
-    const index = Math.floor((address - 0x3f00) / 4);
-
-    imgs.current = imgs.current.map((_, i) =>
-      i % 8 === index ? undefined : _
-    );
-  };
+  const refreshPallet = (address: number) => {};
 
   return {
     getTile,
     getSprite,
-    imgs,
     refresh,
     multi,
     nes,
