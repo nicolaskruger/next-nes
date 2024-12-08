@@ -83,10 +83,8 @@ export const usePrerender = (nes: Nes, multi: number) => {
     const key = generateKey();
     let img = sprites.current[key];
     if (img) return img;
-    const index =
-      8 * Math.floor(tile / 0x10) + Math.floor((pallet - 0x3f00) / 4);
     const renderedTile = mirror(
-      renderTile(nes, Math.floor(index / 8), 0x3f00 + 0x4 * (index % 8))[0],
+      renderTile(nes, Math.floor(tile / 0x10), pallet)[0],
       verticalMirror,
       horizontalMirror
     );
